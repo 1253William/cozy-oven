@@ -98,7 +98,8 @@ export default function Navbar() {
         </div>
 
         {/* Cart icon with counter */}
-        <button
+        <a
+          href="/cart"
           className="relative p-2 rounded-full hover:bg-gray-100/80 transition"
           aria-label="Shopping Cart"
         >
@@ -108,7 +109,7 @@ export default function Navbar() {
               {cartCount}
             </span>
           )}
-        </button>
+        </a>
 
         {/* Menu dropdown */}
         <div className="relative">
