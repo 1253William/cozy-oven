@@ -30,7 +30,7 @@ export default function QuantitySelector({
       <button
         onClick={handleDecrement}
         disabled={quantity <= min}
-        className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-[#2A2C22] hover:bg-[#2A2C22] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <span className="text-xl font-semibold">−</span>
       </button>
@@ -42,7 +42,7 @@ export default function QuantitySelector({
       <button
         onClick={handleIncrement}
         disabled={quantity >= max}
-        className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg hover:border-[#2A2C22] hover:bg-[2A2C22] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <span className="text-xl font-semibold">+</span>
       </button>

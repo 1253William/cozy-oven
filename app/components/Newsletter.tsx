@@ -47,7 +47,7 @@ export default function Newsletter() {
           />
           <button
             type="submit"
-            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-full font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+            className="bg-[#2A2C22] text-white px-8 py-4 rounded-full font-semibold hover:bg-[2A2C22] transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
           >
             <Send className="w-5 h-5" />
             Subscribe

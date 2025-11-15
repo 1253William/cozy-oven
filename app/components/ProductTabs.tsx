@@ -61,26 +61,26 @@ export default function ProductTabs({ details, reviews = [] }: ProductTabsProps)
           onClick={() => setActiveTab("details")}
           className={`pb-3 px-4 font-semibold transition-colors relative ${
             activeTab === "details"
-              ? "text-orange-500"
+              ? "text-[#2A2C22]"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
           Details
           {activeTab === "details" && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2A2C22]" />
           )}
         </button>
         <button
           onClick={() => setActiveTab("reviews")}
           className={`pb-3 px-4 font-semibold transition-colors relative ${
             activeTab === "reviews"
-              ? "text-orange-500"
+              ? "text-[#2A2C22]"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
           Reviews ({displayReviews.length})
           {activeTab === "reviews" && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2A2C22]" />
           )}
         </button>
       </div>

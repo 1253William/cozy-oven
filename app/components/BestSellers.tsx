@@ -147,7 +147,7 @@ export default function BestSellers() {
         {/* Add to Cart Button - slides up on hover */}
         <button
           onClick={(e) => handleAddToCart(e, product)}
-          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 transform translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
+          className="flex items-center justify-center gap-2 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           <ShoppingCart className="w-4 h-4" />
           Add to Cart

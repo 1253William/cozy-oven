@@ -204,7 +204,7 @@ export default function ProductDetails() {
               {/* Add to cart button */}
               <button
                 onClick={handleAddToCart}
-                className="flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg py-4 px-8 rounded-lg transition-colors duration-200"
+                className="flex items-center justify-center gap-3 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold text-lg py-4 px-8 rounded-lg transition-colors duration-200"
               >
                 <ShoppingCart className="w-6 h-6" />
                 Add to Cart

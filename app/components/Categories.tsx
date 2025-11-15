@@ -199,13 +199,13 @@ export default function Categories() {
                   <h2 className="text-4xl font-bold mb-4">{card.title}</h2>
                   <p className="text-gray-300 text-lg">{card.description}</p>
                 </div>
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <button
                     className={`${card.buttonColor} font-medium py-3 px-6 rounded-md`}
                   >
                     {card.button}
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

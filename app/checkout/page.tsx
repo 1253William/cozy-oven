@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -37,11 +37,17 @@ export default function CheckoutPage() {
   const tax = subtotal * taxRate;
   const total = subtotal + tax + (deliveryMethod === "delivery" ? deliveryFee : 0);
 
-  // Redirect if cart is empty
+useEffect(() => {
+    // Redirect if cart is empty
   if (cart.length === 0) {
     router.push("/cart");
+  }
+}, [cart, router]);
+
+ if (cart.length === 0) {
     return null;
   }
+
 
   const steps = [
     { id: "info", label: "Customer Info", completed: false },
@@ -71,8 +77,6 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = () => {
-    // In a real app, this would submit the order to a backend
-    clearCart();
     router.push("/order-success");
   };
 
@@ -94,7 +98,7 @@ export default function CheckoutPage() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                         index <= currentStepIndex
-                          ? "bg-orange-500 text-white"
+                          ? "bg-[#2A2C22] text-white"
                           : "bg-gray-200 text-gray-600"
                       }`}
                     >
@@ -111,7 +115,7 @@ export default function CheckoutPage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-1 mx-2 ${
-                        index < currentStepIndex ? "bg-orange-500" : "bg-gray-200"
+                        index < currentStepIndex ? "bg-[#2A2C22]" : "bg-gray-200"
                       }`}
                     />
                   )}
@@ -139,7 +143,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, name: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                       placeholder="John Doe"
                     />
                   </div>
@@ -153,7 +157,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, email: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -167,7 +171,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, phone: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                       placeholder="+233 123 456 789"
                     />
                   </div>
@@ -192,7 +196,7 @@ export default function CheckoutPage() {
                       onClick={() => setDeliveryMethod("delivery")}
                       className={`flex-1 py-3 px-4 rounded-lg border-2 font-semibold transition-colors ${
                         deliveryMethod === "delivery"
-                          ? "border-orange-500 bg-orange-50 text-orange-700"
+                          ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
                           : "border-gray-300 text-gray-700 hover:border-gray-400"
                       }`}
                     >
@@ -202,7 +206,7 @@ export default function CheckoutPage() {
                       onClick={() => setDeliveryMethod("pickup")}
                       className={`flex-1 py-3 px-4 rounded-lg border-2 font-semibold transition-colors ${
                         deliveryMethod === "pickup"
-                          ? "border-orange-500 bg-orange-50 text-orange-700"
+                          ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
                           : "border-gray-300 text-gray-700 hover:border-gray-400"
                       }`}
                     >
@@ -226,7 +230,7 @@ export default function CheckoutPage() {
                             address: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                         placeholder="123 Main Street"
                       />
                     </div>
@@ -243,7 +247,7 @@ export default function CheckoutPage() {
                             city: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                         placeholder="Accra"
                       />
                     </div>
@@ -264,7 +268,7 @@ export default function CheckoutPage() {
                           date: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -280,7 +284,7 @@ export default function CheckoutPage() {
                           time: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -298,7 +302,7 @@ export default function CheckoutPage() {
                       })
                     }
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
                     placeholder="Please ring bell once, no nuts..."
                   />
                 </div>
@@ -333,7 +337,7 @@ export default function CheckoutPage() {
                           onClick={() => setPaymentMethod(method)}
                           className={`w-full py-3 px-4 rounded-lg border-2 text-left font-semibold transition-colors ${
                             paymentMethod === method
-                              ? "border-orange-500 bg-orange-50 text-orange-700"
+                              ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
                               : "border-gray-300 text-gray-700 hover:border-gray-400"
                           }`}
                         >
@@ -452,7 +456,7 @@ export default function CheckoutPage() {
                       )}
                       <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
                         <span>Total</span>
-                        <span className="text-orange-500">
+                        <span className="text-[#2A2C22]">
                           GHS {total.toFixed(2)}
                         </span>
                       </div>
@@ -461,11 +465,11 @@ export default function CheckoutPage() {
 
                   <div className="p-4 bg-gray-50 rounded-lg text-xs text-gray-600">
                     By placing this order, you agree to our{" "}
-                    <a href="#" className="text-orange-500 hover:underline">
+                    <a href="#" className="text-[#2A2C22] hover:underline">
                       Terms and Conditions
                     </a>{" "}
                     and{" "}
-                    <a href="#" className="text-orange-500 hover:underline">
+                    <a href="#" className="text-[#2A2C22] hover:underline">
                       Privacy Policy
                     </a>
                     .
@@ -486,14 +490,14 @@ export default function CheckoutPage() {
             {currentStep === "review" ? (
               <button
                 onClick={handlePlaceOrder}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                className="flex-1 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-lg transition-colors"
               >
                 Place Order
               </button>
             ) : (
               <button
                 onClick={handleNext}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                className="flex-1 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-lg transition-colors"
               >
                 Continue
               </button>
