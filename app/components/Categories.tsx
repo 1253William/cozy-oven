@@ -28,55 +28,162 @@
 // }
 
 
+"use client";
+
+import { useState } from "react";
+
+type Category = "Cookies" | "Brownies" | "Cakes";
+
 export default function Categories() {
-  const cards = [
-    {
-      id: "card-1",
-      title: "Banana Bread",
-      description: "Our signature banana bread, moist and flavorful, made with ripe bananas and a touch of cinnamon.",
-      button: "View Products",
-      bgImage:
-        "https://images.unsplash.com/photo-1658040529395-39c2ca560ff0?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=435",
-      buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-    },
-    {
-      id: "card-2",
-      title: "Fruit Bread",
-      description:
-        "A delightful blend of fresh fruits baked into a soft and flavorful bread.",
-      button: "Try Now",
-      bgImage:
-        "https://plus.unsplash.com/premium_photo-1695932845484-f920dae37f04?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
-      buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-    },
-    {
-      id: "card-3",
-      title: "Chocolate Bread",
-      description:
-        "Indulge in our rich and moist chocolate bread, perfect for any occasion.",
-      button: "Shop Now",
-      bgImage:
-        "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870",
-      buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-    },
-    {
-      id: "card-4",
-      title: "Walnut Bread",
-      description:
-        "Walnut Bread: Nutty Delight in Every Bite",
-      button: "Explore Now",
-      bgImage:
-        "https://images.unsplash.com/photo-1603455908246-99e3a704acb7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
-      buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-    },
-  ];
+  const [activeCategory, setActiveCategory] = useState<Category>("Cookies");
+
+  const categories: Category[] = ["Cookies", "Brownies", "Cakes"];
+
+  const allCards = {
+    Cookies: [
+      {
+        id: "cookie-1",
+        title: "Chocolate Chip Cookies",
+        description: "Classic chocolate chip cookies with melted chocolate chunks.",
+        button: "View Products",
+        bgImage:
+          "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=465",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cookie-2",
+        title: "Oatmeal Raisin Cookies",
+        description: "Hearty oatmeal cookies with sweet raisins and a hint of cinnamon.",
+        button: "Try Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1590080873009-ed6f23496bb7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cookie-3",
+        title: "Sugar Cookies",
+        description: "Soft and buttery sugar cookies perfect for any occasion.",
+        button: "Shop Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1548365328-8c6db3220e4c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cookie-4",
+        title: "Peanut Butter Cookies",
+        description: "Rich and nutty peanut butter cookies with a crumbly texture.",
+        button: "Explore Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+    ],
+    Brownies: [
+      {
+        id: "brownie-1",
+        title: "Fudgy Brownies",
+        description: "Dense and fudgy chocolate brownies with a crackly top.",
+        button: "View Products",
+        bgImage:
+          "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "brownie-2",
+        title: "Walnut Brownies",
+        description: "Rich brownies studded with crunchy walnuts.",
+        button: "Try Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1607920591413-4ec007e70023?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "brownie-3",
+        title: "Caramel Brownies",
+        description: "Decadent brownies swirled with gooey caramel.",
+        button: "Shop Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "brownie-4",
+        title: "Mint Chocolate Brownies",
+        description: "Chocolate brownies with a refreshing mint layer.",
+        button: "Explore Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=480",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+    ],
+    Cakes: [
+      {
+        id: "cake-1",
+        title: "Vanilla Cake",
+        description: "Light and fluffy vanilla cake with buttercream frosting.",
+        button: "View Products",
+        bgImage:
+          "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cake-2",
+        title: "Chocolate Cake",
+        description: "Moist chocolate cake with rich chocolate ganache.",
+        button: "Try Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cake-3",
+        title: "Red Velvet Cake",
+        description: "Classic red velvet cake with cream cheese frosting.",
+        button: "Shop Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1616690710400-a16d146927c5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=387",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+      {
+        id: "cake-4",
+        title: "Carrot Cake",
+        description: "Spiced carrot cake with walnuts and cream cheese frosting.",
+        button: "Explore Now",
+        bgImage:
+          "https://images.unsplash.com/photo-1621303837174-89787a7d4729?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=436",
+        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      },
+    ],
+  };
+
+  const currentCards = allCards[activeCategory];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen font-[Euclid-Circular-B]">
       <div className="w-full max-w-7xl px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Categories</h1>
+        {/* Category Tabs */}
+        <div className="flex gap-6 mb-8">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`text-2xl font-bold transition-colors relative ${
+                activeCategory === category
+                  ? "text-orange-600"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {category}
+              {activeCategory === category && (
+                <span className="absolute bottom-0 left-0 right-0 h-1 bg-orange-600 rounded-full"></span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cards.map((card) => (
+          {currentCards.map((card) => (
             <div
               key={card.id}
               className="relative overflow-hidden rounded-xl text-white h-[500px] group"
