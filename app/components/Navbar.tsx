@@ -79,7 +79,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 w-full flex items-center justify-between px-4 md:px-8 py-4 backdrop-blur-lg bg-white/80 shadow-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 w-full flex items-center justify-between px-4 md:px-8 py-6 backdrop-blur-lg bg-white/80 shadow-sm">
         {/* Left: Brand */}
         <div className="flex items-center gap-3">
           <Link href="/">
@@ -96,7 +96,7 @@ export default function Navbar() {
               className="relative text-gray-700 hover:text-gray-900 transition-colors group"
             >
               {link.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#2A2C22] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </div>
@@ -118,7 +118,7 @@ export default function Navbar() {
           >
             <ShoppingCart className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-[#2A2C22] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
@@ -161,7 +161,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-2xl font-semibold text-gray-800 py-4 hover:text-orange-500 transition-colors"
+              className="text-2xl font-semibold text-gray-800 py-4 hover:text-[#2A2C22]-500 transition-colors"
               onClick={() => setMenuOpen(false)}
             >
               {link.label}

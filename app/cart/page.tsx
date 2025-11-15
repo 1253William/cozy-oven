@@ -140,7 +140,7 @@ export default function CartPage() {
                             <p className="text-sm text-gray-600">
                               GHS {itemPrice.toFixed(2)} each
                             </p>
-                            <p className="text-lg font-bold text-orange-500">
+                            <p className="text-lg font-bold text-[#2A2C22]">
                               GHS {itemTotal.toFixed(2)}
                             </p>
                           </div>
@@ -174,13 +174,13 @@ export default function CartPage() {
                   </div>
                   <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900">
                     <span>Total</span>
-                    <span className="text-orange-500">GHS {total.toFixed(2)}</span>
+                    <span className="text-[#2A2C22]">GHS {total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => router.push("/checkout")}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors mb-3"
+                  className="w-full bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-lg transition-colors mb-3"
                 >
                   Proceed to Checkout
                 </button>

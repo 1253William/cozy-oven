@@ -1,162 +1,91 @@
-// // apps/client/components/BestSelling.jsx
-// const bestSelling = [
-//   { name: 'Banana Bread', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-//   { name: 'Chocolate Cake', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-//   { name: 'Croissants', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-//   { name: 'Muffins', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-//   { name: 'Donuts', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-//   { name: 'Baguette', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=872' },
-// ];
-
-// export default function BestSelling() {
-//   return (
-//     <section className="py-16 px-6 scrollbar-hide">
-//       <h2 className="text-3xl font-bold mb-6">Best Selling Breads</h2>
-//       <div className="flex gap-4 overflow-x-auto">
-//         {bestSelling.map(item => (
-//           <div key={item.name} className="relative h-[300px] w-[300px] rounded-xl overflow-hidden flex-shrink-0 hover:scale-95 transition">
-//             <img src={item.img} alt={item.name} className="object-cover w-full h-full" />
-//             <div className="absolute bottom-0 w-full bg-black/40 text-white p-2 text-center">{item.name}</div>
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
-
-
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { ArrowRight } from 'lucide-react';
+
+interface Category {
+  id: string;
+  name: string;
+  itemCount: number;
+  image: string;
+}
 
 export default function BestSellers() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { addToCart } = useCart();
-
-  const products = [
+  const categories: Category[] = [
     {
-      id: "1",
-      name: "Classic Banana Bread",
-      price: "GHS 25",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.5,
-      reviews: 120,
-      description: "Moist and delicious banana bread made with ripe bananas and a hint of vanilla.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Our classic banana bread is baked fresh daily using only the finest ingredients. Made with ripe bananas, premium flour, and a touch of cinnamon for that perfect flavor."
+      id: "brownies",
+      name: "Brownies",
+      itemCount: 3,
+      image: "https://images.unsplash.com/photo-1610611424854-5e07032143d8?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
-      id: "2",
-      name: "Chocolate Chip Banana Bread",
-      price: "GHS 30",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.8,
-      reviews: 95,
-      description: "Rich banana bread studded with premium chocolate chips.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Indulge in our chocolate chip banana bread, featuring generous amounts of Belgian chocolate chips mixed into our classic banana bread recipe."
+      id: "cookies",
+      name: "Cookies",
+      itemCount: 16,
+      image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=800",
     },
     {
-      id: "3",
-      name: "Walnut Banana Bread",
-      price: "GHS 28",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.6,
-      reviews: 78,
-      description: "Banana bread with crunchy walnuts for added texture.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Our walnut banana bread combines the moistness of banana bread with the crunch of fresh California walnuts, creating a perfect balance of texture and flavor."
-    },
-    {
-      id: "4",
-      name: "Blueberry Muffins",
-      price: "GHS 20",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.7,
-      reviews: 145,
-      description: "Fluffy muffins bursting with fresh blueberries.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Our blueberry muffins are made with fresh, plump blueberries and have a tender, moist crumb that melts in your mouth."
-    },
-    {
-      id: "5",
-      name: "Cinnamon Rolls",
-      price: "GHS 35",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.9,
-      reviews: 203,
-      description: "Warm, gooey cinnamon rolls with cream cheese frosting.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Our signature cinnamon rolls are hand-rolled and baked to perfection, topped with our house-made cream cheese frosting."
-    },
-    {
-      id: "6",
-      name: "Sourdough Loaf",
-      price: "GHS 22",
-      image: "https://images.unsplash.com/photo-1673961020718-ac4698e08aa8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
-      rating: 4.8,
-      reviews: 167,
-      description: "Artisan sourdough bread with a crispy crust and chewy interior.",
-      sizes: ["Family", "Regular", "Medium"],
-      details: "Our sourdough is made with a natural starter that's been cultivated for years, resulting in a complex flavor and perfect texture."
+      id: "cakes",
+      name: "Cakes",
+      itemCount: 15,
+      image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=800",
     },
   ];
 
-  const handleAddToCart = (e: React.MouseEvent, product: typeof products[0]) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(product);
-  };
-
   return (
-    <section className="py-16 ">
+    <section className="py-20 bg-[#2A2C22]/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-          Best Sellers
-        </h2>
-        
- <div
-  ref={scrollRef}
-  className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
->
-  {products.map((product, index) => (
-    <Link
-      key={index}
-      href={`/product/${product.id}`}
-      className="relative flex-shrink-0 w-[280px] h-[320px] rounded-2xl overflow-hidden cursor-pointer group snap-start bg-white transition-shadow duration-300"
-    >
-      {/* Image fills card */}
-      <Image
-             src={`${product.image}`}
-             alt={product.name}
-             fill
-             className="object-cover"
-             priority
-           />
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="lg:w-1/3 flex flex-col justify-center">
+            <p className="text-sm font-medium text-gray-600 mb-2">
+              What's Popular Now
+            </p>
+            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Best Sellers
+            </h2>
+            <p className="text-lg text-gray-700">
+              Shop our most loved products.
+            </p>
+          </div>
 
-      {/* Blurred overlay with text and button */}
-      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/70 to-transparent backdrop-blur-md flex flex-col justify-end p-5">
-        <h3 className="text-white text-md font-bold mb-1">{product.name}</h3>
-        <p className="text-white/90 text-md font-semibold mb-3">{product.price}</p>
-        
-        {/* Add to Cart Button - slides up on hover */}
-        <button
-          onClick={(e) => handleAddToCart(e, product)}
-          className="flex items-center justify-center gap-2 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-        >
-          <ShoppingCart className="w-4 h-4" />
-          Add to Cart
-        </button>
-      </div>
-    </Link>
-  ))}
-</div>
+          <div className="lg:w-2/3 w-full">
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/category/${category.id}`}
+                  className="relative flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden cursor-pointer group snap-start transition-transform duration-300 hover:scale-105"
+                >
+                  {/* Category Image */}
+                  <Image
+                    src={category.image || "/placeholder.svg"}
+                    alt={category.name}
+                    fill
+                    className="object-cover"
+                  />
 
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <h3 className="text-white text-2xl font-bold mb-2">
+                          {category.name}
+                        </h3>
+                        <p className="text-white/80 text-sm font-medium">
+                          {category.itemCount} items
+                        </p>
+                      </div>
+                      {/* Arrow icon */}
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 flex items-center justify-center hover:bg-white/30 transition-colors">
+                        <ArrowRight className="w-5 h-5 text-white hover:transform hover:rotate-300 hover:scale-105 transition-all duration-300" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
