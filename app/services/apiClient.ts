@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.cozyoven.store";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://cozy-oven-bakery-backend.onrender.com";
 
 // Create axios instance with default config
 export const apiClient = axios.create({
