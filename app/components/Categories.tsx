@@ -198,22 +198,23 @@ import type { Product } from "../context/CartContext";
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-type Category = "Cookies" | "Brownies" | "Cakes";
+
+type Category = "Banana Breads" | "Flight Box" | "Gift Box";
 
 export default function Categories() {
-  const [activeCategory, setActiveCategory] = useState<Category>("Cookies");
+  const [activeCategory, setActiveCategory] = useState<Category>("Banana Breads");
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const router = useRouter();
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
-  const categories: Category[] = ["Cookies", "Brownies", "Cakes"];
+  const categories: Category[] = ["Banana Breads", "Flight Box", "Gift Box"];
 
   const allCards = {
-    Cookies: [
+    "Banana Breads": [
       {
-        id: "cookie-1",
+        id: "bread-1",
         name: "Chocolate Chip Cookies",
         title: "Chocolate Chip Cookies",
         description: "Classic chocolate chip cookies with melted chocolate chunks.",
@@ -222,7 +223,7 @@ export default function Categories() {
         image:
           "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=465",
         bgImage:
-          "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=465",
+          "/nutty.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
@@ -236,7 +237,7 @@ export default function Categories() {
         image:
           "https://images.unsplash.com/photo-1590080873009-ed6f23496bb7?auto=format&fit=crop&q=80&w=464",
         bgImage:
-          "https://images.unsplash.com/photo-1590080873009-ed6f23496bb7?auto=format&fit=crop&q=80&w=464",
+          "/fruity.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
@@ -250,7 +251,7 @@ export default function Categories() {
         image:
           "https://images.unsplash.com/photo-1548365328-8c6db3220e4c?auto=format&fit=crop&q=80&w=387",
         bgImage:
-          "https://images.unsplash.com/photo-1548365328-8c6db3220e4c?auto=format&fit=crop&q=80&w=387",
+     "/white-chocolate.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
@@ -264,140 +265,140 @@ export default function Categories() {
         image:
           "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=464",
         bgImage:
-          "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=464",
+          "/coconut.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
     ],
-    Brownies: [
+    "Gift Box": [
       {
         id: "brownie-1",
-        name: "Fudgy Brownies",
-        title: "Fudgy Brownies",
-        description: "Dense and fudgy chocolate brownies with a crackly top.",
+        name: "Flight Box",
+        title: "Flight Box",
+        description: "Can't decide which flavor to try first? Our flight box gives you the best of all worlds!",
         button: "View Products",
         price: "GHS 28",
         image:
-          "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=387",
+          "/gift.png",
         bgImage:
-          "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=387",
+          "/flightbox.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
-      {
-        id: "brownie-2",
-        name: "Walnut Brownies",
-        title: "Walnut Brownies",
-        description: "Rich brownies studded with crunchy walnuts.",
-        button: "Try Now",
-        price: "GHS 30",
-        image:
-          "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
-        bgImage:
-          "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "brownie-3",
-        name: "Caramel Brownies",
-        title: "Caramel Brownies",
-        description: "Decadent brownies swirled with gooey caramel.",
-        button: "Shop Now",
-        price: "GHS 32",
-        image:
-          "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
-        bgImage:
-          "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "brownie-4",
-        name: "Mint Chocolate Brownies",
-        title: "Mint Chocolate Brownies",
-        description: "Chocolate brownies with a refreshing mint layer.",
-        button: "Explore Now",
-        price: "GHS 31",
-        image:
-          "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-        bgImage:
-          "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "brownie-5",
-        name: "Mint Chocolate Brownies",
-        title: "Mint Chocolate Brownies",
-        description: "Chocolate brownies with a refreshing mint layer.",
-        button: "Explore Now",
-        price: "GHS 31",
-        image:
-          "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-        bgImage:
-          "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
+      // {
+      //   id: "brownie-2",
+      //   name: "Walnut Brownies",
+      //   title: "Walnut Brownies",
+      //   description: "Rich brownies studded with crunchy walnuts.",
+      //   button: "Try Now",
+      //   price: "GHS 30",
+      //   image:
+      //     "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
+      // {
+      //   id: "brownie-3",
+      //   name: "Caramel Brownies",
+      //   title: "Caramel Brownies",
+      //   description: "Decadent brownies swirled with gooey caramel.",
+      //   button: "Shop Now",
+      //   price: "GHS 32",
+      //   image:
+      //     "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
+      // {
+      //   id: "brownie-4",
+      //   name: "Mint Chocolate Brownies",
+      //   title: "Mint Chocolate Brownies",
+      //   description: "Chocolate brownies with a refreshing mint layer.",
+      //   button: "Explore Now",
+      //   price: "GHS 31",
+      //   image:
+      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
+      // {
+      //   id: "brownie-5",
+      //   name: "Mint Chocolate Brownies",
+      //   title: "Mint Chocolate Brownies",
+      //   description: "Chocolate brownies with a refreshing mint layer.",
+      //   button: "Explore Now",
+      //   price: "GHS 31",
+      //   image:
+      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
     ],
-    Cakes: [
+    "Flight Box": [
       {
-        id: "cake-1",
-        name: "Vanilla Cake",
-        title: "Vanilla Cake",
-        description: "Light and fluffy vanilla cake with buttercream frosting.",
+        id: "box-1",
+        name: "Flight Box",
+        title: "Flight Box",
+        description: "Can't decide which flavor to try first? Our flight box gives you the best of all worlds!",
         button: "View Products",
         price: "GHS 45",
         image:
-          "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=464",
+          "/flightbox.png",
         bgImage:
-          "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=464",
+          "/flightbox.png",
         buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
         sizes: ["Family", "Regular", "Medium"],
       },
-      {
-        id: "cake-2",
-        name: "Chocolate Cake",
-        title: "Chocolate Cake",
-        description: "Moist chocolate cake with rich chocolate ganache.",
-        button: "Try Now",
-        price: "GHS 48",
-        image:
-          "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
-        bgImage:
-          "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "cake-3",
-        name: "Red Velvet Cake",
-        title: "Red Velvet Cake",
-        description: "Classic red velvet cake with cream cheese frosting.",
-        button: "Shop Now",
-        price: "GHS 50",
-        image:
-          "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
-        bgImage:
-          "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "cake-4",
-        name: "Carrot Cake",
-        title: "Carrot Cake",
-        description: "Spiced carrot cake with walnuts and cream cheese frosting.",
-        button: "Explore Now",
-        price: "GHS 47",
-        image:
-          "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
-        bgImage:
-          "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
+      // {
+      //   id: "cake-2",
+      //   name: "Chocolate Cake",
+      //   title: "Chocolate Cake",
+      //   description: "Moist chocolate cake with rich chocolate ganache.",
+      //   button: "Try Now",
+      //   price: "GHS 48",
+      //   image:
+      //     "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
+      // {
+      //   id: "cake-3",
+      //   name: "Red Velvet Cake",
+      //   title: "Red Velvet Cake",
+      //   description: "Classic red velvet cake with cream cheese frosting.",
+      //   button: "Shop Now",
+      //   price: "GHS 50",
+      //   image:
+      //     "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
+      // {
+      //   id: "cake-4",
+      //   name: "Carrot Cake",
+      //   title: "Carrot Cake",
+      //   description: "Spiced carrot cake with walnuts and cream cheese frosting.",
+      //   button: "Explore Now",
+      //   price: "GHS 47",
+      //   image:
+      //     "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
+      //   bgImage:
+      //     "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
+      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
+      //   sizes: ["Family", "Regular", "Medium"],
+      // },
     ],
   };
 
