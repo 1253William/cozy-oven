@@ -11,6 +11,7 @@ interface WishlistItem {
   price: string;
   image?: string;
   sizes?: string[];
+  quantity?: number;
 }
 
 // Mock data - replace with API call
@@ -29,13 +30,15 @@ export default function WishlistPage() {
   const hasItems = wishlist.length > 0;
 
   const handleAddToCart = (item: WishlistItem) => {
-    addToCart({
-      id: item.id,
+    addToCart(
+     {
+       id: item.id,
       name: item.name,
       price: item.price,
-      quantity: 1,
-      selectedSize: item.sizes?.[0] || "",
-    });
+     },
+     item.quantity || 1,
+      item.sizes ? item.sizes[0] || "" : ""
+    );
   };
 
   return (

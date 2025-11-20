@@ -79,7 +79,7 @@ export default function CartPage() {
                       {/* Thumbnail */}
                       <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                         <Image
-                          src={item.image}
+                          src={item.image || ""}
                           alt={item.name}
                           fill
                           className="object-cover hover:scale-105 transition-transform duration-200"

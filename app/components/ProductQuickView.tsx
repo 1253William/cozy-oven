@@ -92,7 +92,7 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
               {/* Product Image */}
               <div className="relative w-full h-64 rounded-xl overflow-hidden bg-gray-100 mb-6">
                 <Image
-                  src={product.image}
+                  src={product.image || ""}
                   alt={product.name}
                   fill
                   className="object-cover"
