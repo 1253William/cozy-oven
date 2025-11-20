@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, MapPin, X, ShoppingCart, User, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import CartDrawer from "./CartDrawer";
@@ -14,11 +15,12 @@ import logo from "@/public/cozy3.png"
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "Orders", href: "/orders" },
+  { label: "Orders", href: "/account/orders" },
   { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -111,11 +113,18 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
                     <Link
-                      href="/orders"
+                      href="/account/orders"
                       onClick={() => setProfileMenuOpen(false)}
                       className="block px-4 py-2 hover:bg-gray-50 text-gray-700"
                     >
                       My Orders
+                    </Link>
+                    <Link
+                      href="/account/details"
+                      onClick={() => setProfileMenuOpen(false)}
+                      className="block px-4 py-2 hover:bg-gray-50 text-gray-700"
+                    >
+                      Account Settings
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -223,6 +232,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: navLinks.length * 0.08 + 0.1 }}
                       onClick={() => {
+                        router.push("/account/orders");
                         setMenuOpen(false);
                       }}
                       className="text-lg py-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition"
@@ -234,6 +244,19 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: navLinks.length * 0.08 + 0.15 }}
+                      onClick={() => {
+                        router.push("/account/details");
+                        setMenuOpen(false);
+                      }}
+                      className="text-lg py-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition"
+                    >
+                      Account Settings
+                    </motion.button>
+
+                    <motion.button
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: navLinks.length * 0.08 + 0.2 }}
                       onClick={handleLogout}
                       className="text-lg py-3 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition flex items-center justify-center gap-2"
                     >
