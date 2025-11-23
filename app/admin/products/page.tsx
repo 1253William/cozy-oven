@@ -95,8 +95,7 @@ export default function ProductManagementPage() {
 
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle add product logic here
-    console.log("Adding product:", newProduct);
+    // TODO: Handle add product logic here - integrate with API
     setShowAddModal(false);
     setNewProduct({ name: "", category: "", price: "", stock: "" });
   };
