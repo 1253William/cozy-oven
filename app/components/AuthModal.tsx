@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,9 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const [tempToken, setTempToken] = useState<string>("");
   const [resetToken, setResetToken] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const { login } = useAuth();
 
   // Login form
@@ -291,12 +294,25 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    {...loginForm.register("password")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showLoginPassword ? "text" : "password"}
+                      {...loginForm.register("password")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
                   {loginForm.formState.errors.password && (
                     <p className="text-red-500 text-sm mt-1">
                       {loginForm.formState.errors.password.message}
@@ -397,12 +413,25 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    {...signupForm.register("password")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-                    placeholder="********"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showSignupPassword ? "text" : "password"}
+                      {...signupForm.register("password")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent pr-10"
+                      placeholder="********"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showSignupPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
                   {signupForm.formState.errors.password && (
                     <p className="text-red-500 text-sm mt-1">
                       {signupForm.formState.errors.password.message}
@@ -534,12 +563,25 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     New Password
                   </label>
-                  <input
-                    type="password"
-                    {...resetPasswordForm.register("newPassword")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showResetPassword ? "text" : "password"}
+                      {...resetPasswordForm.register("newPassword")}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowResetPassword(!showResetPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showResetPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
                   {resetPasswordForm.formState.errors.newPassword && (
                     <p className="text-red-500 text-sm mt-1">
                       {resetPasswordForm.formState.errors.newPassword.message}
