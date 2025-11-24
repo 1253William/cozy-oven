@@ -55,6 +55,8 @@ export default function ProductManagementPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [newProduct, setNewProduct] = useState<NewProductForm>({
     productName: "",
     productCategory: "",
@@ -134,6 +136,8 @@ export default function ProductManagementPage() {
     e.preventDefault();
     try {
       setLoading(true);
+      setError("");
+      setSuccess("");
 
       if (imageFile) {
         // Create product with image upload
@@ -173,12 +177,17 @@ export default function ProductManagementPage() {
       setSelectOptions([]);
       setImageFile(null);
       setImagePreview("");
+      setSuccess("Product created successfully!");
 
       // Refresh products list
       await fetchProducts();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
       console.error("Error creating product:", error);
-      alert("Failed to create product. Please try again.");
+      setError("Failed to create product. Please try again.");
+      setTimeout(() => setError(""), 5000);
     } finally {
       setLoading(false);
     }
@@ -190,6 +199,8 @@ export default function ProductManagementPage() {
 
     try {
       setLoading(true);
+      setError("");
+      setSuccess("");
 
       if (imageFile) {
         // Update product with new image
@@ -231,12 +242,17 @@ export default function ProductManagementPage() {
       setSelectOptions([]);
       setImageFile(null);
       setImagePreview("");
+      setSuccess("Product updated successfully!");
 
       // Refresh products
       await fetchProducts();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
       console.error("Error updating product:", error);
-      alert("Failed to update product. Please try again.");
+      setError("Failed to update product. Please try again.");
+      setTimeout(() => setError(""), 5000);
     } finally {
       setLoading(false);
     }
@@ -259,6 +275,18 @@ export default function ProductManagementPage() {
 
   return (
     <AdminLayout>
+      {/* Toast Notifications */}
+      {error && (
+        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          {success}
+        </div>
+      )}
+
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
 
   // Profile form state
   const [profileData, setProfileData] = useState({
@@ -59,7 +61,8 @@ export default function ProfilePage() {
     e.preventDefault();
     // TODO: Integrate with API to update profile
     setIsEditing(false);
-    // Show success message
+    setSuccess("Profile updated successfully!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   const handleCancelEdit = () => {
@@ -80,16 +83,31 @@ export default function ProfilePage() {
     e.preventDefault();
     // TODO: Integrate with API to change password
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
+      setTimeout(() => setError(""), 5000);
       return;
     }
     // Reset form and show success message
     setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     setShowPasswordForm(false);
+    setSuccess("Password changed successfully!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   return (
     <AdminLayout>
+      {/* Toast Notifications */}
+      {error && (
+        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          {success}
+        </div>
+      )}
+
       <div className="space-y-6">
         {/* Header */}
         <div>
