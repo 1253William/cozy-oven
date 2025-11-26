@@ -5,39 +5,12 @@ import Link from "next/link";
 import { ArrowRight } from 'lucide-react';
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-
-
-interface Category {
-  id: string;
-  name: string;
-  itemCount: number;
-  image: string;
-}
+import useCustomerProducts from "../hooks/useCustomerProducts";
 
 export default function BestSellers() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
-
-  const categories: Category[] = [
-    {
-      id: "1",
-      name: "Brownies",
-      itemCount: 3,
-      image: "https://images.unsplash.com/photo-1610611424854-5e07032143d8?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: "2",
-      name: "Cookies",
-      itemCount: 16,
-      image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=800",
-    },
-    {
-      id: "3",
-      name: "Cakes",
-      itemCount: 15,
-      image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=800",
-    },
-  ];
+  const { products, loading } = useCustomerProducts({ limit: 6 });
 
   return (
     <section ref={sectionRef} className="py-20 bg-[#2A2C22]/10">
@@ -61,46 +34,52 @@ export default function BestSellers() {
           </div>
 
           <div className="lg:w-2/3 w-full">
-            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-              {categories.map((category, index) => (
-                <motion.div
-                  key={category.id}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Link
-                    href={`/product/${category.id}`}
-                    className="relative flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden cursor-pointer group snap-start transition-transform duration-300 hover:scale-105 block"
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2A2C22]"></div>
+              </div>
+            ) : (
+              <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                {products.slice(0, 6).map((product, index) => (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    {/* Category Image */}
-                    <Image
-                      src={category.image || "/placeholder.svg"}
-                      alt={category.name}
-                      fill
-                      className="object-cover"
-                    />
+                    <Link
+                      href={`/product/${product._id}`}
+                      className="relative flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden cursor-pointer group snap-start transition-transform duration-300 hover:scale-105 block"
+                    >
+                      {/* Product Image */}
+                      <Image
+                        src={product.productThumbnail || "/placeholder.svg"}
+                        alt={product.productName}
+                        fill
+                        className="object-cover"
+                      />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
-                      <div className="flex items-end justify-between">
-                        <div>
-                          <h3 className="text-white text-2xl font-bold mb-2">
-                            {category.name}
-                          </h3>
-                          <p className="text-white/80 text-sm font-medium">
-                            {category.itemCount} items
-                          </p>
-                        </div>
-                        {/* Arrow icon */}
-                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                          <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <h3 className="text-white text-2xl font-bold mb-2">
+                              {product.productName}
+                            </h3>
+                            <p className="text-white/80 text-sm font-medium">
+                              GHS {product.price.toFixed(2)}
+                            </p>
+                          </div>
+                          {/* Arrow icon */}
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                            <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-300" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </motion.div>

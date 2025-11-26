@@ -1,0 +1,57 @@
+import { useState, useEffect } from "react";
+import customerProductService, { CustomerProductListResponse } from "../services/customerProductService";
+import { Product } from "../services/productService";
+
+interface UseCustomerProductsOptions {
+  page?: number;
+  limit?: number;
+  autoFetch?: boolean;
+}
+
+export const useCustomerProducts = (options: UseCustomerProductsOptions = {}) => {
+  const { page = 1, limit = 20, autoFetch = true } = options;
+  
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    totalDocuments: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await customerProductService.getAllProducts({ page, limit });
+      setProducts(response.data);
+      setPagination(response.pagination);
+    } catch (err) {
+      console.error("Error fetching customer products:", err);
+      setError("Failed to fetch products");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (autoFetch) {
+      fetchProducts();
+    }
+  }, [page, limit, autoFetch]);
+
+  return {
+    products,
+    loading,
+    error,
+    pagination,
+    refetch: fetchProducts,
+  };
+};
+
+export default useCustomerProducts;
