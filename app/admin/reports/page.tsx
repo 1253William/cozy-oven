@@ -250,7 +250,9 @@ export default function ReportsPage() {
         {/* Top Customers */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Top Customers</h2>
-          <div className="overflow-x-auto">
+          
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -296,6 +298,35 @@ export default function ReportsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+          
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-3">
+            {mockReportData.topCustomers.map((customer, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#2A2C22] rounded-full flex items-center justify-center text-white font-semibold">
+                      {customer.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{customer.name}</h3>
+                      <p className="text-xs text-gray-500">Rank #{index + 1}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Total Orders</p>
+                    <p className="text-sm font-semibold text-gray-900">{customer.orders}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Total Spent</p>
+                    <p className="text-sm font-semibold text-[#2A2C22]">GHS {customer.spent.toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
