@@ -40,7 +40,7 @@ export default function BestSellers() {
               </div>
             ) : (
               <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                {products.slice(0, 6).map((product, index) => (
+                {products.map((product, index) => (
                   <motion.div
                     key={product._id}
                     initial={{ opacity: 0, x: 50 }}

@@ -29,7 +29,9 @@ export const useCustomerProducts = (options: UseCustomerProductsOptions = {}) =>
       setError(null);
       const response = await customerProductService.getAllProducts({ page, limit });
       setProducts(response.data);
-      setPagination(response.pagination);
+      if (response.pagination) {
+        setPagination(response.pagination);
+      }
     } catch (err) {
       console.error("Error fetching customer products:", err);
       setError("Failed to fetch products");

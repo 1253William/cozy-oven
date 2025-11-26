@@ -135,7 +135,7 @@ export default function ProductManagementPage() {
     e.preventDefault();
     try {
       if (!imageFile) {
-        alert("Please select an image for the product");
+        // Use the error state from the hook
         return;
       }
 
