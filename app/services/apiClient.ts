@@ -1,4 +1,5 @@
 import axios from "axios";
+import { redirect } from "next/navigation";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://cozy-oven-bakery-backend.onrender.com";
 
@@ -33,13 +34,13 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or unauthorized
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-        // Optionally redirect to login
+        redirect("/login");
       }
     }
+
     return Promise.reject(error);
   }
 );
