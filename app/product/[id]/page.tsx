@@ -30,6 +30,11 @@ export default function ProductDetails() {
   const productId = params.id as string;
   const { product, loading } = useCustomerProduct(productId);
 
+  // Constants for fallback values
+  const DEFAULT_RATING = 4.5;
+  const DEFAULT_REVIEWS_COUNT = 0;
+  const DEFAULT_SIZES = ["Regular"];
+
   // Loading state
   if (loading) {
     return (
@@ -102,16 +107,16 @@ export default function ProductDetails() {
       price: `GHS ${product.price.toFixed(2)}`,
       image: product.productThumbnail,
       description: product.productDetails || "",
-      rating: product.rating || 4.5,
-      reviews: 0,
-      sizes: product.selectOptions?.map((opt: { label: string }) => opt.label) || ["Regular"],
+      rating: product.rating || DEFAULT_RATING,
+      reviews: DEFAULT_REVIEWS_COUNT,
+      sizes: product.selectOptions?.map((opt: { label: string }) => opt.label) || DEFAULT_SIZES,
       details: product.productDetails || "",
     };
     addToCart(cartItem, quantity, selectedSize);
   };
 
   // Extract sizes from selectOptions
-  const sizes = product.selectOptions?.map((opt: { label: string }) => opt.label) || ["Regular"];
+  const sizes = product.selectOptions?.map((opt: { label: string }) => opt.label) || DEFAULT_SIZES;
 
   return (
     <>
@@ -149,7 +154,7 @@ export default function ProductDetails() {
             >
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.productName}</h1>
 
-              <div className="mb-4">{renderStars(product.rating || 4.5)}</div>
+              <div className="mb-4">{renderStars(product.rating || DEFAULT_RATING)}</div>
 
               <p className="text-3xl font-bold text-orange-500 mb-6">GHS {product.price.toFixed(2)}</p>
 
