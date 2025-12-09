@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import AuthModal from "../components/AuthModal";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { orderService, type OrderItem } from "../services/orderService";
 
 type DeliveryMethod = "delivery" | "pickup";
 type CheckoutStep = "info" | "delivery" | "payment" | "review";
@@ -19,6 +20,8 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("info");
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [deliveryFee] = useState(10);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const taxRate = 0.125;
 
   // Form state - pre-fill with user data if authenticated
@@ -35,7 +38,7 @@ export default function CheckoutPage() {
     time: "",
     notes: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("hubtel");
 
   const subtotal = getCartTotal();
   const tax = subtotal * taxRate;
@@ -80,13 +83,57 @@ useEffect(() => {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     // Check if user is authenticated before placing order
     if (!isAuthenticated) {
       setAuthModalOpen(true);
       return;
     }
-    router.push("/order-success");
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Prepare order items from cart
+      const items: OrderItem[] = cart.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        unitPrice: parseFloat(item.price.replace("GHS ", "")),
+      }));
+
+      // Create the order
+      const checkoutResponse = await orderService.checkout({
+        items,
+        deliveryFee: deliveryMethod === "delivery" ? deliveryFee : 0,
+        deliveryAddress: deliveryMethod === "delivery" 
+          ? `${deliveryDetails.address}, ${deliveryDetails.city}`
+          : "Pickup from store",
+        contactNumber: customerInfo.phone,
+        paymentMethod: paymentMethod,
+      });
+
+      if (checkoutResponse.success && checkoutResponse.data) {
+        const orderId = checkoutResponse.data._id;
+
+        // Initiate payment with Hubtel
+        const paymentResponse = await orderService.initiatePayment(orderId);
+
+        if (paymentResponse.success && paymentResponse.data.checkoutUrl) {
+          // Redirect to Hubtel checkout page
+          window.location.href = paymentResponse.data.checkoutUrl;
+        } else {
+          throw new Error("Failed to initiate payment");
+        }
+      } else {
+        throw new Error(checkoutResponse.message || "Failed to create order");
+      }
+    } catch (err) {
+      console.error("Order creation error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to place order. Please try again."
+      );
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -350,29 +397,18 @@ useEffect(() => {
                       Select Payment Method *
                     </label>
                     <div className="space-y-3">
-                      {["card", "mobile-money", "paypal"].map((method) => (
-                        <button
-                          key={method}
-                          onClick={() => setPaymentMethod(method)}
-                          className={`w-full py-3 px-4 rounded-lg border-2 text-left font-semibold transition-colors ${
-                            paymentMethod === method
-                              ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
-                              : "border-gray-300 text-gray-700 hover:border-gray-400"
-                          }`}
-                        >
-                          {method === "card" && "Credit/Debit Card"}
-                          {method === "mobile-money" && "Mobile Money"}
-                          {method === "paypal" && "PayPal"}
-                        </button>
-                      ))}
+                      <button
+                        onClick={() => setPaymentMethod("hubtel")}
+                        className="w-full py-3 px-4 rounded-lg border-2 text-left font-semibold transition-colors border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
+                      >
+                        Hubtel Payment (Mobile Money, Cards, & More)
+                      </button>
                     </div>
                   </div>
 
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-sm text-blue-800">
-                      🔒 <span className="font-semibold">Secure Payment:</span> Your
-                      payment information is encrypted and secure. We never store your
-                      card details.
+                      🔒 <span className="font-semibold">Secure Payment:</span> You&apos;ll be redirected to Hubtel&apos;s secure checkout page to complete your payment. Hubtel supports Mobile Money, credit/debit cards, and other payment methods.
                     </p>
                   </div>
                 </div>
@@ -493,6 +529,13 @@ useEffect(() => {
                     </a>
                     .
                   </div>
+
+                  {/* Error Message */}
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -502,16 +545,18 @@ useEffect(() => {
           <div className="flex gap-4">
             <button
               onClick={handleBack}
-              className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-full transition-colors hover:cursor-pointer hover:bg-gray-100"
+              disabled={isProcessing}
+              className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-full transition-colors hover:cursor-pointer hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Back
             </button>
             {currentStep === "review" ? (
               <button
                 onClick={handlePlaceOrder}
-                className="flex-1 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-full transition-colors hover:cursor-pointer"
+                disabled={isProcessing}
+                className="flex-1 bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-full transition-colors hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Place Order
+                {isProcessing ? "Processing..." : "Place Order & Pay"}
               </button>
             ) : (
               <button
