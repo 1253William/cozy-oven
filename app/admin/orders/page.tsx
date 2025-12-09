@@ -7,7 +7,6 @@ import { useAuth } from "../../context/AuthContext";
 import {
   Search,
   Filter,
-  Eye,
   Package,
   Clock,
   CheckCircle,
@@ -16,7 +15,6 @@ import {
   Trash2,
   Edit,
 } from "lucide-react";
-import OrderCards from "./components/OrderCards";
 import { orderService, type Order } from "../../services/orderService";
 
 const statusOptions = [
@@ -387,14 +385,77 @@ export default function OrdersPage() {
           <div className="md:hidden p-4">
             {loading ? (
               <div className="text-center py-8 text-gray-500">Loading orders...</div>
+            ) : filteredOrders.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No orders found</div>
             ) : (
-              <OrderCards
-                orders={filteredOrders}
-                onViewOrder={(order) => {
-                  // TODO: Implement view order details
-                  console.log("View order:", order);
-                }}
-              />
+              <div className="space-y-4">
+                {filteredOrders.map((order) => (
+                  <div
+                    key={order._id}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{order.orderId}</h3>
+                        <p className="text-sm text-gray-500">{order.contactNumber}</p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                          order.orderStatus
+                        )}`}
+                      >
+                        {getStatusIcon(order.orderStatus)}
+                        {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                      </span>
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Items</p>
+                        <p className="text-sm font-medium text-gray-900">{order.items.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Total</p>
+                        <p className="text-sm font-semibold text-gray-900">GHS {order.total.toFixed(2)}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-xs text-gray-500 mb-1">Date</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Delivery Address */}
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-1">Delivery Address</p>
+                      <p className="text-sm text-gray-700">{order.deliveryAddress}</p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingOrderId(order._id);
+                          setNewStatus(order.orderStatus);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit Status
+                      </button>
+                      <button
+                        onClick={() => handleDeleteOrder(order._id)}
+                        className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
