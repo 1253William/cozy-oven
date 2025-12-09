@@ -1,5 +1,4 @@
 import axios from "axios";
-import { redirect } from "next/navigation";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://cozy-oven-bakery-backend.onrender.com";
 
@@ -35,9 +34,13 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
+        // Clear all auth-related data from localStorage
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-        redirect("/login");
+        localStorage.removeItem("cart");
+        
+        // Redirect to home page (not logged in)
+        window.location.href = "/";
       }
     }
 
