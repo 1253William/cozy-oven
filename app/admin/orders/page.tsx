@@ -7,74 +7,21 @@ import { useAuth } from "../../context/AuthContext";
 import {
   Search,
   Filter,
-  Eye,
   Package,
   Clock,
   CheckCircle,
   XCircle,
   Truck,
+  Trash2,
+  Edit,
 } from "lucide-react";
-import OrderCards from "./components/OrderCards";
-
-// Mock data - replace with actual API calls
-const mockOrders = [
-  {
-    id: "ORD-001",
-    customerName: "John Doe",
-    customerEmail: "john.doe@email.com",
-    items: 3,
-    total: 85.97,
-    status: "delivered",
-    date: "2024-11-20T10:30:00",
-    deliveryAddress: "123 Main St, Accra",
-  },
-  {
-    id: "ORD-002",
-    customerName: "Jane Smith",
-    customerEmail: "jane.smith@email.com",
-    items: 2,
-    total: 55.98,
-    status: "pending",
-    date: "2024-11-22T14:15:00",
-    deliveryAddress: "456 Oak Ave, Kumasi",
-  },
-  {
-    id: "ORD-003",
-    customerName: "Michael Johnson",
-    customerEmail: "michael.j@email.com",
-    items: 5,
-    total: 139.95,
-    status: "processing",
-    date: "2024-11-23T09:00:00",
-    deliveryAddress: "789 Pine Rd, Takoradi",
-  },
-  {
-    id: "ORD-004",
-    customerName: "Sarah Williams",
-    customerEmail: "sarah.w@email.com",
-    items: 1,
-    total: 27.99,
-    status: "cancelled",
-    date: "2024-11-21T16:45:00",
-    deliveryAddress: "321 Elm St, Tema",
-  },
-  {
-    id: "ORD-005",
-    customerName: "David Brown",
-    customerEmail: "david.b@email.com",
-    items: 4,
-    total: 111.96,
-    status: "shipped",
-    date: "2024-11-23T11:20:00",
-    deliveryAddress: "654 Birch Ln, Cape Coast",
-  },
-];
+import { orderService, type Order } from "../../services/orderService";
 
 const statusOptions = [
   { value: "all", label: "All Orders" },
   { value: "pending", label: "Pending" },
-  { value: "processing", label: "Processing" },
-  { value: "shipped", label: "Shipped" },
+  { value: "preparing", label: "Preparing" },
+  { value: "on-delivery", label: "On Delivery" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -83,9 +30,9 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case "pending":
       return "bg-yellow-100 text-yellow-700";
-    case "processing":
+    case "preparing":
       return "bg-blue-100 text-blue-700";
-    case "shipped":
+    case "on-delivery":
       return "bg-purple-100 text-purple-700";
     case "delivered":
       return "bg-green-100 text-green-700";
@@ -100,9 +47,9 @@ const getStatusIcon = (status: string) => {
   switch (status) {
     case "pending":
       return <Clock className="w-4 h-4" />;
-    case "processing":
+    case "preparing":
       return <Package className="w-4 h-4" />;
-    case "shipped":
+    case "on-delivery":
       return <Truck className="w-4 h-4" />;
     case "delivered":
       return <CheckCircle className="w-4 h-4" />;
@@ -116,8 +63,20 @@ const getStatusIcon = (status: string) => {
 export default function OrdersPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
+  const [statistics, setStatistics] = useState({
+    total: 0,
+    pending: 0,
+    preparing: 0,
+    delivered: 0,
+  });
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -125,27 +84,96 @@ export default function OrdersPage() {
     }
   }, [isAuthenticated, user, router]);
 
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "Admin") {
+      fetchOrders();
+    }
+  }, [isAuthenticated, user, currentPage]);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await orderService.getAllOrders({
+        page: currentPage,
+        limit: 10,
+      });
+
+      if (response.success && response.data) {
+        setOrders(response.data);
+        
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages);
+        }
+
+        if (response.statistics) {
+          setStatistics({
+            total: response.statistics.totalOrders,
+            pending: response.statistics.pendingOrders,
+            preparing: response.statistics.preparingOrders,
+            delivered: response.statistics.deliveredOrders,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (orderId: string, status: string) => {
+    try {
+      const response = await orderService.updateOrderStatus(
+        orderId,
+        status as "pending" | "preparing" | "on-delivery" | "delivered" | "cancelled"
+      );
+
+      if (response.success) {
+        // Refresh orders list
+        fetchOrders();
+        setEditingOrderId(null);
+      } else {
+        alert(response.message || "Failed to update order status");
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      alert("Failed to update order status");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const response = await orderService.deleteOrder(orderId);
+      if (response.success) {
+        // Refresh orders list
+        fetchOrders();
+      } else {
+        alert(response.message || "Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("Failed to delete order");
+    }
+  };
+
   if (!isAuthenticated || user?.role !== "Admin") {
     return null;
   }
 
-  const filteredOrders = mockOrders.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     const matchesSearch =
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customerEmail.toLowerCase().includes(searchQuery.toLowerCase());
+      order.orderId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.deliveryAddress?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || order.orderStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
-
-  const orderStats = {
-    total: mockOrders.length,
-    pending: mockOrders.filter((o) => o.status === "pending").length,
-    processing: mockOrders.filter((o) => o.status === "processing").length,
-    delivered: mockOrders.filter((o) => o.status === "delivered").length,
-  };
 
   return (
     <AdminLayout>
@@ -160,19 +188,19 @@ export default function OrdersPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
             <p className="text-sm text-gray-600 font-medium">Total Orders</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{orderStats.total}</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">{statistics.total}</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
             <p className="text-sm text-gray-600 font-medium">Pending</p>
-            <p className="text-2xl font-bold text-yellow-600 mt-1">{orderStats.pending}</p>
+            <p className="text-2xl font-bold text-yellow-600 mt-1">{statistics.pending}</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <p className="text-sm text-gray-600 font-medium">Processing</p>
-            <p className="text-2xl font-bold text-blue-600 mt-1">{orderStats.processing}</p>
+            <p className="text-sm text-gray-600 font-medium">Preparing</p>
+            <p className="text-2xl font-bold text-blue-600 mt-1">{statistics.preparing}</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
             <p className="text-sm text-gray-600 font-medium">Delivered</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">{orderStats.delivered}</p>
+            <p className="text-2xl font-bold text-green-600 mt-1">{statistics.delivered}</p>
           </div>
         </div>
 
@@ -240,71 +268,228 @@ export default function OrdersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-semibold text-gray-900">{order.id}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{order.customerName}</p>
-                        <p className="text-xs text-gray-500">{order.customerEmail}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">{order.items} items</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-semibold text-[#2A2C22]">
-                        GHS {order.total.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {getStatusIcon(order.status)}
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">
-                        {new Date(order.date).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button className="flex items-center gap-2 px-3 py-1 text-sm text-[#2A2C22] hover:bg-gray-100 rounded-lg transition-colors">
-                        <Eye className="w-4 h-4" />
-                        View
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                      Loading orders...
                     </td>
                   </tr>
-                ))}
+                ) : filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                      No orders found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <tr key={order._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-semibold text-gray-900">{order.orderId}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{order.contactNumber}</p>
+                          <p className="text-xs text-gray-500">{order.deliveryAddress}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{order.items.length} items</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-semibold text-[#2A2C22]">
+                          GHS {order.total.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {editingOrderId === order._id ? (
+                          <select
+                            value={newStatus}
+                            onChange={(e) => setNewStatus(e.target.value)}
+                            className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-[#2A2C22]"
+                          >
+                            <option value="">Select status</option>
+                            <option value="pending">Pending</option>
+                            <option value="preparing">Preparing</option>
+                            <option value="on-delivery">On Delivery</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        ) : (
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                              order.orderStatus
+                            )}`}
+                          >
+                            {getStatusIcon(order.orderStatus)}
+                            {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-500">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {editingOrderId === order._id ? (
+                            <>
+                              <button
+                                onClick={() => handleStatusUpdate(order._id, newStatus)}
+                                disabled={!newStatus}
+                                className="px-2 py-1 text-xs text-white bg-green-600 hover:bg-green-700 rounded transition-colors disabled:opacity-50"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingOrderId(null);
+                                  setNewStatus("");
+                                }}
+                                className="px-2 py-1 text-xs text-gray-700 border border-gray-300 hover:bg-gray-100 rounded transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditingOrderId(order._id);
+                                  setNewStatus(order.orderStatus);
+                                }}
+                                className="p-1 text-[#2A2C22] hover:bg-gray-100 rounded transition-colors"
+                                title="Edit Status"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteOrder(order._id)}
+                                className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                title="Delete Order"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Mobile Cards View */}
           <div className="md:hidden p-4">
-            <OrderCards
-              orders={filteredOrders}
-              onViewOrder={(order) => {
-                // TODO: Implement view order details
-                console.log("View order:", order);
-              }}
-            />
+            {loading ? (
+              <div className="text-center py-8 text-gray-500">Loading orders...</div>
+            ) : filteredOrders.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No orders found</div>
+            ) : (
+              <div className="space-y-4">
+                {filteredOrders.map((order) => (
+                  <div
+                    key={order._id}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{order.orderId}</h3>
+                        <p className="text-sm text-gray-500">{order.contactNumber}</p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                          order.orderStatus
+                        )}`}
+                      >
+                        {getStatusIcon(order.orderStatus)}
+                        {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                      </span>
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Items</p>
+                        <p className="text-sm font-medium text-gray-900">{order.items.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Total</p>
+                        <p className="text-sm font-semibold text-gray-900">GHS {order.total.toFixed(2)}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-xs text-gray-500 mb-1">Date</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Delivery Address */}
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-1">Delivery Address</p>
+                      <p className="text-sm text-gray-700">{order.deliveryAddress}</p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingOrderId(order._id);
+                          setNewStatus(order.orderStatus);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit Status
+                      </button>
+                      <button
+                        onClick={() => handleDeleteOrder(order._id)}
+                        className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Empty State */}
-          {filteredOrders.length === 0 && (
+          {!loading && filteredOrders.length === 0 && (
             <div className="text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No orders found</p>
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-6">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="px-4 py-2 text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
