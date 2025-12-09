@@ -124,9 +124,7 @@ export default function ProductDetails() {
       <main className="min-h-screen pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+        
             onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
@@ -137,9 +135,8 @@ export default function ProductDetails() {
           <div className="grid md:grid-cols-2 gap-12">
             <motion.div
               ref={imageRef}
-              initial={{ opacity: 0, x: -50 }}
-              animate={isImageInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-              transition={{ duration: 0.6 }}
+  
+
               className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100"
             >
               <Image src={product.productThumbnail} alt={product.productName} fill className="object-cover" priority />
@@ -147,9 +144,7 @@ export default function ProductDetails() {
 
             <motion.div
               ref={detailsRef}
-              initial={{ opacity: 0, x: 50 }}
-              animate={isDetailsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-              transition={{ duration: 0.6 }}
+ 
               className="flex flex-col"
             >
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.productName}</h1>
@@ -181,9 +176,7 @@ export default function ProductDetails() {
 
           <motion.div
             ref={tabsRef}
-            initial={{ opacity: 0, y: 50 }}
-            animate={isTabsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.6 }}
+
             className="mt-16"
           >
             <ProductTabs details={product.productDetails || ""} />

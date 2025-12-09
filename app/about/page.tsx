@@ -87,7 +87,7 @@ export default function AboutPage() {
                   src="/cozy3.png"
                   alt="How it started"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               </motion.div>
 
@@ -166,13 +166,14 @@ export default function AboutPage() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={isVisionInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
                 transition={{ duration: 0.8 }}
-                className="w-full md:w-1/4 relative h-64 md:h-auto rounded-2xl overflow-hidden"
+                className="w-full md:w-1/4 relative h-64 md:h-96 rounded-2xl overflow-hidden"
               >
                 <Image
-                  src="/cozy4.PNG"
+                  src="/cozy2.png"
                   alt="The vision"
-                  fill
-                  className="object-cover"
+                  height={400}
+                  width={300}
+                  className="object-cover h-96"
                 />
               </motion.div>
 
