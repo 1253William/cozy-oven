@@ -15,6 +15,7 @@ import logo from "@/public/cozy3.png"
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
+  { label: "About", href: "/about" },
   { label: "Orders", href: "/account/orders" },
   { label: "Contact", href: "/contact" },
 ];

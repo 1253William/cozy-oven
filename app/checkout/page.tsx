@@ -18,8 +18,6 @@ export default function CheckoutPage() {
   const { isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("info");
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [deliveryFee] = useState(10);
-  const taxRate = 0.125;
 
   // Form state - pre-fill with user data if authenticated
   const [customerInfo, setCustomerInfo] = useState(() => ({
@@ -38,8 +36,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
 
   const subtotal = getCartTotal();
-  const tax = subtotal * taxRate;
-  const total = subtotal + tax + (deliveryMethod === "delivery" ? deliveryFee : 0);
+  const total = subtotal;
 
 useEffect(() => {
     // Redirect if cart is empty
@@ -325,15 +322,6 @@ useEffect(() => {
                     placeholder="Please ring bell once, no nuts..."
                   />
                 </div>
-
-                {deliveryMethod === "delivery" && (
-                  <div className="mt-4 p-4 bg-orange-50 rounded-lg">
-                    <p className="text-sm text-gray-700">
-                      <span className="font-semibold">Delivery Fee:</span> GHS{" "}
-                      {deliveryFee.toFixed(2)}
-                    </p>
-                  </div>
-                )}
               </div>
             )}
 
@@ -463,16 +451,6 @@ useEffect(() => {
                         <span>Subtotal</span>
                         <span>GHS {subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Tax (12.5%)</span>
-                        <span>GHS {tax.toFixed(2)}</span>
-                      </div>
-                      {deliveryMethod === "delivery" && (
-                        <div className="flex justify-between">
-                          <span>Delivery Fee</span>
-                          <span>GHS {deliveryFee.toFixed(2)}</span>
-                        </div>
-                      )}
                       <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
                         <span>Total</span>
                         <span className="text-[#2A2C22]">
