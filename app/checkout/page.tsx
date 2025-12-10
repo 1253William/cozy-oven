@@ -600,8 +600,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("hubtel");
 
   const subtotal = getCartTotal();
-  // Cap delivery fee at 40 cedis maximum
-  const deliveryFee = Math.min(10, 40);
+  // Fixed delivery fee (capped at 40 cedis maximum)
+  const deliveryFee = 10;
   const total = subtotal + (deliveryMethod === "delivery" ? deliveryFee : 0);
 
   useEffect(() => {

@@ -95,8 +95,9 @@ export const dashboardService = {
     if (params?.daily) queryParams.append("daily", "true");
     if (params?.monthly) queryParams.append("monthly", "true");
 
+    const queryString = queryParams.toString();
     const response = await apiClient.get(
-      `/api/v1/dashboard/overview/sales${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
+      `/api/v1/dashboard/overview/sales${queryString ? `?${queryString}` : ""}`
     );
     return response.data;
   },

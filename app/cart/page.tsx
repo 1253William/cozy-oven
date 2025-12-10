@@ -13,8 +13,8 @@ export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, getCartTotal } = useCart();
   
   const subtotal = getCartTotal();
-  // Cap delivery fee at 40 cedis maximum
-  const deliveryFee = Math.min(10, 40);
+  // Fixed delivery fee (capped at 40 cedis maximum)
+  const deliveryFee = 10;
   const total = subtotal + deliveryFee;
 
   const handleQuantityChange = (productId: string, newQuantity: number, size?: string) => {
