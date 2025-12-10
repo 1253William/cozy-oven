@@ -44,11 +44,8 @@ export interface Order {
 export interface PaymentInitiationResponse {
   success: boolean;
   message: string;
-  data: {
-    checkoutUrl?: string;
-    checkoutId?: string;
+    authorizationUrl?: string;
     reference?: string;
-  };
 }
 
 // Payment verification response
@@ -66,7 +63,7 @@ export interface PaymentVerificationResponse {
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
-  data?: T;
+  order?: T;
   pagination?: {
     currentPage: number;
     totalPages: number;
