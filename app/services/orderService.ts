@@ -69,6 +69,7 @@ export interface PaymentVerificationResponse {
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
+  data?: T;
   order?: T;
   pagination?: {
     currentPage: number;

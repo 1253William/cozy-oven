@@ -297,7 +297,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-semibold text-[#2A2C22]">
-                          GHS {order.total.toFixed(2)}
+                          GHS {(order.total || order.totalAmount || 0).toFixed(2)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -418,7 +418,7 @@ export default function OrdersPage() {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Total</p>
-                        <p className="text-sm font-semibold text-gray-900">GHS {order.total.toFixed(2)}</p>
+                        <p className="text-sm font-semibold text-gray-900">GHS {(order.total || order.totalAmount || 0).toFixed(2)}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-xs text-gray-500 mb-1">Date</p>

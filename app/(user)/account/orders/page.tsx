@@ -129,7 +129,7 @@ export default function OrdersPage() {
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Total</p>
                     <p className="text-xl font-bold text-[#2A2C22]">
-                      GHS {order.total.toFixed(2)}
+                      GHS {((order.total || order.totalAmount || 0)).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <p className="font-semibold text-gray-900">
-                        GHS {item.total.toFixed(2)}
+                        GHS {(item.total || (item.unitPrice * item.quantity)).toFixed(2)}
                       </p>
                     </div>
                   ))}
