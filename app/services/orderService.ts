@@ -110,6 +110,26 @@ export interface OrderStatistics {
   deliveredOrders: number;
   cancelledOrders: number;
   totalRevenue: number;
+  pending?: number;
+  preparing?: number;
+  delivered?: number;
+}
+
+// Admin get all orders response
+export interface GetAllOrdersResponse {
+  success: boolean;
+  message: string;
+  data: {
+    orders: Order[];
+    pagination?: {
+      currentPage: number;
+      totalPages: number;
+      totalOrders: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+    statistics?: OrderStatistics;
+  };
 }
 
 export const orderService = {
@@ -145,7 +165,7 @@ export const orderService = {
   getAllOrders: async (params?: {
     page?: number;
     limit?: number;
-  }): Promise<ApiResponse<Order[]> & { statistics?: OrderStatistics }> => {
+  }): Promise<GetAllOrdersResponse> => {
     const queryParams = new URLSearchParams();
     
     if (params?.page) queryParams.append("page", params.page.toString());

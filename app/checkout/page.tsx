@@ -673,6 +673,10 @@ export default function CheckoutPage() {
       // Use the orderId field (e.g., "CZ-850560") instead of _id for payment initiation
       const orderId = checkoutResponse.order.orderId || checkoutResponse.order._id;
 
+      if (!orderId) {
+        throw new Error("Order ID not found in response");
+      }
+
       // Initiate payment
       const paymentResponse = await orderService.initiatePayment(orderId);
       console.log("Payment initiation response:", paymentResponse);
