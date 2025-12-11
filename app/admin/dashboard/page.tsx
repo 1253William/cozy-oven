@@ -10,8 +10,6 @@ import {
   Award,
   ArrowRight,
   Download,
-  Package,
-  BarChart3,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -231,14 +229,74 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Placeholder for Chart */}
-          <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-200">
-            <div className="text-center">
-              <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-600 font-medium">Chart visualization goes here</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Showing {chartFilter} data
-              </p>
+          {/* Bar Chart */}
+          <div className="h-80">
+            <div className="h-full flex items-end justify-between gap-4 px-4">
+              {chartFilter === "daily" && [
+                { label: "Mon", value: 850 },
+                { label: "Tue", value: 1200 },
+                { label: "Wed", value: 950 },
+                { label: "Thu", value: 1100 },
+                { label: "Fri", value: 1400 },
+                { label: "Sat", value: 1600 },
+                { label: "Sun", value: 1300 },
+              ].map((day, index) => (
+                <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
+                    <div
+                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
+                      style={{ height: `${(day.value / 1600) * 280}px` }}
+                    >
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        GHS {day.value}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600">{day.label}</span>
+                </div>
+              ))}
+              {chartFilter === "monthly" && [
+                { label: "Jan", value: 35000 },
+                { label: "Feb", value: 38000 },
+                { label: "Mar", value: 42000 },
+                { label: "Apr", value: 39000 },
+                { label: "May", value: 45000 },
+                { label: "Jun", value: 46000 },
+              ].map((month, index) => (
+                <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
+                    <div
+                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
+                      style={{ height: `${(month.value / 46000) * 280}px` }}
+                    >
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        GHS {month.value.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600">{month.label}</span>
+                </div>
+              ))}
+              {chartFilter === "overview" && [
+                { label: "Q1", value: 115000 },
+                { label: "Q2", value: 130000 },
+                { label: "Q3", value: 125000 },
+                { label: "Q4", value: 140000 },
+              ].map((quarter, index) => (
+                <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
+                    <div
+                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
+                      style={{ height: `${(quarter.value / 140000) * 280}px` }}
+                    >
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        GHS {quarter.value.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600">{quarter.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -71,6 +71,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Check if we're on client side to avoid hydration mismatch
+  const isMounted = typeof window !== 'undefined';
 
   const handleLogout = () => {
     logout();
@@ -113,17 +116,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200">
-          <div className="mb-3 px-4">
-            <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
-            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
+          {isMounted && (
+            <>
+              <div className="mb-3 px-4">
+                <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
+                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </>
+          )}
         </div>
       </aside>
 
@@ -183,17 +190,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200">
-          <div className="mb-3 px-4">
-            <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
-            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
+          {isMounted && (
+            <>
+              <div className="mb-3 px-4">
+                <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
+                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </>
+          )}
         </div>
       </aside>
 

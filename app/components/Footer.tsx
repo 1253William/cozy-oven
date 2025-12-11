@@ -13,7 +13,7 @@ export default function Footer() {
 
       {/* Main Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Newsletter Section */}
           <div className="md:col-span-2">
             <h2 className="text-2xl font-bold mb-3">
@@ -58,34 +58,10 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="/faq"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  FAQ
-                </a>
-              </li>
-              <li>
-                <a
                   href="/about"
                   className="text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   Our Story
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/shipping"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Shipping Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/returns"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Refund Policy
                 </a>
               </li>
             </ul>
@@ -118,95 +94,21 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          {/* Info Column */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Info</h3>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="/careers"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Jobs
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/community"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Community
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/sustainability"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Sustainability
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/press"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Press
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/blog"
-                  className="text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* Bottom Section */}
         <div className="relative border-t border-gray-300 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex flex-col gap-4">
-              <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-                <span className="text-lg">🇬🇭</span>
-                <span className="text-sm">Ghana (GHS ₵)</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-6 md:items-end">
-              <div className="flex gap-4">
-                <a className="text-gray-700 hover:text-gray-900 transition-colors">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a className="text-gray-700 hover:text-gray-900 transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a className="text-gray-700 hover:text-gray-900 transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </a>
-              </div>
-
-              <div className="flex gap-2">
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded">
-                  Apple Pay
-                </span>
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded">
-                  Google Pay
-                </span>
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded">
-                  Mastercard
-                </span>
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded">
-                  Shop Pay
-                </span>
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded">
-                  Visa
-                </span>
-              </div>
+            <div className="flex gap-4">
+              <a className="text-gray-700 hover:text-gray-900 transition-colors">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a className="text-gray-700 hover:text-gray-900 transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a className="text-gray-700 hover:text-gray-900 transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
             </div>
           </div>
         </div>

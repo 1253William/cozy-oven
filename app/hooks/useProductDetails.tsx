@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import customerProductService from "../services/customerProductService";
+import { Product } from "../services/productService";
 
 export default function useCustomerProduct(productId: string | undefined) {
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

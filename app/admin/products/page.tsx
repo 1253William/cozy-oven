@@ -144,7 +144,10 @@ export default function ProductManagementPage() {
       formData.append("price", newProduct.price.toString());
       formData.append("productCategory", newProduct.productCategory);
       formData.append("productDetails", newProduct.productDetails);
-      formData.append("selectOptions", JSON.stringify(selectOptions));
+      // Only append selectOptions if there are any
+      if (selectOptions.length > 0) {
+        formData.append("selectOptions", JSON.stringify(selectOptions));
+      }
       formData.append("productThumbnail", imageFile);
 
       await createProductWithImage(formData);

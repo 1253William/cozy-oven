@@ -29,7 +29,9 @@ export default function Navbar() {
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const { getCartCount } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
-  const cartCount = getCartCount();
+  
+  // Only get cart count on client side to avoid hydration mismatch
+  const cartCount = typeof window !== 'undefined' ? getCartCount() : 0;
 
   const handleCartClick = () => {
     if (cartCount > 0) {
