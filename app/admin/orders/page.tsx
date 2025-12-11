@@ -92,56 +92,6 @@ export default function OrdersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user, currentPage]);
 
-  // const fetchOrders = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await orderService.getAllOrders({
-  //       page: currentPage,
-  //       limit: 10,
-  //     });
-
-  //     if (response?.success && response.data) {
-  //       const data = response.data;
-  //       const ordersArray: Order[] = Array.isArray(data) ? data : data?.orders ?? [];
-  //       setOrders(ordersArray);
-
-  //       const pagination = response.pagination ?? data?.pagination;
-  //       if (pagination) {
-  //         setTotalPages(pagination.totalPages ?? 1);
-  //       } else {
-  //         setTotalPages(1);
-  //       }
-
-  //       const statisticsSource = response.statistics ?? data?.statistics;
-  //       if (statisticsSource) {
-  //         setStatistics({
-  //           total: statisticsSource.totalOrders ?? 0,
-  //           pending: statisticsSource.pendingOrders ?? 0,
-  //           preparing: statisticsSource.preparingOrders ?? 0,
-  //           delivered: statisticsSource.deliveredOrders ?? 0,
-  //         });
-  //       } else {
-  //         // fallback: compute from ordersArray
-  //         setStatistics({
-  //           total: ordersArray.length,
-  //           pending: ordersArray.filter((o) => o.status === "pending").length,
-  //           preparing: ordersArray.filter((o) => o.status === "preparing").length,
-  //           delivered: ordersArray.filter((o) => o.status === "delivered").length,
-  //         });
-  //       }
-  //     } else {
-  //       setOrders([]);
-  //       setTotalPages(1);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //     setOrders([]);
-  //     setTotalPages(1);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchOrders = async () => {
   try {
     setLoading(true);
@@ -158,7 +108,6 @@ export default function OrdersPage() {
     }
 
     const data = response.data;
-    console.log("Data",data);
 
     // Orders
     const ordersArray: Order[] = data.orders ?? [];
@@ -332,12 +281,6 @@ export default function OrdersPage() {
                     Customer
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Items
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -351,13 +294,13 @@ export default function OrdersPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                       Loading orders...
                     </td>
                   </tr>
                 ) : filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                       No orders found
                     </td>
                   </tr>
@@ -372,14 +315,6 @@ export default function OrdersPage() {
                           <p className="text-sm font-medium text-gray-900">{order.contactNumber}</p>
                           <p className="text-xs text-gray-500">{order.deliveryAddress}</p>
                         </div>
-                      </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{order.items?.length ?? 0} items</span>
-                      </td> */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-[#2A2C22]">
-                          {/* GHS {((order.total ?? order.totalAmount) as number | undefined ?? 0).toFixed(2)} */}
-                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingOrderId === order._id ? (
@@ -491,18 +426,8 @@ export default function OrdersPage() {
                     </div>
 
                     {/* Info Grid */}
-                    <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="grid grid-cols-1 gap-3 mb-3">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Items</p>
-                        {/* <p className="text-sm font-medium text-gray-900">{order.items?.length ?? 0}</p> */}
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Total</p>
-                        {/* <p className="text-sm font-semibold text-gray-900">
-                          GHS {((order.total ?? order.price) as number | undefined ?? 0).toFixed(2)}
-                        </p> */}
-                      </div>
-                      <div className="col-span-2">
                         <p className="text-xs text-gray-500 mb-1">Date</p>
                         <p className="text-sm font-medium text-gray-900">
                           {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}
