@@ -10,8 +10,6 @@ import {
   Award,
   ArrowRight,
   Download,
-  Package,
-  BarChart3,
 } from "lucide-react";
 import Image from "next/image";
 

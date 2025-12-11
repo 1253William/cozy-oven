@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, MapPin, X, ShoppingCart, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,15 +26,12 @@ export default function Navbar() {
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const { getCartCount } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
-  const cartCount = getCartCount();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  
+  // Only get cart count on client side to avoid hydration mismatch
+  const cartCount = typeof window !== 'undefined' ? getCartCount() : 0;
 
   const handleCartClick = () => {
     if (cartCount > 0) {
@@ -93,7 +90,7 @@ export default function Navbar() {
             aria-label="Shopping Cart"
           >
             <ShoppingCart className="w-5 h-5" />
-            {isMounted && cartCount > 0 && (
+            {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#2A2C22] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
