@@ -26,7 +26,7 @@ const statusOptions = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status?: string) => {
   switch (status) {
     case "pending":
       return "bg-yellow-100 text-yellow-700";
@@ -43,7 +43,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const getStatusIcon = (status: string) => {
+const getStatusIcon = (status?: string) => {
   switch (status) {
     case "pending":
       return <Clock className="w-4 h-4" />;
@@ -63,6 +63,7 @@ const getStatusIcon = (status: string) => {
 export default function OrdersPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,38 +89,114 @@ export default function OrdersPage() {
     if (isAuthenticated && user?.role === "Admin") {
       fetchOrders();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user, currentPage]);
 
+  // const fetchOrders = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await orderService.getAllOrders({
+  //       page: currentPage,
+  //       limit: 10,
+  //     });
+
+  //     if (response?.success && response.data) {
+  //       const data = response.data;
+  //       const ordersArray: Order[] = Array.isArray(data) ? data : data?.orders ?? [];
+  //       setOrders(ordersArray);
+
+  //       const pagination = response.pagination ?? data?.pagination;
+  //       if (pagination) {
+  //         setTotalPages(pagination.totalPages ?? 1);
+  //       } else {
+  //         setTotalPages(1);
+  //       }
+
+  //       const statisticsSource = response.statistics ?? data?.statistics;
+  //       if (statisticsSource) {
+  //         setStatistics({
+  //           total: statisticsSource.totalOrders ?? 0,
+  //           pending: statisticsSource.pendingOrders ?? 0,
+  //           preparing: statisticsSource.preparingOrders ?? 0,
+  //           delivered: statisticsSource.deliveredOrders ?? 0,
+  //         });
+  //       } else {
+  //         // fallback: compute from ordersArray
+  //         setStatistics({
+  //           total: ordersArray.length,
+  //           pending: ordersArray.filter((o) => o.status === "pending").length,
+  //           preparing: ordersArray.filter((o) => o.status === "preparing").length,
+  //           delivered: ordersArray.filter((o) => o.status === "delivered").length,
+  //         });
+  //       }
+  //     } else {
+  //       setOrders([]);
+  //       setTotalPages(1);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching orders:", error);
+  //     setOrders([]);
+  //     setTotalPages(1);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const response = await orderService.getAllOrders({
-        page: currentPage,
-        limit: 10,
-      });
+  try {
+    setLoading(true);
 
-      if (response.success && response.data) {
-        setOrders(response.data);
-        
-        if (response.pagination) {
-          setTotalPages(response.pagination.totalPages);
-        }
+    const response = await orderService.getAllOrders({
+      page: currentPage,
+      limit: 10,
+    });
 
-        if (response.statistics) {
-          setStatistics({
-            total: response.statistics.totalOrders,
-            pending: response.statistics.pendingOrders,
-            preparing: response.statistics.preparingOrders,
-            delivered: response.statistics.deliveredOrders,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
+    if (!response?.success || !response.data) {
+      setOrders([]);
+      setTotalPages(1);
+      return;
     }
-  };
+
+    const data = response.data;
+    console.log("Data",data);
+
+    // Orders
+    const ordersArray: Order[] = data.orders ?? [];
+    setOrders(ordersArray);
+
+    // Pagination
+    if (data.pagination) {
+      setTotalPages(data.pagination.totalPages || 1);
+    } else {
+      setTotalPages(1);
+    }
+
+    // Statistics
+    if (data.statistics) {
+      setStatistics({
+        total: data.statistics.totalOrders ?? 0,
+        pending: data.statistics.pending ?? 0,
+        preparing: data.statistics.preparing ?? 0,
+        delivered: data.statistics.delivered ?? 0,
+      });
+    } else {
+      // fallback: compute from orders
+      setStatistics({
+        total: ordersArray.length,
+        pending: ordersArray.filter((o) => o.status === "pending").length,
+        preparing: ordersArray.filter((o) => o.status === "preparing").length,
+        delivered: ordersArray.filter((o) => o.status === "delivered").length,
+      });
+    }
+
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    setOrders([]);
+    setTotalPages(1);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleStatusUpdate = async (orderId: string, status: string) => {
     try {
@@ -128,12 +205,12 @@ export default function OrdersPage() {
         status as "pending" | "preparing" | "on-delivery" | "delivered" | "cancelled"
       );
 
-      if (response.success) {
-        // Refresh orders list
-        fetchOrders();
+      if (response?.success) {
+        await fetchOrders();
         setEditingOrderId(null);
+        setNewStatus("");
       } else {
-        alert(response.message || "Failed to update order status");
+        alert(response?.message || "Failed to update order status");
       }
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -148,11 +225,10 @@ export default function OrdersPage() {
 
     try {
       const response = await orderService.deleteOrder(orderId);
-      if (response.success) {
-        // Refresh orders list
-        fetchOrders();
+      if (response?.success) {
+        await fetchOrders();
       } else {
-        alert(response.message || "Failed to delete order");
+        alert(response?.message || "Failed to delete order");
       }
     } catch (error) {
       console.error("Error deleting order:", error);
@@ -160,17 +236,16 @@ export default function OrdersPage() {
     }
   };
 
-  if (!isAuthenticated || user?.role !== "Admin") {
-    return null;
-  }
-
+  // Filtered orders (client-side)
   const filteredOrders = orders.filter((order) => {
+    const q = searchQuery.trim().toLowerCase();
     const matchesSearch =
-      order.orderId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.deliveryAddress?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase());
+      !q ||
+      (order.orderId?.toLowerCase().includes(q) ?? false) ||
+      (order.deliveryAddress?.toLowerCase().includes(q) ?? false) ||
+      (order.contactNumber?.toLowerCase().includes(q) ?? false);
 
-    const matchesStatus = statusFilter === "all" || order.orderStatus === statusFilter;
+    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -213,7 +288,10 @@ export default function OrdersPage() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1); // reset page when searching
+                }}
                 placeholder="Search by order ID, customer name, or email..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
               />
@@ -224,7 +302,10 @@ export default function OrdersPage() {
               <Filter className="w-5 h-5 text-gray-400" />
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
               >
                 {statusOptions.map((option) => (
@@ -292,12 +373,12 @@ export default function OrdersPage() {
                           <p className="text-xs text-gray-500">{order.deliveryAddress}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{order.items.length} items</span>
-                      </td>
+                      {/* <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{order.items?.length ?? 0} items</span>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-semibold text-[#2A2C22]">
-                          GHS {(order.total || order.totalAmount || 0).toFixed(2)}
+                          {/* GHS {((order.total ?? order.totalAmount) as number | undefined ?? 0).toFixed(2)} */}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -317,17 +398,18 @@ export default function OrdersPage() {
                         ) : (
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                              order.orderStatus
+                              order.status
                             )}`}
                           >
-                            {getStatusIcon(order.orderStatus)}
-                            {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                            {getStatusIcon(order.status)}
+                            {String(order.status ?? "").charAt(0).toUpperCase() +
+                              String(order.status ?? "").slice(1)}
                           </span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-500">
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -335,7 +417,7 @@ export default function OrdersPage() {
                           {editingOrderId === order._id ? (
                             <>
                               <button
-                                onClick={() => handleStatusUpdate(order._id, newStatus)}
+                                onClick={() => handleStatusUpdate(order.orderId, newStatus)}
                                 disabled={!newStatus}
                                 className="px-2 py-1 text-xs text-white bg-green-600 hover:bg-green-700 rounded transition-colors disabled:opacity-50"
                               >
@@ -355,8 +437,8 @@ export default function OrdersPage() {
                             <>
                               <button
                                 onClick={() => {
-                                  setEditingOrderId(order._id);
-                                  setNewStatus(order.orderStatus);
+                                  setEditingOrderId(order.orderId);
+                                  setNewStatus(order.status ?? "");
                                 }}
                                 className="p-1 text-[#2A2C22] hover:bg-gray-100 rounded transition-colors"
                                 title="Edit Status"
@@ -364,7 +446,7 @@ export default function OrdersPage() {
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => handleDeleteOrder(order._id)}
+                                onClick={() => handleDeleteOrder(order.orderId)}
                                 className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                                 title="Delete Order"
                               >
@@ -390,10 +472,7 @@ export default function OrdersPage() {
             ) : (
               <div className="space-y-4">
                 {filteredOrders.map((order) => (
-                  <div
-                    key={order._id}
-                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
-                  >
+                  <div key={order._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -402,11 +481,12 @@ export default function OrdersPage() {
                       </div>
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          order.orderStatus
+                          order.status
                         )}`}
                       >
-                        {getStatusIcon(order.orderStatus)}
-                        {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                        {getStatusIcon(order.status)}
+                        {String(order.status ?? "").charAt(0).toUpperCase() +
+                          String(order.status ?? "").slice(1)}
                       </span>
                     </div>
 
@@ -414,16 +494,18 @@ export default function OrdersPage() {
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Items</p>
-                        <p className="text-sm font-medium text-gray-900">{order.items.length}</p>
+                        {/* <p className="text-sm font-medium text-gray-900">{order.items?.length ?? 0}</p> */}
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Total</p>
-                        <p className="text-sm font-semibold text-gray-900">GHS {(order.total || order.totalAmount || 0).toFixed(2)}</p>
+                        {/* <p className="text-sm font-semibold text-gray-900">
+                          GHS {((order.total ?? order.price) as number | undefined ?? 0).toFixed(2)}
+                        </p> */}
                       </div>
                       <div className="col-span-2">
                         <p className="text-xs text-gray-500 mb-1">Date</p>
                         <p className="text-sm font-medium text-gray-900">
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}
                         </p>
                       </div>
                     </div>
@@ -438,8 +520,8 @@ export default function OrdersPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
-                          setEditingOrderId(order._id);
-                          setNewStatus(order.orderStatus);
+                          setEditingOrderId(order.orderId);
+                          setNewStatus(order.status ?? "");
                         }}
                         className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                       >
@@ -447,7 +529,7 @@ export default function OrdersPage() {
                         Edit Status
                       </button>
                       <button
-                        onClick={() => handleDeleteOrder(order._id)}
+                        onClick={() => handleDeleteOrder(order.orderId)}
                         className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />

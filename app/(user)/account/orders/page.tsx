@@ -107,57 +107,38 @@ export default function OrdersPage() {
         // Orders list
         <div className="space-y-6">
           {orders.map((order) => {
-            const statusInfo = getStatusInfo(order.orderStatus);
+            const statusInfo = getStatusInfo(order.status);
             return (
               <div
-                key={order._id}
+                key={order.orderId}
                 className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
               >
                 {/* Order Header */}
                 <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
                   <div>
+                     <div className="flex items-center gap-3">
+                        <Package className="w-7 h-7 text-black" />
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-900">
+                            {order.title || "Product"}
+                          </h3>
+                        </div>
+                      </div>
                     <h3 className="text-lg font-semibold text-gray-900">
                       Order #{order.orderId}
                     </h3>
-                    <p className="text-sm text-gray-600">
-                      Placed on {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Payment: {order.paymentStatus}
+                      Status: {order.status}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Total</p>
                     <p className="text-xl font-bold text-[#2A2C22]">
-                      GHS {((order.total || order.totalAmount || 0)).toFixed(2)}
+                      GHS {((order.price || 0)).toFixed(2)}
                     </p>
                   </div>
                 </div>
 
-                {/* Order Items */}
-                <div className="mb-4 space-y-2">
-                  {order.items.map((item, index) => (
-                    <div
-                      key={`${item.productId}-${index}`}
-                      className="flex items-center justify-between py-2 border-t border-gray-100"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Package className="w-5 h-5 text-gray-400" />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {item.name || "Product"}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Qty: {item.quantity}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="font-semibold text-gray-900">
-                        GHS {(item.total || (item.unitPrice * item.quantity)).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
 
                 {/* Order Status */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
@@ -176,22 +157,6 @@ export default function OrdersPage() {
                     ></div>
                   </div>
                 </div>
-
-                {/* Delivery Information */}
-                {order.deliveryAddress && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Delivery Address:</span>{" "}
-                      {order.deliveryAddress}
-                    </p>
-                    {order.contactNumber && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        <span className="font-semibold">Contact:</span>{" "}
-                        {order.contactNumber}
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
             );
           })}

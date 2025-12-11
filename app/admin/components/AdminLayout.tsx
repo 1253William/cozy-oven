@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -24,46 +24,14 @@ interface AdminLayoutProps {
 }
 
 const menuItems = [
-  {
-    name: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/admin/dashboard",
-  },
-  {
-    name: "Customer Management",
-    icon: Users,
-    href: "/admin/customers",
-  },
-  {
-    name: "Inventory",
-    icon: Package,
-    href: "/admin/inventory",
-  },
-  {
-    name: "Product Management",
-    icon: ShoppingBag,
-    href: "/admin/products",
-  },
-  {
-    name: "Orders",
-    icon: ShoppingCart,
-    href: "/admin/orders",
-  },
-  {
-    name: "Notifications",
-    icon: Bell,
-    href: "/admin/notifications",
-  },
-  {
-    name: "Admin Profile",
-    icon: UserCircle,
-    href: "/admin/profile",
-  },
-  {
-    name: "Reports",
-    icon: BarChart3,
-    href: "/admin/reports",
-  },
+  { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+  { name: "Customer Management", icon: Users, href: "/admin/customers" },
+  { name: "Inventory", icon: Package, href: "/admin/inventory" },
+  { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
+  { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
+  { name: "Notifications", icon: Bell, href: "/admin/notifications" },
+  { name: "Admin Profile", icon: UserCircle, href: "/admin/profile" },
+  { name: "Reports", icon: BarChart3, href: "/admin/reports" },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -71,9 +39,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  // Check if we're on client side to avoid hydration mismatch
-  const isMounted = typeof window !== 'undefined';
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by using stable placeholders
+  const displayName = mounted && user?.fullName ? user.fullName : "Loading...";
+  const displayEmail = mounted && user?.email ? user.email : "Loading...";
 
   const handleLogout = () => {
     logout();
@@ -82,19 +56,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar for Desktop */}
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-gray-200 fixed h-full">
-        {/* Logo/Brand */}
         <div className="p-6 border-b border-gray-200">
           <Image src="/cozy3.png" alt="Cozy Oven" width={100} height={60} />
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
+
               return (
                 <li key={item.name}>
                   <Link
@@ -114,23 +87,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </ul>
         </nav>
 
-        {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200">
-          {isMounted && (
-            <>
-              <div className="mb-3 px-4">
-                <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
-                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Logout</span>
-              </button>
-            </>
-          )}
+          <div className="mb-3 px-4">
+            <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
+            <p className="text-xs text-gray-600 truncate">{displayEmail}</p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
         </div>
       </aside>
 
@@ -148,7 +117,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Close Button */}
+        {/* Header */}
         <div className="p-4 flex justify-between items-center border-b border-gray-200">
           <div>
             <h1 className="text-xl font-bold text-[#2A2C22]">Cozy Oven</h1>
@@ -162,12 +131,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
+
               return (
                 <li key={item.name}>
                   <Link
@@ -188,29 +157,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </ul>
         </nav>
 
-        {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200">
-          {isMounted && (
-            <>
-              <div className="mb-3 px-4">
-                <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
-                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Logout</span>
-              </button>
-            </>
-          )}
+          <div className="mb-3 px-4">
+            <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
+            <p className="text-xs text-gray-600 truncate">{displayEmail}</p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Page Content */}
       <div className="flex-1 lg:ml-64">
-        {/* Mobile Header */}
+        {/* Mobile Top Bar */}
         <header className="lg:hidden bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-30">
           <div className="flex items-center justify-between">
             <button
@@ -220,11 +185,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Menu className="w-6 h-6" />
             </button>
             <h1 className="text-lg font-bold text-[#2A2C22]">Cozy Oven</h1>
-            <div className="w-10" /> {/* Spacer for alignment */}
+            <div className="w-10" />
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="p-6">{children}</main>
       </div>
     </div>

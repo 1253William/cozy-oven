@@ -18,29 +18,51 @@ export interface CheckoutRequest {
 
 // Order interface
 export interface Order {
-  _id: string;
+  _id?: string;
   orderId: string;
+
+  // New fields from your response
+  customer?: string;
+  email?: string;
+  items?: string;         
+  total?: string;         
+  date?: string;          
+
+  // Existing fields
   userId?: string;
   customerId?: string;
-  items: Array<{
-    productId: string;
-    name?: string;
-    quantity: number;
-    unitPrice: number;
-    total?: number;
-  }>;
-  subtotal: number;
-  deliveryFee: number;
-  totalAmount?: number;
-  total?: number;
-  deliveryAddress: string;
-  contactNumber: string;
-  paymentMethod: string;
-  paymentStatus: string;
-  orderStatus: string;
-  createdAt: string;
-  updatedAt: string;
+  title?: string;
+  subtotal?: number;
+  deliveryFee?: number;
+  price?: number;
+  deliveryAddress?: string;
+  contactNumber?: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  status: string;
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Pagination (embedded in same interface)
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalOrders: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+
+  // Statistics (also embedded)
+  statistics?: {
+    totalOrders: number;
+    pending: number;
+    preparing: number;
+    delivered: number;
+    cancelled: number;
+    totalRevenue: number;
+  };
 }
+
 
 // Payment initiation response
 export interface PaymentInitiationResponse {
