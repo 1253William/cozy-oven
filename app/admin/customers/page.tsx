@@ -367,6 +367,30 @@ export default function CustomersPage() {
     return matchesSearch && matchesStatus
   })
 
+  const handleViewDetails = (customerId: number) => {
+    const customer = mockCustomers.find(c => c.id === customerId)
+    if (customer) {
+      alert(`Customer Details:\n\nName: ${customer.fullName}\nEmail: ${customer.email}\nPhone: ${customer.phoneNumber}\nTotal Orders: ${customer.totalOrders}\nTotal Spent: GHS ${customer.totalSpent.toFixed(2)}\nStatus: ${customer.status}\nJoined: ${new Date(customer.joinedDate).toLocaleDateString()}`)
+    }
+    setSelectedCustomer(null)
+  }
+
+  const handleSendEmail = (customerId: number) => {
+    const customer = mockCustomers.find(c => c.id === customerId)
+    if (customer) {
+      window.location.href = `mailto:${customer.email}`
+    }
+    setSelectedCustomer(null)
+  }
+
+  const handleDeactivate = (customerId: number) => {
+    const customer = mockCustomers.find(c => c.id === customerId)
+    if (customer && confirm(`Are you sure you want to deactivate ${customer.fullName}?`)) {
+      alert(`Customer ${customer.fullName} has been deactivated. (This is a mock action)`)
+    }
+    setSelectedCustomer(null)
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -494,15 +518,24 @@ export default function CustomersPage() {
                 {/* Mobile Actions Menu */}
                 {selectedCustomer === customer.id && (
                   <div className="border-t border-gray-100 pt-3 space-y-2">
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                    <button 
+                      onClick={() => handleViewDetails(customer.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                    >
                       <Eye className="w-4 h-4" />
                       View Details
                     </button>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                    <button 
+                      onClick={() => handleSendEmail(customer.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                    >
                       <Mail className="w-4 h-4" />
                       Send Email
                     </button>
-                    <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
+                    <button 
+                      onClick={() => handleDeactivate(customer.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+                    >
                       <Ban className="w-4 h-4" />
                       Deactivate
                     </button>
@@ -608,15 +641,24 @@ export default function CustomersPage() {
 
                           {selectedCustomer === customer.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                              <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">
+                              <button 
+                                onClick={() => handleViewDetails(customer.id)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                              >
                                 <Eye className="w-4 h-4" />
                                 View Details
                               </button>
-                              <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                              <button 
+                                onClick={() => handleSendEmail(customer.id)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
                                 <Mail className="w-4 h-4" />
                                 Send Email
                               </button>
-                              <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg">
+                              <button 
+                                onClick={() => handleDeactivate(customer.id)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
+                              >
                                 <Ban className="w-4 h-4" />
                                 Deactivate
                               </button>
