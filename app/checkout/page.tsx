@@ -586,7 +586,7 @@ export default function CheckoutPage() {
   const [customerInfo, setCustomerInfo] = useState({
     name: user?.fullName || "",
     email: user?.email || "",
-    phone: "",
+    phone: user?.phoneNumber || "",
   });
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("delivery");

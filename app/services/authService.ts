@@ -12,6 +12,7 @@ export interface User {
   fullName: string;
   email: string;
   role: string;
+  phoneNumber: string;
 }
 
 export interface AuthResponse {
