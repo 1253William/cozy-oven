@@ -25,6 +25,7 @@ interface CartContextType {
   removeFromCart: (productId: string, size?: string) => void;
   updateQuantity: (productId: string, quantity: number, size?: string) => void;
   clearCart: () => void;
+  moveAllToWishlist: () => CartItem[];
   getCartCount: () => number;
   getCartTotal: () => number;
 }
@@ -91,6 +92,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart([]);
   };
 
+  const moveAllToWishlist = (): CartItem[] => {
+    const currentCart = [...cart];
+    setCart([]);
+    return currentCart;
+  };
+
   const getCartCount = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
@@ -110,6 +117,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        moveAllToWishlist,
         getCartCount,
         getCartTotal,
       }}

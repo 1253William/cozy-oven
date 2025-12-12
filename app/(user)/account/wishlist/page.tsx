@@ -3,42 +3,36 @@
 import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
-import { useState } from "react";
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  price: string;
-  image?: string;
-  sizes?: string[];
-  quantity?: number;
-}
-
-// Mock data - replace with API call
-const mockWishlist: WishlistItem[] = [
-  // {
-  //   id: "1",
-  //   name: "Classic Banana Bread",
-  //   price: "GHS 45.00",
-  //   sizes: ["Small", "Medium", "Large"],
-  // },
-];
+import { useWishlist } from "@/app/context/WishlistContext";
+import Image from "next/image";
 
 export default function WishlistPage() {
   const { addToCart } = useCart();
-  const [wishlist] = useState<WishlistItem[]>(mockWishlist);
+  const { wishlist, removeFromWishlist } = useWishlist();
   const hasItems = wishlist.length > 0;
 
-  const handleAddToCart = (item: WishlistItem) => {
+  const handleAddToCart = (item: typeof wishlist[0]) => {
     addToCart(
-     {
-       id: item.id,
-      name: item.name,
-      price: item.price,
-     },
-     item.quantity || 1,
-      item.sizes ? item.sizes[0] || "" : ""
+      {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        rating: item.rating,
+        reviews: item.reviews,
+        description: item.description,
+        sizes: item.sizes,
+        details: item.details,
+      },
+      item.quantity || 1,
+      item.selectedSize
     );
+    // Remove from wishlist after adding to cart
+    removeFromWishlist(item.id, item.selectedSize);
+  };
+
+  const handleRemove = (item: typeof wishlist[0]) => {
+    removeFromWishlist(item.id, item.selectedSize);
   };
 
   return (
@@ -72,38 +66,46 @@ export default function WishlistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlist.map((item) => (
             <div
-              key={item.id}
+              key={`${item.id}-${item.selectedSize || 'default'}`}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
             >
-              {/* Product Image Placeholder */}
-              <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center">
-                <Heart className="w-12 h-12 text-gray-300" />
+              {/* Product Image */}
+              <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center overflow-hidden relative">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <Heart className="w-12 h-12 text-gray-300" />
+                )}
               </div>
 
               {/* Product Info */}
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {item.name}
               </h3>
-              <p className="text-xl font-bold text-[#2A2C22] mb-4">
+              <p className="text-xl font-bold text-[#2A2C22] mb-2">
                 {item.price}
               </p>
 
-              {/* Sizes */}
-              {item.sizes && item.sizes.length > 0 && (
+              {/* Selected Size */}
+              {item.selectedSize && (
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Available sizes:</p>
-                  <div className="flex gap-2">
-                    {item.sizes.map((size) => (
-                      <span
-                        key={size}
-                        className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
-                      >
-                        {size}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-sm text-gray-600">
+                    Size: <span className="font-semibold">{item.selectedSize}</span>
+                  </p>
                 </div>
               )}
+
+              {/* Quantity */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">
+                  Quantity: <span className="font-semibold">{item.quantity}</span>
+                </p>
+              </div>
 
               {/* Actions */}
               <div className="flex gap-2">
@@ -112,10 +114,11 @@ export default function WishlistPage() {
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#2A2C22] text-white font-semibold rounded-lg hover:bg-[#1a1c12] transition-colors"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
+                  Move to Cart
                 </button>
                 <button
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={() => handleRemove(item)}
+                  className="p-2 border border-gray-300 rounded-lg hover:bg-red-50 transition-colors"
                   aria-label="Remove from wishlist"
                 >
                   <Heart className="w-5 h-5 text-red-500 fill-red-500" />

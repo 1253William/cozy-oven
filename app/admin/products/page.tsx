@@ -148,7 +148,8 @@ export default function ProductManagementPage() {
       if (selectOptions.length > 0) {
         formData.append("selectOptions", JSON.stringify(selectOptions));
       }
-      formData.append("productThumbnail", imageFile);
+      // Change field name from "productThumbnail" to "image" to match backend expectations
+      formData.append("image", imageFile);
 
       await createProductWithImage(formData);
       setShowAddModal(false);
@@ -175,7 +176,8 @@ export default function ProductManagementPage() {
           formData.append("productDetails", newProduct.productDetails);
         if (selectOptions.length > 0)
           formData.append("selectOptions", JSON.stringify(selectOptions));
-        formData.append("productThumbnail", imageFile);
+        // Change field name from "productThumbnail" to "image" to match backend expectations
+        formData.append("image", imageFile);
 
         await updateProductWithImage(selectedProduct._id, formData);
       } else {
