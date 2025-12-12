@@ -127,12 +127,6 @@ export default function OrdersPage() {
                     <h3 className="text-lg font-semibold text-gray-900">
                       Order #{order.orderId}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Status: {order.status}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Status: {order.date}
-                    </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Total</p>

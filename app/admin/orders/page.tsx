@@ -165,7 +165,7 @@ export default function OrdersPage() {
     setOrders(ordersArray);
 
     // Pagination
-    if (data.pagination) {
+    if (data.pagination) {`
       setTotalPages(data.pagination.totalPages || 1);
     } else {
       setTotalPages(1);
