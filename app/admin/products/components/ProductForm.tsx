@@ -1,4 +1,5 @@
 import { X, Upload, Plus } from "lucide-react";
+import Image from "next/image";
 import { SelectOption } from "../../../services/productService";
 
 interface ProductFormProps {
@@ -140,11 +141,14 @@ export default function ProductForm({
           {imageFile && <span className="text-sm text-gray-600">{imageFile.name}</span>}
         </div>
         {imagePreview && (
-          <img
-            src={imagePreview}
-            alt="Preview"
-            className="mt-2 w-32 h-32 object-cover rounded-lg"
-          />
+          <div className="mt-2 w-32 h-32 relative rounded-lg overflow-hidden">
+            <Image
+              src={imagePreview}
+              alt="Preview"
+              fill
+              className="object-cover"
+            />
+          </div>
         )}
       </div>
 

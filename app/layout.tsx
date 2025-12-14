@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 export const metadata: Metadata = {
   title: "Cozy Oven - Delicious Baked Goods",
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
-          <CartProvider>{children}</CartProvider>
+          <WishlistProvider>
+            <CartProvider>{children}</CartProvider>
+          </WishlistProvider>
         </AuthProvider>
       </body>
     </html>

@@ -83,6 +83,39 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Validate customer information
+    if (!customerInfo.name.trim() || !customerInfo.email.trim() || !customerInfo.phone.trim()) {
+      setError("Please fill in all customer information fields");
+      return;
+    }
+
+    // Validate email format - comprehensive regex following RFC 5322 standards
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (!emailRegex.test(customerInfo.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    // Validate delivery details if delivery method is selected
+    if (deliveryMethod === "delivery") {
+      if (!deliveryDetails.address.trim() || !deliveryDetails.city.trim()) {
+        setError("Please fill in delivery address and city");
+        return;
+      }
+    }
+
+    // Validate date and time
+    if (!deliveryDetails.date || !deliveryDetails.time) {
+      setError("Please select delivery/pickup date and time");
+      return;
+    }
+
+    // Validate cart is not empty
+    if (cart.length === 0) {
+      setError("Your cart is empty");
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -98,9 +131,9 @@ export default function CheckoutPage() {
         deliveryFee: deliveryMethod === "delivery" ? deliveryFee : 0,
         deliveryAddress:
           deliveryMethod === "delivery"
-            ? `${deliveryDetails.address}, ${deliveryDetails.city}`
+            ? `${deliveryDetails.address.trim()}, ${deliveryDetails.city.trim()}`
             : "Pickup from store",
-        contactNumber: customerInfo.phone,
+        contactNumber: customerInfo.phone.trim(),
         paymentMethod,
       });
 
@@ -125,7 +158,7 @@ export default function CheckoutPage() {
       if (paymentResponse.success && authUrl) {
         window.location.href = authUrl;
       } else {
-        throw new Error("Failed to initiate payment");
+        throw new Error("Failed to initiate payment. Please try again or contact support.");
       }
     } catch (err) {
       console.error("Order creation error:", err);

@@ -134,21 +134,56 @@ export default function ProductManagementPage() {
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Validate required fields
+      if (!newProduct.productName.trim()) {
+        console.error("Product name is required");
+        return;
+      }
+      
+      if (!newProduct.productCategory) {
+        console.error("Product category is required");
+        return;
+      }
+      
+      if (newProduct.price <= 0) {
+        console.error("Product price must be greater than 0");
+        return;
+      }
+      
+      if (!newProduct.productDetails.trim()) {
+        console.error("Product details are required");
+        return;
+      }
+      
       if (!imageFile) {
-        // Use the error state from the hook
+        console.error("Product image is required");
+        return;
+      }
+
+      // Validate image file type and size
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(imageFile.type)) {
+        console.error("Invalid image type. Only JPEG, PNG, and WebP are allowed");
+        return;
+      }
+      
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (imageFile.size > maxSize) {
+        console.error("Image size must be less than 5MB");
         return;
       }
 
       const formData = new FormData();
-      formData.append("productName", newProduct.productName);
+      formData.append("productName", newProduct.productName.trim());
       formData.append("price", newProduct.price.toString());
       formData.append("productCategory", newProduct.productCategory);
-      formData.append("productDetails", newProduct.productDetails);
+      formData.append("productDetails", newProduct.productDetails.trim());
       // Only append selectOptions if there are any
       if (selectOptions.length > 0) {
         formData.append("selectOptions", JSON.stringify(selectOptions));
       }
-      formData.append("productThumbnail", imageFile);
+      // Change field name from "productThumbnail" to "image" to match backend expectations
+      formData.append("image", imageFile);
 
       await createProductWithImage(formData);
       setShowAddModal(false);
@@ -164,26 +199,63 @@ export default function ProductManagementPage() {
     if (!selectedProduct) return;
 
     try {
+      // Validate if there are any changes
+      const hasChanges = 
+        newProduct.productName !== selectedProduct.productName ||
+        newProduct.price !== selectedProduct.price ||
+        newProduct.productCategory !== selectedProduct.productCategory ||
+        newProduct.productDetails !== selectedProduct.productDetails ||
+        imageFile !== null ||
+        JSON.stringify(selectOptions) !== JSON.stringify(selectedProduct.selectOptions);
+      
+      if (!hasChanges) {
+        console.log("No changes detected");
+        setShowEditModal(false);
+        setSelectedProduct(null);
+        resetForm();
+        return;
+      }
+
+      // Validate price if changed
+      if (newProduct.price && newProduct.price <= 0) {
+        console.error("Product price must be greater than 0");
+        return;
+      }
+
       if (imageFile) {
+        // Validate image file type and size
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(imageFile.type)) {
+          console.error("Invalid image type. Only JPEG, PNG, and WebP are allowed");
+          return;
+        }
+        
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (imageFile.size > maxSize) {
+          console.error("Image size must be less than 5MB");
+          return;
+        }
+
         const formData = new FormData();
-        if (newProduct.productName)
-          formData.append("productName", newProduct.productName);
+        if (newProduct.productName && newProduct.productName.trim())
+          formData.append("productName", newProduct.productName.trim());
         if (newProduct.price) formData.append("price", newProduct.price.toString());
         if (newProduct.productCategory)
           formData.append("productCategory", newProduct.productCategory);
-        if (newProduct.productDetails)
-          formData.append("productDetails", newProduct.productDetails);
+        if (newProduct.productDetails && newProduct.productDetails.trim())
+          formData.append("productDetails", newProduct.productDetails.trim());
         if (selectOptions.length > 0)
           formData.append("selectOptions", JSON.stringify(selectOptions));
-        formData.append("productThumbnail", imageFile);
+        // Change field name from "productThumbnail" to "image" to match backend expectations
+        formData.append("image", imageFile);
 
         await updateProductWithImage(selectedProduct._id, formData);
       } else {
         await updateProduct(selectedProduct._id, {
-          productName: newProduct.productName || undefined,
+          productName: newProduct.productName?.trim() || undefined,
           price: newProduct.price || undefined,
           productCategory: newProduct.productCategory || undefined,
-          productDetails: newProduct.productDetails || undefined,
+          productDetails: newProduct.productDetails?.trim() || undefined,
           selectOptions: selectOptions.length > 0 ? selectOptions : undefined,
         });
       }

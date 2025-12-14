@@ -17,6 +17,7 @@ function OrderSuccessContent() {
 
   
   useEffect(() => {
+    // Clear cart after successful order
     clearCart();
   }, [clearCart]);
 

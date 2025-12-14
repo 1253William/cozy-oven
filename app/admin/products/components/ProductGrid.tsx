@@ -1,4 +1,5 @@
 import { Edit2, Trash2, Package } from "lucide-react";
+import Image from "next/image";
 import { Product } from "../../../services/productService";
 
 interface ProductGridProps {
@@ -16,12 +17,13 @@ export default function ProductGrid({ products, onEdit, onDelete }: ProductGridP
           className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
         >
           {/* Product Image */}
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden relative">
             {product.productThumbnail ? (
-              <img
+              <Image
                 src={product.productThumbnail}
                 alt={product.productName}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             ) : (
               <Package className="w-16 h-16 text-gray-400" />
