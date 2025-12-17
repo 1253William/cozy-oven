@@ -100,10 +100,10 @@ export default function AdminDashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Best Seller</p>
                     <h3 className="text-lg font-bold text-gray-900 mt-2">
-                      {dashboardData.popularProductThisWeek.name}
+                      {dashboardData.bestSellerThisMonth?.name}
                     </h3>
                     <p className="text-xs text-gray-600 mt-1">
-                      {dashboardData.popularProductThisWeek.quantitySold} sold
+                      {dashboardData.bestSellerThisMonth?.quantitySold} sold
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">

@@ -22,7 +22,8 @@ export interface PopularProduct {
 export interface DashboardOverview {
   dailyStats: DailyStats;
   monthlyStats: MonthlyStats;
-  popularProductThisWeek: PopularProduct;
+  bestSellerThisWeek: PopularProduct;
+  bestSellerThisMonth: PopularProduct;
 }
 
 export interface DashboardOverviewResponse {
