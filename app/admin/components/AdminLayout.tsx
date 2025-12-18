@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import Image from "next/image";
+import notificationService from "../../services/notificationService";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -40,10 +41,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    // Fetch notification count when user is authenticated
+    const fetchNotificationCount = async () => {
+      if (user?.role === "Admin") {
+        try {
+          const response = await notificationService.getUnreadNotifications();
+          if (response.success) {
+            setNotificationCount(response.unread);
+          }
+        } catch (error) {
+          console.error("Error fetching notification count:", error);
+        }
+      }
+    };
+
+    fetchNotificationCount();
+    // Refresh notification count every 30 seconds
+    const interval = setInterval(fetchNotificationCount, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   // Prevent hydration mismatch by using stable placeholders
   const displayName = mounted && user?.fullName ? user.fullName : "Loading...";
@@ -72,7 +96,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
                       isActive
                         ? "bg-[#2A2C22] text-white"
                         : "text-gray-700 hover:bg-gray-100"
@@ -80,6 +104,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.name}</span>
+                    {item.name === "Notifications" && notificationCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1.5">
+                        {notificationCount > 99 ? "99+" : notificationCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );
@@ -142,7 +171,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Link
                     href={item.href}
                     onClick={() => setIsSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
                       isActive
                         ? "bg-[#2A2C22] text-white"
                         : "text-gray-700 hover:bg-gray-100"
@@ -150,6 +179,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.name}</span>
+                    {item.name === "Notifications" && notificationCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1.5">
+                        {notificationCount > 99 ? "99+" : notificationCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

@@ -13,25 +13,46 @@ import {
   AlertCircle,
   Edit2,
   Plus,
-  Minus,
   Loader2,
   Trash2,
 } from "lucide-react";
-import InventoryCards from "./components/InventoryCards";
 import inventoryService, { type InventoryItem } from "../../services/inventoryService";
+import AddInventoryModal from "./components/AddInventoryModal";
+import EditInventoryModal from "./components/EditInventoryModal";
 
 export default function InventoryPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setcategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [adjustmentAmount, setAdjustmentAmount] = useState(0);
-  const [adjustmentType, setAdjustmentType] = useState<"add" | "remove">("add");
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Add Inventory Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [addItemName, setAddItemName] = useState("");
+  const [addQuantityPurchased, setAddQuantityPurchased] = useState(0);
+  const [addCostPrice, setAddCostPrice] = useState(0);
+  const [addSellingPrice, setAddSellingPrice] = useState(0);
+  const [addVendorName, setAddVendorName] = useState("");
+  const [addVendorContact, setAddVendorContact] = useState("");
+  const [addPurchasePurpose, setAddPurchasePurpose] = useState("");
+  const [addItemCategory, setAddItemCategory] = useState("");
+
+  // Edit Inventory Modal State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [editItemName, setEditItemName] = useState("");
+  const [editQuantityPurchased, setEditQuantityPurchased] = useState(0);
+  const [editCostPrice, setEditCostPrice] = useState(0);
+  const [editSellingPrice, setEditSellingPrice] = useState(0);
+  const [editVendorName, setEditVendorName] = useState("");
+  const [editVendorContact, setEditVendorContact] = useState("");
+  const [editPurchasePurpose, setEditPurchasePurpose] = useState("");
+  const [editItemCategory, setEditItemCategory] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -44,7 +65,7 @@ export default function InventoryPage() {
       fetchInventory();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage, statusFilter, categoryFilter]);
+  }, [isAuthenticated, user, currentPage, statusFilter]);
 
   const fetchInventory = async () => {
     try {
@@ -54,7 +75,6 @@ export default function InventoryPage() {
         limit: 10,
         search: searchQuery || undefined,
         status: statusFilter !== "all" ? statusFilter : undefined,
-        category: categoryFilter !== "all" ? categoryFilter : undefined,
       });
       if (response.success) {
         setInventory(response.data);
@@ -64,11 +84,6 @@ export default function InventoryPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSearch = () => {
-    setCurrentPage(1);
-    fetchInventory();
   };
 
   const handleDelete = async (id: string) => {
@@ -83,6 +98,96 @@ export default function InventoryPage() {
         console.error("Error deleting inventory:", error);
         alert("Failed to delete inventory item");
       }
+    }
+  };
+
+  // Add Inventory Handler
+  const handleAddInventory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddLoading(true);
+    try {
+      const response = await inventoryService.createInventory({
+        itemName: addItemName,
+        quantityPurchased: addQuantityPurchased,
+        costPrice: addCostPrice,
+        sellingPrice: addSellingPrice,
+        vendorName: addVendorName,
+        vendorContact: addVendorContact,
+        purchasePurpose: addPurchasePurpose,
+        itemCategory: addItemCategory,
+      });
+      if (response.success) {
+        alert(response.message);
+        setShowAddModal(false);
+        resetAddForm();
+        fetchInventory();
+      }
+    } catch (error) {
+      console.error("Error creating inventory:", error);
+      alert("Failed to create inventory item");
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+  const resetAddForm = () => {
+    setAddItemName("");
+    setAddQuantityPurchased(0);
+    setAddCostPrice(0);
+    setAddSellingPrice(0);
+    setAddVendorName("");
+    setAddVendorContact("");
+    setAddPurchasePurpose("");
+    setAddItemCategory("");
+  };
+
+  // Edit Inventory Handler
+  const handleEditClick = async (item: InventoryItem) => {
+    try {
+      // Fetch full item details
+      const response = await inventoryService.getInventoryItem(item._id);
+      if (response.success) {
+        const fullItem = response.data;
+        setSelectedItem(fullItem);
+        setEditItemName(fullItem.itemName);
+        setEditQuantityPurchased(fullItem.quantityRemaining);
+        setEditCostPrice(fullItem.costPrice);
+        setEditSellingPrice(fullItem.sellingPrice || 0);
+        setEditVendorName(fullItem.vendorName);
+        setEditVendorContact(fullItem.vendorContact || "");
+        setEditPurchasePurpose(fullItem.purchasePurpose || "");
+        setEditItemCategory(fullItem.itemCategory);
+        setShowEditModal(true);
+      }
+    } catch (error) {
+      console.error("Error fetching inventory item:", error);
+      alert("Failed to fetch inventory item details");
+    }
+  };
+
+  const handleEditInventory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedItem) return;
+
+    setEditLoading(true);
+    try {
+      const response = await inventoryService.updateInventory(selectedItem._id, {
+        itemName: editItemName,
+        itemQuantity: editQuantityPurchased,
+        itemPrice: editCostPrice,
+        itemCategory: editItemCategory,
+      });
+      if (response.success) {
+        alert(response.message);
+        setShowEditModal(false);
+        setSelectedItem(null);
+        fetchInventory();
+      }
+    } catch (error) {
+      console.error("Error updating inventory:", error);
+      alert("Failed to update inventory item");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -129,45 +234,24 @@ export default function InventoryPage() {
     }
   };
 
-  const handleStockAdjustment = async (itemId: string) => {
-    const item = inventory.find((i) => i._id === itemId);
-    if (!item) return;
 
-    // Validate adjustment amount
-    if (adjustmentAmount <= 0) {
-      alert("Adjustment amount must be a positive number");
-      return;
-    }
-
-    try {
-      // Calculate new quantity based on adjustment type
-      const currentQty = item.quantityRemaining;
-      const newQty = adjustmentType === "add" 
-        ? currentQty + adjustmentAmount 
-        : Math.max(0, currentQty - adjustmentAmount);
-
-      const response = await inventoryService.updateInventory(itemId, {
-        itemQuantity: newQty,
-      });
-      if (response.success) {
-        alert(response.message);
-        fetchInventory();
-      }
-    } catch (error) {
-      console.error("Error adjusting stock:", error);
-      alert("Failed to adjust stock");
-    }
-    setSelectedItem(null);
-    setAdjustmentAmount(0);
-  };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
-          <p className="text-gray-600 mt-1">Track and manage your product stock levels</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
+            <p className="text-gray-600 mt-1">Track and manage your product stock levels</p>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Add Inventory
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -237,6 +321,12 @@ export default function InventoryPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    setCurrentPage(1);
+                    fetchInventory();
+                  }
+                }}
                 placeholder="Search by product name, SKU, or category..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
               />
@@ -355,7 +445,7 @@ export default function InventoryPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => setSelectedItem(item._id)}
+                            onClick={() => handleEditClick(item)}
                             className="p-1 text-[#2A2C22] hover:bg-gray-100 rounded transition-colors"
                             title="Edit"
                           >
@@ -377,23 +467,76 @@ export default function InventoryPage() {
             </table>
           </div>
 
-          {/* Mobile Cards View */}
-          <div className="md:hidden p-4">
-            <InventoryCards
-              items={filteredInventory}
-              onAdjustStock={handleStockAdjustment}
-              selectedItem={selectedItem}
-              setSelectedItem={setSelectedItem}
-              adjustmentType={adjustmentType}
-              setAdjustmentType={setAdjustmentType}
-              adjustmentAmount={adjustmentAmount}
-              setAdjustmentAmount={setAdjustmentAmount}
-            />
+          {/* Mobile Cards View - Simplified */}
+          <div className="md:hidden p-4 space-y-4">
+            {loading ? (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin mx-auto" />
+              </div>
+            ) : filteredInventory.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No inventory items found</p>
+              </div>
+            ) : (
+              filteredInventory.map((item) => (
+                <div key={item._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <Package className="w-6 h-6 text-gray-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{item.itemName}</h3>
+                        <p className="text-sm text-gray-500">{item.itemCategory}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.itemStatus)}`}>
+                      {getStockIcon(item.itemStatus)}
+                      {item.itemStatus.charAt(0).toUpperCase() + item.itemStatus.slice(1)}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">SKU</p>
+                      <p className="text-sm font-medium text-gray-900">{item.itemSKU}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Stock</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {item.quantityRemaining} / {item.quantityPurchased}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Unit Cost</p>
+                      <p className="text-sm font-semibold text-gray-900">GHS {item.costPrice.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Actions</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditClick(item)}
+                          className="p-1 text-[#2A2C22] hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Empty State */}
-          {filteredInventory.length === 0 && (
-            <div className="text-center py-12">
+          {filteredInventory.length === 0 && !loading && (
+            <div className="hidden md:block text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No inventory items found</p>
             </div>
@@ -401,107 +544,60 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Stock Adjustment Modal - Only for Desktop */}
-      {selectedItem && (
-        <div className="hidden md:flex fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Adjust Stock</h2>
-            <p className="text-gray-600 mb-6">
-              Adjust the stock level for{" "}
-              {mockInventory.find((i) => i.id === selectedItem)?.productName}
-            </p>
+      {/* Add Inventory Modal */}
+      <AddInventoryModal
+        show={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          resetAddForm();
+        }}
+        onSubmit={handleAddInventory}
+        itemName={addItemName}
+        quantityPurchased={addQuantityPurchased}
+        costPrice={addCostPrice}
+        sellingPrice={addSellingPrice}
+        vendorName={addVendorName}
+        vendorContact={addVendorContact}
+        purchasePurpose={addPurchasePurpose}
+        itemCategory={addItemCategory}
+        loading={addLoading}
+        onItemNameChange={setAddItemName}
+        onQuantityPurchasedChange={setAddQuantityPurchased}
+        onCostPriceChange={setAddCostPrice}
+        onSellingPriceChange={setAddSellingPrice}
+        onVendorNameChange={setAddVendorName}
+        onVendorContactChange={setAddVendorContact}
+        onPurchasePurposeChange={setAddPurchasePurpose}
+        onItemCategoryChange={setAddItemCategory}
+      />
 
-            <div className="space-y-4">
-              {/* Adjustment Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Adjustment Type
-                </label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setAdjustmentType("add")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-                      adjustmentType === "add"
-                        ? "bg-green-100 border-green-500 text-green-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Stock
-                  </button>
-                  <button
-                    onClick={() => setAdjustmentType("remove")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-                      adjustmentType === "remove"
-                        ? "bg-red-100 border-red-500 text-red-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Minus className="w-4 h-4" />
-                    Remove Stock
-                  </button>
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={adjustmentAmount}
-                  onChange={(e) => setAdjustmentAmount(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-                  placeholder="Enter amount"
-                />
-              </div>
-
-              {/* Current Stock Info */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Current Stock:</span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {mockInventory.find((i) => i.id === selectedItem)?.currentStock}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-gray-600">New Stock:</span>
-                  <span className="text-sm font-semibold text-[#2A2C22]">
-                    {adjustmentType === "add"
-                      ? (mockInventory.find((i) => i.id === selectedItem)?.currentStock ||
-                          0) + adjustmentAmount
-                      : Math.max(
-                          0,
-                          (mockInventory.find((i) => i.id === selectedItem)
-                            ?.currentStock || 0) - adjustmentAmount
-                        )}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => {
-                  setSelectedItem(null);
-                  setAdjustmentAmount(0);
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleStockAdjustment(selectedItem)}
-                className="flex-1 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Edit Inventory Modal */}
+      <EditInventoryModal
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedItem(null);
+        }}
+        onSubmit={handleEditInventory}
+        selectedItem={selectedItem}
+        itemName={editItemName}
+        quantityPurchased={editQuantityPurchased}
+        costPrice={editCostPrice}
+        sellingPrice={editSellingPrice}
+        vendorName={editVendorName}
+        vendorContact={editVendorContact}
+        purchasePurpose={editPurchasePurpose}
+        itemCategory={editItemCategory}
+        loading={editLoading}
+        onItemNameChange={setEditItemName}
+        onQuantityPurchasedChange={setEditQuantityPurchased}
+        onCostPriceChange={setEditCostPrice}
+        onSellingPriceChange={setEditSellingPrice}
+        onVendorNameChange={setEditVendorName}
+        onVendorContactChange={setEditVendorContact}
+        onPurchasePurposeChange={setEditPurchasePurpose}
+        onItemCategoryChange={setEditItemCategory}
+      />
     </AdminLayout>
   );
 }
