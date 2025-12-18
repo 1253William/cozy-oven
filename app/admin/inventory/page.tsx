@@ -130,11 +130,18 @@ export default function InventoryPage() {
   };
 
   const handleStockAdjustment = async (itemId: string) => {
-    // Simple update - in real implementation, you'd show a modal for details
+    const item = inventory.find((i) => i._id === itemId);
+    if (!item) return;
+
     try {
+      // Calculate new quantity based on adjustment type
+      const currentQty = item.quantityRemaining;
+      const newQty = adjustmentType === "add" 
+        ? currentQty + adjustmentAmount 
+        : Math.max(0, currentQty - adjustmentAmount);
+
       const response = await inventoryService.updateInventory(itemId, {
-        // Update quantity based on adjustment
-        itemQuantity: adjustmentType === "add" ? adjustmentAmount : -adjustmentAmount,
+        itemQuantity: newQty,
       });
       if (response.success) {
         alert(response.message);
