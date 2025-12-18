@@ -133,6 +133,12 @@ export default function InventoryPage() {
     const item = inventory.find((i) => i._id === itemId);
     if (!item) return;
 
+    // Validate adjustment amount
+    if (adjustmentAmount <= 0) {
+      alert("Adjustment amount must be a positive number");
+      return;
+    }
+
     try {
       // Calculate new quantity based on adjustment type
       const currentQty = item.quantityRemaining;
