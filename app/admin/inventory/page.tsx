@@ -14,81 +14,24 @@ import {
   Edit2,
   Plus,
   Minus,
+  Loader2,
+  Trash2,
 } from "lucide-react";
 import InventoryCards from "./components/InventoryCards";
-
-// Mock inventory data - replace with actual API calls
-const mockInventory = [
-  {
-    id: 1,
-    productName: "Classic Banana Bread",
-    sku: "CBB-001",
-    category: "Classic",
-    currentStock: 45,
-    minStock: 10,
-    maxStock: 100,
-    reorderPoint: 15,
-    unitCost: 15.0,
-    status: "in_stock",
-  },
-  {
-    id: 2,
-    productName: "Chocolate Chip Delight",
-    sku: "CCD-002",
-    category: "Chocolate",
-    currentStock: 5,
-    minStock: 10,
-    maxStock: 80,
-    reorderPoint: 15,
-    unitCost: 18.0,
-    status: "low_stock",
-  },
-  {
-    id: 3,
-    productName: "Walnut Banana Bread",
-    sku: "WBB-003",
-    category: "Nuts & Seeds",
-    currentStock: 32,
-    minStock: 8,
-    maxStock: 70,
-    reorderPoint: 12,
-    unitCost: 20.0,
-    status: "in_stock",
-  },
-  {
-    id: 4,
-    productName: "Blueberry Banana Bread",
-    sku: "BBB-004",
-    category: "Fruits",
-    currentStock: 0,
-    minStock: 10,
-    maxStock: 75,
-    reorderPoint: 15,
-    unitCost: 19.0,
-    status: "out_of_stock",
-  },
-  {
-    id: 5,
-    productName: "Double Chocolate Delight",
-    sku: "DCD-005",
-    category: "Chocolate",
-    currentStock: 28,
-    minStock: 8,
-    maxStock: 80,
-    reorderPoint: 12,
-    unitCost: 22.0,
-    status: "in_stock",
-  },
-];
+import inventoryService, { type InventoryItem } from "../../services/inventoryService";
 
 export default function InventoryPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setcategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [adjustmentAmount, setAdjustmentAmount] = useState(0);
   const [adjustmentType, setAdjustmentType] = useState<"add" | "remove">("add");
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -96,61 +39,124 @@ export default function InventoryPage() {
     }
   }, [isAuthenticated, user, router]);
 
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "Admin") {
+      fetchInventory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user, currentPage, statusFilter, categoryFilter]);
+
+  const fetchInventory = async () => {
+    try {
+      setLoading(true);
+      const response = await inventoryService.getAllInventory({
+        page: currentPage,
+        limit: 10,
+        search: searchQuery || undefined,
+        status: statusFilter !== "all" ? statusFilter : undefined,
+        category: categoryFilter !== "all" ? categoryFilter : undefined,
+      });
+      if (response.success) {
+        setInventory(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchInventory();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this inventory item?")) {
+      try {
+        const response = await inventoryService.deleteInventory(id);
+        if (response.success) {
+          alert(response.message);
+          fetchInventory();
+        }
+      } catch (error) {
+        console.error("Error deleting inventory:", error);
+        alert("Failed to delete inventory item");
+      }
+    }
+  };
+
   if (!isAuthenticated || user?.role !== "Admin") {
     return null;
   }
 
-  const filteredInventory = mockInventory.filter((item) => {
-    const matchesSearch =
-      item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  const filteredInventory = inventory;
 
   const stats = {
-    totalProducts: mockInventory.length,
-    lowStock: mockInventory.filter((item) => item.status === "low_stock").length,
-    outOfStock: mockInventory.filter((item) => item.status === "out_of_stock").length,
-    totalValue: mockInventory
-      .reduce((acc, item) => acc + item.currentStock * item.unitCost, 0)
+    totalProducts: inventory.length,
+    lowStock: inventory.filter((item) => item.itemStatus === "low stock").length,
+    outOfStock: inventory.filter((item) => item.itemStatus === "out of stock").length,
+    totalValue: inventory
+      .reduce((acc, item) => acc + item.quantityRemaining * item.costPrice, 0)
       .toFixed(2),
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "in_stock":
+    switch (status.toLowerCase()) {
+      case "in stock":
         return "bg-green-100 text-green-700";
-      case "low_stock":
+      case "low stock":
         return "bg-yellow-100 text-yellow-700";
-      case "out_of_stock":
+      case "out of stock":
         return "bg-red-100 text-red-700";
+      case "damaged":
+        return "bg-orange-100 text-orange-700";
       default:
         return "bg-gray-100 text-gray-700";
     }
   };
 
   const getStockIcon = (status: string) => {
-    switch (status) {
-      case "in_stock":
+    switch (status.toLowerCase()) {
+      case "in stock":
         return <TrendingUp className="w-4 h-4" />;
-      case "low_stock":
+      case "low stock":
         return <AlertCircle className="w-4 h-4" />;
-      case "out_of_stock":
+      case "out of stock":
         return <TrendingDown className="w-4 h-4" />;
       default:
         return null;
     }
   };
 
-  const handleStockAdjustment = (itemId: number) => {
-    // TODO: Implement stock adjustment API call
-    console.log(
-      `Adjusting stock for item ${itemId}: ${adjustmentType} ${adjustmentAmount}`
-    );
+  const handleStockAdjustment = async (itemId: string) => {
+    const item = inventory.find((i) => i._id === itemId);
+    if (!item) return;
+
+    // Validate adjustment amount
+    if (adjustmentAmount <= 0) {
+      alert("Adjustment amount must be a positive number");
+      return;
+    }
+
+    try {
+      // Calculate new quantity based on adjustment type
+      const currentQty = item.quantityRemaining;
+      const newQty = adjustmentType === "add" 
+        ? currentQty + adjustmentAmount 
+        : Math.max(0, currentQty - adjustmentAmount);
+
+      const response = await inventoryService.updateInventory(itemId, {
+        itemQuantity: newQty,
+      });
+      if (response.success) {
+        alert(response.message);
+        fetchInventory();
+      }
+    } catch (error) {
+      console.error("Error adjusting stock:", error);
+      alert("Failed to adjust stock");
+    }
     setSelectedItem(null);
     setAdjustmentAmount(0);
   };
@@ -165,55 +171,61 @@ export default function InventoryPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Package className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Total Products</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Package className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Total Products</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Low Stock</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
+            <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Low Stock</p>
+                  <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <TrendingDown className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Out of Stock</p>
-                <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
+            <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <TrendingDown className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Out of Stock</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Total Value</p>
-                <p className="text-xl font-bold text-gray-900">GHS {stats.totalValue}</p>
+            <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Total Value</p>
+                  <p className="text-xl font-bold text-gray-900">GHS {stats.totalValue}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
@@ -281,67 +293,86 @@ export default function InventoryPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredInventory.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <Package className="w-5 h-5 text-gray-500" />
-                        </div>
-                        <span className="ml-3 text-sm font-medium text-gray-900">
-                          {item.productName}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-600">{item.sku}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-600">{item.category}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-900">
-                          {item.currentStock}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          / {item.maxStock}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-600">{item.reorderPoint}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">
-                        GHS {item.unitCost.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          item.status
-                        )}`}
-                      >
-                        {getStockIcon(item.status)}
-                        {item.status === "in_stock"
-                          ? "In Stock"
-                          : item.status === "low_stock"
-                          ? "Low Stock"
-                          : "Out of Stock"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => setSelectedItem(item.id)}
-                        className="flex items-center gap-2 px-3 py-1 text-sm text-[#2A2C22] hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                        Adjust
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-8 text-center">
+                      <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin mx-auto" />
                     </td>
                   </tr>
-                ))}
+                ) : filteredInventory.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                      No inventory items found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInventory.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <Package className="w-5 h-5 text-gray-500" />
+                          </div>
+                          <span className="ml-3 text-sm font-medium text-gray-900">
+                            {item.itemName}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-600">{item.itemSKU}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-600">{item.itemCategory}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-900">
+                            {item.quantityRemaining}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            / {item.quantityPurchased}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-600">-</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">
+                          GHS {item.costPrice.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                            item.itemStatus
+                          )}`}
+                        >
+                          {getStockIcon(item.itemStatus)}
+                          {item.itemStatus.charAt(0).toUpperCase() + item.itemStatus.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSelectedItem(item._id)}
+                            className="p-1 text-[#2A2C22] hover:bg-gray-100 rounded transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
