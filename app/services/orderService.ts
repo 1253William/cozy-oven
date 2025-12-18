@@ -179,8 +179,7 @@ export const orderService = {
     status: "pending" | "preparing" | "on-delivery" | "delivered" | "cancelled"
   ): Promise<ApiResponse<Order>> => {
     const response = await apiClient.patch(
-      `/api/v1/dashboard/admin/orders/${orderId}`,
-      { status }
+      `/api/v1/dashboard/admin/orders/status/${orderId}/${status}`
     );
     return response.data;
   },
