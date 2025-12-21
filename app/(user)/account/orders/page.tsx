@@ -120,7 +120,7 @@ export default function OrdersPage() {
                           Order #{order.orderId}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
+                          {order.title || 'N/A'}
                         </p>
                       </div>
                     </div>

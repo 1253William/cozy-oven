@@ -198,11 +198,11 @@ export default function InventoryPage() {
   const filteredInventory = inventory;
 
   const stats = {
-    totalProducts: inventory.length,
-    lowStock: inventory.filter((item) => item.itemStatus === "low stock").length,
-    outOfStock: inventory.filter((item) => item.itemStatus === "out of stock").length,
+    totalProducts: inventory?.length,
+    lowStock: inventory?.filter((item) => item.itemStatus === "low stock").length,
+    outOfStock: inventory?.filter((item) => item.itemStatus === "out of stock").length,
     totalValue: inventory
-      .reduce((acc, item) => acc + item.quantityRemaining * item.costPrice, 0)
+      ?.reduce((acc, item) => acc + item.quantityRemaining * item.costPrice, 0)
       .toFixed(2),
   };
 
@@ -389,14 +389,14 @@ export default function InventoryPage() {
                       <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin mx-auto" />
                     </td>
                   </tr>
-                ) : filteredInventory.length === 0 ? (
+                ) : filteredInventory?.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       No inventory items found
                     </td>
                   </tr>
                 ) : (
-                  filteredInventory.map((item) => (
+                  filteredInventory?.map((item) => (
                     <tr key={item._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -473,13 +473,13 @@ export default function InventoryPage() {
               <div className="text-center py-8">
                 <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin mx-auto" />
               </div>
-            ) : filteredInventory.length === 0 ? (
+            ) : filteredInventory?.length === 0 ? (
               <div className="text-center py-12">
                 <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No inventory items found</p>
               </div>
             ) : (
-              filteredInventory.map((item) => (
+              filteredInventory?.map((item) => (
                 <div key={item._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -535,7 +535,7 @@ export default function InventoryPage() {
           </div>
 
           {/* Empty State */}
-          {filteredInventory.length === 0 && !loading && (
+          {filteredInventory?.length === 0 && !loading && (
             <div className="hidden md:block text-center py-12">
               <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No inventory items found</p>

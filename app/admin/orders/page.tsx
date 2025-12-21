@@ -407,7 +407,7 @@ export default function OrdersPage() {
             ) : (
               <div className="space-y-4">
                 {filteredOrders.map((order) => (
-                  <div key={order._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                  <div key={order.orderId} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -429,9 +429,10 @@ export default function OrdersPage() {
                     <div className="grid grid-cols-1 gap-3 mb-3">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Date</p>
-                        <p className="text-sm font-medium text-gray-900">
-                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}
-                        </p>
+                       <p className="text-sm font-medium text-gray-900">
+                        {order.date ? new Date(order.date).toLocaleDateString() : "-"}
+                      </p>
+
                       </div>
                     </div>
 
