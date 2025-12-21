@@ -317,7 +317,7 @@ export default function OrdersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {editingOrderId === order._id ? (
+                        {editingOrderId === order.orderId ? (
                           <select
                             value={newStatus}
                             onChange={(e) => setNewStatus(e.target.value)}
@@ -349,7 +349,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          {editingOrderId === order._id ? (
+                          {editingOrderId === order.orderId ? (
                             <>
                               <button
                                 onClick={() => handleStatusUpdate(order.orderId, newStatus)}

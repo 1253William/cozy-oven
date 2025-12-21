@@ -86,7 +86,7 @@ function OrderSuccessContent() {
                 Continue Shopping
               </button>
               <button
-                onClick={() => router.push("/orders")}
+                onClick={() => router.push("/account/orders")}
                 className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-8 rounded-lg transition-colors"
               >
                 Track Order
