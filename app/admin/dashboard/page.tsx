@@ -14,7 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Image from "next/image";
-import { useDashboardOverview, usePopularProducts } from "../../hooks/useDashboard";
+import { useDashboardOverview, usePopularProducts, useSalesOverview } from "../../hooks/useDashboard";
 
 export default function AdminDashboardPage() {
   const { user, isAuthenticated } = useAuth();
@@ -27,6 +27,16 @@ export default function AdminDashboardPage() {
   // Fetch real dashboard data
   const { data: dashboardData, loading: dashboardLoading } = useDashboardOverview();
   const { products: popularProducts, loading: productsLoading } = usePopularProducts(1, 4);
+  
+  // Fetch sales overview data based on chart filter
+  const { data: dailySalesData, loading: dailySalesLoading } = useSalesOverview(
+    chartFilter === "daily",
+    false
+  );
+  const { data: monthlySalesData, loading: monthlySalesLoading } = useSalesOverview(
+    false,
+    chartFilter === "monthly"
+  );
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -39,6 +49,53 @@ export default function AdminDashboardPage() {
   }
 
   const loading = dashboardLoading || productsLoading;
+
+  // Prepare chart data based on filter
+  const getChartData = () => {
+    if (chartFilter === "daily" && dailySalesData && dailySalesData.length > 0) {
+      return dailySalesData.map((point) => ({
+        label: point.date ? new Date(point.date).toLocaleDateString('en-US', { weekday: 'short' }) : '',
+        value: point.sales,
+      }));
+    } else if (chartFilter === "monthly" && monthlySalesData && monthlySalesData.length > 0) {
+      return monthlySalesData.map((point) => ({
+        label: point.month || '',
+        value: point.sales,
+      }));
+    }
+    
+    // Fallback to hardcoded data if no API data available
+    if (chartFilter === "daily") {
+      return [
+        { label: "Mon", value: 850 },
+        { label: "Tue", value: 1200 },
+        { label: "Wed", value: 950 },
+        { label: "Thu", value: 1100 },
+        { label: "Fri", value: 1400 },
+        { label: "Sat", value: 1600 },
+        { label: "Sun", value: 1300 },
+      ];
+    } else if (chartFilter === "monthly") {
+      return [
+        { label: "Jan", value: 35000 },
+        { label: "Feb", value: 38000 },
+        { label: "Mar", value: 42000 },
+        { label: "Apr", value: 39000 },
+        { label: "May", value: 45000 },
+        { label: "Jun", value: 46000 },
+      ];
+    } else {
+      return [
+        { label: "Q1", value: 115000 },
+        { label: "Q2", value: 130000 },
+        { label: "Q3", value: 125000 },
+        { label: "Q4", value: 140000 },
+      ];
+    }
+  };
+
+  const chartData = getChartData();
+  const maxValue = Math.max(...chartData.map((d) => d.value));
 
   return (
     <AdminLayout>
@@ -291,73 +348,30 @@ export default function AdminDashboardPage() {
 
           {/* Bar Chart */}
           <div className="h-80">
-            <div className="h-full flex items-end justify-between gap-4 px-4">
-              {chartFilter === "daily" && [
-                { label: "Mon", value: 850 },
-                { label: "Tue", value: 1200 },
-                { label: "Wed", value: 950 },
-                { label: "Thu", value: 1100 },
-                { label: "Fri", value: 1400 },
-                { label: "Sat", value: 1600 },
-                { label: "Sun", value: 1300 },
-              ].map((day, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
-                    <div
-                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
-                      style={{ height: `${(day.value / 1600) * 280}px` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                        GHS {day.value}
+            {(chartFilter === "daily" && dailySalesLoading) || 
+             (chartFilter === "monthly" && monthlySalesLoading) ? (
+              <div className="h-full flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin" />
+              </div>
+            ) : (
+              <div className="h-full flex items-end justify-between gap-4 px-4">
+                {chartData.map((dataPoint, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="w-full bg-gray-100 rounded-t-lg relative group">
+                      <div
+                        className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32]"
+                        style={{ height: `${maxValue > 0 ? (dataPoint.value / maxValue) * 280 : 0}px` }}
+                      >
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                          GHS {dataPoint.value.toLocaleString()}
+                        </div>
                       </div>
                     </div>
+                    <span className="text-xs font-medium text-gray-600">{dataPoint.label}</span>
                   </div>
-                  <span className="text-xs font-medium text-gray-600">{day.label}</span>
-                </div>
-              ))}
-              {chartFilter === "monthly" && [
-                { label: "Jan", value: 35000 },
-                { label: "Feb", value: 38000 },
-                { label: "Mar", value: 42000 },
-                { label: "Apr", value: 39000 },
-                { label: "May", value: 45000 },
-                { label: "Jun", value: 46000 },
-              ].map((month, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
-                    <div
-                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
-                      style={{ height: `${(month.value / 46000) * 280}px` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                        GHS {month.value.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-600">{month.label}</span>
-                </div>
-              ))}
-              {chartFilter === "overview" && [
-                { label: "Q1", value: 115000 },
-                { label: "Q2", value: 130000 },
-                { label: "Q3", value: 125000 },
-                { label: "Q4", value: 140000 },
-              ].map((quarter, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full bg-gray-100 rounded-t-lg relative group">
-                    <div
-                      className="w-full bg-[#2A2C22] rounded-t-lg transition-all duration-500 hover:bg-[#3a3c32] cursor-pointer"
-                      style={{ height: `${(quarter.value / 140000) * 280}px` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                        GHS {quarter.value.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-600">{quarter.label}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

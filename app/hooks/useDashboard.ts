@@ -67,6 +67,12 @@ export const useSalesOverview = (daily = false, monthly = false) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
+    // Don't fetch if neither daily nor monthly is selected
+    if (!daily && !monthly) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await dashboardService.getSalesOverview({ daily, monthly });
