@@ -17,7 +17,7 @@ export default function Hero() {
   };
 
   return(
-    <section className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] flex items-center justify-center text-center">
+    <section className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] flex items-center justify-center text-center mt-0 md:mt-5">
       <Image
         src={logo}
         alt="Cozy Oven"
