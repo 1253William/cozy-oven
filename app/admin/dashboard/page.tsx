@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
         {!loading && dashboardData && (
           <>
             {/* Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Daily Sales Card */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <div className="flex items-center justify-between">
@@ -94,16 +94,34 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Most Popular Item Card */}
+              {/* Best Seller This Week Card */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Best Seller</p>
+                    <p className="text-sm font-medium text-gray-600">Best Seller (Week)</p>
                     <h3 className="text-lg font-bold text-gray-900 mt-2">
-                      {dashboardData.bestSellerThisMonth?.name}
+                      {dashboardData.bestSellerThisWeek?.name || "N/A"}
                     </h3>
                     <p className="text-xs text-gray-600 mt-1">
-                      {dashboardData.bestSellerThisMonth?.quantitySold} sold
+                      {dashboardData.bestSellerThisWeek?.quantitySold || 0} sold
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Award className="w-6 h-6 text-orange-600" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Best Seller This Month Card */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Best Seller (Month)</p>
+                    <h3 className="text-lg font-bold text-gray-900 mt-2">
+                      {dashboardData.bestSellerThisMonth?.name || "N/A"}
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {dashboardData.bestSellerThisMonth?.quantitySold || 0} sold
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -112,6 +130,62 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Best Seller of the Month - Detailed Card */}
+            {dashboardData.bestSellerThisMonth && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  🏆 Best Seller of the Month
+                </h2>
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  {/* Product Image */}
+                  <div className="w-full md:w-48 h-48 bg-gray-200 rounded-xl relative overflow-hidden flex-shrink-0">
+                    {dashboardData.bestSellerThisMonth.productThumbnail ? (
+                      <Image
+                        src={dashboardData.bestSellerThisMonth.productThumbnail}
+                        alt={dashboardData.bestSellerThisMonth.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-16 h-16 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1 w-full">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      {dashboardData.bestSellerThisMonth.name}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-600 mb-1">Total Sold</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {dashboardData.bestSellerThisMonth.quantitySold}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">units this month</p>
+                      </div>
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-600 mb-1">Revenue</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                          GHS {dashboardData.bestSellerThisMonth.revenue?.toFixed(2) || '0.00'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">total earnings</p>
+                      </div>
+                      <div className="bg-yellow-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-600 mb-1">Product ID</p>
+                        <p className="text-lg font-bold text-yellow-600">
+                          {dashboardData.bestSellerThisMonth.productId?.slice(0, 8) || 'N/A'}...
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">identifier</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Popular Dishes Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

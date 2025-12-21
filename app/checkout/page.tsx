@@ -152,11 +152,17 @@ export default function CheckoutPage() {
       const paymentResponse = await orderService.initiatePayment(orderId);
       console.log("Payment initiation response:", paymentResponse);
 
-      // Handle different response structures - authorizationUrl can be at top level or in data
-      const authUrl = paymentResponse.authorizationUrl || paymentResponse.data?.authorizationUrl;
+      // Handle different response structures - Hubtel returns checkoutUrl or authorizationUrl
+      // Can be at top level or in data object
+      const checkoutUrl = 
+        paymentResponse.checkoutUrl || 
+        paymentResponse.data?.checkoutUrl ||
+        paymentResponse.authorizationUrl || 
+        paymentResponse.data?.authorizationUrl;
       
-      if (paymentResponse.success && authUrl) {
-        window.location.href = authUrl;
+      if (paymentResponse.success && checkoutUrl) {
+        // Redirect to Hubtel's checkout page
+        window.location.href = checkoutUrl;
       } else {
         throw new Error("Failed to initiate payment. Please try again or contact support.");
       }

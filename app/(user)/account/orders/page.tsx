@@ -113,17 +113,17 @@ export default function OrdersPage() {
                 {/* Order Header */}
                 <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
                   <div>
-                     <div className="flex items-center gap-3">
-                        <Package className="w-7 h-7 text-black" />
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900">
-                            {order.title || "Product"}
-                          </h3>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <Package className="w-7 h-7 text-black" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Order #{order.orderId}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
+                        </p>
                       </div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Order #{order.orderId}
-                    </h3>
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Total</p>

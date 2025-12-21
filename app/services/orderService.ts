@@ -64,15 +64,17 @@ export interface Order {
 }
 
 
-// Payment initiation response
+// Payment initiation response (Hubtel integration)
 export interface PaymentInitiationResponse {
   success: boolean;
   message: string;
   data?: {
     authorizationUrl?: string;
+    checkoutUrl?: string; // Hubtel checkout URL
     reference?: string;
   };
   authorizationUrl?: string;
+  checkoutUrl?: string; // Hubtel checkout URL (can be at top level)
   reference?: string;
 }
 
