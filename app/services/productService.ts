@@ -104,11 +104,7 @@ export const productService = {
 
   // POST /api/v1/dashboard/admin/products with file upload - Create new product with image
   createProductWithImage: async (formData: FormData): Promise<ProductResponse> => {
-    const response = await apiClient.post("/api/v1/dashboard/admin/products", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await apiClient.post("/api/v1/dashboard/admin/products", formData);
     return response.data;
   },
 
@@ -133,12 +129,7 @@ export const productService = {
   updateProductWithImage: async (productId: string, formData: FormData): Promise<ProductResponse> => {
     const response = await apiClient.patch(
       `/api/v1/dashboard/admin/products/${productId}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
     );
     return response.data;
   },
