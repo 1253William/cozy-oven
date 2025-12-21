@@ -191,6 +191,12 @@ export const orderService = {
     const response = await apiClient.delete(`/api/v1/dashboard/admin/orders/${orderId}`);
     return response.data;
   },
+
+  // Admin: Get single order details by orderId
+  getOrderById: async (orderId: string): Promise<ApiResponse> => {
+    const response = await apiClient.get(`/api/v1/dashboard/admin/orders/${orderId}`);
+    return response.data;
+  },
 };
 
 export default orderService;

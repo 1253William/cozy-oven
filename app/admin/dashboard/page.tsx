@@ -138,7 +138,7 @@ export default function AdminDashboardPage() {
             {dashboardData.bestSellerThisMonth && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  🏆 Best Seller of the Month
+                  Best Seller of the Month
                 </h2>
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   {/* Product Image */}
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       {dashboardData.bestSellerThisMonth.name}
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                       <div className="bg-green-50 rounded-lg p-4">
                         <p className="text-sm text-gray-600 mb-1">Total Sold</p>
                         <p className="text-2xl font-bold text-green-600">
@@ -185,13 +185,6 @@ export default function AdminDashboardPage() {
                           GHS {dashboardData.bestSellerThisMonth.revenue?.toFixed(2) || '0.00'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">total earnings</p>
-                      </div>
-                      <div className="bg-yellow-50 rounded-lg p-4">
-                        <p className="text-sm text-gray-600 mb-1">Product ID</p>
-                        <p className="text-lg font-bold text-yellow-600">
-                          {dashboardData.bestSellerThisMonth.productId?.slice(0, PRODUCT_ID_DISPLAY_LENGTH) || 'N/A'}...
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">identifier</p>
                       </div>
                     </div>
                   </div>

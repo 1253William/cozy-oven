@@ -14,8 +14,10 @@ import {
   Truck,
   Trash2,
   Edit,
+  Eye,
 } from "lucide-react";
 import { orderService, type Order } from "../../services/orderService";
+import ViewOrderModal from "./components/ViewOrderModal";
 
 const statusOptions = [
   { value: "all", label: "All Orders" },
@@ -72,6 +74,7 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [newStatus, setNewStatus] = useState<string>("");
+  const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
   const [statistics, setStatistics] = useState({
     total: 0,
     pending: 0,
@@ -281,6 +284,15 @@ export default function OrdersPage() {
                     Customer
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Items
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Payment
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -294,13 +306,13 @@ export default function OrdersPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       Loading orders...
                     </td>
                   </tr>
                 ) : filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       No orders found
                     </td>
                   </tr>
@@ -312,8 +324,30 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{order.customer}</p>
-                          <p className="text-xs text-gray-500">{order.deliveryAddress}</p>
+                          <p className="text-sm font-medium text-gray-900">{order.customer || 'N/A'}</p>
+                          <p className="text-xs text-gray-500">{order.email || 'N/A'}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-700">{order.items || 'N/A'}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{order.amount || 'N/A'}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              order.paymentStatus === 'paid'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                            }`}
+                          >
+                            {order.paymentStatus || 'N/A'}
+                          </span>
+                          {order.paidAt && (
+                            <p className="text-xs text-gray-500 mt-1">{order.paidAt}</p>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -344,7 +378,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-500">
-                          {order.date ? new Date(order.date).toLocaleDateString() : "-"}
+                          {order.date || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -370,6 +404,13 @@ export default function OrdersPage() {
                             </>
                           ) : (
                             <>
+                              <button
+                                onClick={() => setViewingOrderId(order.orderId)}
+                                className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="View Order"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
                               <button
                                 onClick={() => {
                                   setEditingOrderId(order.orderId);
@@ -499,6 +540,14 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {/* View Order Modal */}
+      {viewingOrderId && (
+        <ViewOrderModal
+          orderId={viewingOrderId}
+          onClose={() => setViewingOrderId(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

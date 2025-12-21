@@ -39,8 +39,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("hubtel");
 
   const subtotal = getCartTotal();
-  const deliveryFee = 40;
-  const total = subtotal + (deliveryMethod === "delivery" ? deliveryFee : 0);
+  const total = subtotal; // Delivery fee not included in checkout
 
   useEffect(() => {
     if (cart.length === 0) {
@@ -153,7 +152,7 @@ export default function CheckoutPage() {
 
       const checkoutResponse = await orderService.checkout({
         items,
-        deliveryFee: deliveryMethod === "delivery" ? deliveryFee : 0,
+        deliveryFee: 0, // Delivery fee will be paid on delivery
         deliveryAddress:
           deliveryMethod === "delivery"
             ? `${deliveryDetails.address.trim()}, ${deliveryDetails.city.trim()}`
@@ -213,9 +212,9 @@ export default function CheckoutPage() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-8">Checkout</h1>
 
           {!isAuthenticated && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                ℹ️ You&apos;ll need to sign in before placing your order.
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-800">
+                You&apos;ll need to sign in before placing your order.
               </p>
             </div>
           )}
@@ -468,9 +467,9 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-800">
-                      🔒 <span className="font-semibold">Secure Payment:</span> You&apos;ll be redirected to Hubtel&apos;s secure checkout page to complete your payment. Hubtel supports Mobile Money, credit/debit cards, and other payment methods.
+                  <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">
+                    <p className="text-sm text-red-800">
+                      <span className="font-semibold">Secure Payment:</span> You&apos;ll be redirected to Hubtel&apos;s secure checkout page to complete your payment. Hubtel supports Mobile Money, credit/debit cards, and other payment methods.
                     </p>
                   </div>
                 </div>
@@ -566,6 +565,11 @@ export default function CheckoutPage() {
                         <span className="text-[#2A2C22]">
                           GHS {total.toFixed(2)}
                         </span>
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-xs text-blue-800">
+                          <span className="font-semibold">Note:</span> Delivery fee is not included in this total. Estimated delivery fee is above GHS 30 and may vary based on location. You will pay delivery fee when your order is delivered.
+                        </p>
                       </div>
                     </div>
                   </div>
