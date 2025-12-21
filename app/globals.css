@@ -14,3 +14,17 @@ body {
   color: var(--foreground);
   font-family: "Euclid-Circular-B", Helvetica, sans-serif;
 }
+
+/* Ensure all interactive elements have pointer cursor */
+button,
+a,
+[role="button"],
+[onclick],
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select,
+label[for],
+.cursor-pointer {
+  cursor: pointer;
+}

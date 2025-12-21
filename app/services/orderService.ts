@@ -25,8 +25,10 @@ export interface Order {
   customer?: string;
   email?: string;
   items?: string;         
-  total?: string;         
-  date?: string;          
+  total?: string;
+  amount?: string;        
+  date?: string;
+  paidAt?: string;          
 
   // Existing fields
   userId?: string;
@@ -189,6 +191,12 @@ export const orderService = {
   // Admin: Delete order
   deleteOrder: async (orderId: string): Promise<ApiResponse> => {
     const response = await apiClient.delete(`/api/v1/dashboard/admin/orders/${orderId}`);
+    return response.data;
+  },
+
+  // Admin: Get single order details by orderId
+  getOrderById: async (orderId: string): Promise<ApiResponse> => {
+    const response = await apiClient.get(`/api/v1/dashboard/admin/orders/${orderId}`);
     return response.data;
   },
 };

@@ -188,13 +188,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProductQuickView from "./ProductQuickView";
 import type { Product } from "../context/CartContext";
+import useCustomerProducts from "../hooks/useCustomerProducts";
 import 'react-loading-skeleton/dist/skeleton.css'
 
 
@@ -208,227 +209,43 @@ export default function Categories() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
+  // Fetch products from backend
+  const { products: allProducts, loading } = useCustomerProducts({ limit: 100 });
+
   const categories: Category[] = ["Banana Breads", "Flight Box", "Gift Box"];
 
-  const allCards = {
-    "Banana Breads": [
-      {
-        id: "bread-1",
-        name: "Chocolate Chip Cookies",
-        title: "Chocolate Chip Cookies",
-        description: "Classic chocolate chip cookies with melted chocolate chunks.",
-        button: "View Products",
-        price: "GHS 25",
-        image:
-          "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=465",
-        bgImage:
-          "/nutty.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "cookie-2",
-        name: "Oatmeal Raisin Cookies",
-        title: "Oatmeal Raisin Cookies",
-        description: "Hearty oatmeal cookies with sweet raisins and a hint of cinnamon.",
-        button: "Try Now",
-        price: "GHS 22",
-        image:
-          "https://images.unsplash.com/photo-1590080873009-ed6f23496bb7?auto=format&fit=crop&q=80&w=464",
-        bgImage:
-          "/fruity.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "cookie-3",
-        name: "Sugar Cookies",
-        title: "Sugar Cookies",
-        description: "Soft and buttery sugar cookies perfect for any occasion.",
-        button: "Shop Now",
-        price: "GHS 20",
-        image:
-          "https://images.unsplash.com/photo-1548365328-8c6db3220e4c?auto=format&fit=crop&q=80&w=387",
-        bgImage:
-     "/white-chocolate.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      {
-        id: "cookie-4",
-        name: "Peanut Butter Cookies",
-        title: "Peanut Butter Cookies",
-        description: "Rich and nutty peanut butter cookies with a crumbly texture.",
-        button: "Explore Now",
-        price: "GHS 24",
-        image:
-          "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=464",
-        bgImage:
-          "/coconut.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-    ],
-    "Gift Box": [
-      {
-        id: "brownie-1",
-        name: "Flight Box",
-        title: "Flight Box",
-        description: "Can't decide which flavor to try first? Our flight box gives you the best of all worlds!",
-        button: "View Products",
-        price: "GHS 28",
-        image:
-          "/gift.png",
-        bgImage:
-          "/flightbox.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      // {
-      //   id: "brownie-2",
-      //   name: "Walnut Brownies",
-      //   title: "Walnut Brownies",
-      //   description: "Rich brownies studded with crunchy walnuts.",
-      //   button: "Try Now",
-      //   price: "GHS 30",
-      //   image:
-      //     "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1607920591413-4ec007e70023?auto=format&fit=crop&q=80&w=387",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-      // {
-      //   id: "brownie-3",
-      //   name: "Caramel Brownies",
-      //   title: "Caramel Brownies",
-      //   description: "Decadent brownies swirled with gooey caramel.",
-      //   button: "Shop Now",
-      //   price: "GHS 32",
-      //   image:
-      //     "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1564355808853-07d7c6e5b433?auto=format&fit=crop&q=80&w=387",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-      // {
-      //   id: "brownie-4",
-      //   name: "Mint Chocolate Brownies",
-      //   title: "Mint Chocolate Brownies",
-      //   description: "Chocolate brownies with a refreshing mint layer.",
-      //   button: "Explore Now",
-      //   price: "GHS 31",
-      //   image:
-      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-      // {
-      //   id: "brownie-5",
-      //   name: "Mint Chocolate Brownies",
-      //   title: "Mint Chocolate Brownies",
-      //   description: "Chocolate brownies with a refreshing mint layer.",
-      //   button: "Explore Now",
-      //   price: "GHS 31",
-      //   image:
-      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=480",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-    ],
-    "Flight Box": [
-      {
-        id: "box-1",
-        name: "Flight Box",
-        title: "Flight Box",
-        description: "Can't decide which flavor to try first? Our flight box gives you the best of all worlds!",
-        button: "View Products",
-        price: "GHS 45",
-        image:
-          "/flightbox.png",
-        bgImage:
-          "/flightbox.png",
-        buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-        sizes: ["Family", "Regular", "Medium"],
-      },
-      // {
-      //   id: "cake-2",
-      //   name: "Chocolate Cake",
-      //   title: "Chocolate Cake",
-      //   description: "Moist chocolate cake with rich chocolate ganache.",
-      //   button: "Try Now",
-      //   price: "GHS 48",
-      //   image:
-      //     "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=387",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-      // {
-      //   id: "cake-3",
-      //   name: "Red Velvet Cake",
-      //   title: "Red Velvet Cake",
-      //   description: "Classic red velvet cake with cream cheese frosting.",
-      //   button: "Shop Now",
-      //   price: "GHS 50",
-      //   image:
-      //     "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1616690710400-a16d146927c5?auto=format&fit=crop&q=80&w=387",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-      // {
-      //   id: "cake-4",
-      //   name: "Carrot Cake",
-      //   title: "Carrot Cake",
-      //   description: "Spiced carrot cake with walnuts and cream cheese frosting.",
-      //   button: "Explore Now",
-      //   price: "GHS 47",
-      //   image:
-      //     "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
-      //   bgImage:
-      //     "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=436",
-      //   buttonColor: "bg-[#E9F9F1] hover:bg-[#d8f0e3] text-black",
-      //   sizes: ["Family", "Regular", "Medium"],
-      // },
-    ],
+  // Filter products by category
+  const getProductsByCategory = (category: Category) => {
+    return allProducts.filter(product => {
+      if (category === "Banana Breads") {
+        return product.productCategory?.toLowerCase().includes("banana") || 
+               product.productCategory?.toLowerCase().includes("bread");
+      } else if (category === "Flight Box") {
+        return product.productCategory?.toLowerCase().includes("flight");
+      } else if (category === "Gift Box") {
+        return product.productCategory?.toLowerCase().includes("gift");
+      }
+      return false;
+    });
   };
 
-  const currentCards = allCards[activeCategory];
+  const currentProducts = getProductsByCategory(activeCategory);
 
-  const handleQuickView = (card: {
-    id: string;
-    name: string;
-    title: string;
-    description: string;
-    button: string;
-    price: string;
-    image: string;
-    bgImage: string;
-    buttonColor: string;
-    sizes: string[];
-  }) => {
+  const handleQuickView = (product: typeof allProducts[0]) => {
     const productData: Product = {
-      id: card.id,
-      name: card.name,
-      price: card.price,
-      image: card.image,
-      description: card.description,
-      sizes: card.sizes,
+      id: product._id,
+      name: product.productName,
+      price: `GHS ${product.price}`,
+      image: product.productThumbnail,
+      description: product.productDetails,
+      sizes: product.selectOptions?.map(opt => opt.label) || [],
     };
     setQuickViewProduct(productData);
     setIsQuickViewOpen(true);
   };
 
-  const handleCardClick = (cardId: string) => {
-    router.push(`/product/${cardId}`);
+  const handleCardClick = (productId: string) => {
+    router.push(`/product/${productId}`);
   };
 
   const containerVariants = {
@@ -482,67 +299,84 @@ export default function Categories() {
             ))}
           </div>
 
-          {/* Cards Grid */}
-          <motion.div
-            key={activeCategory}   // ← THE FIX
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {currentCards.map((card) => (
-              <motion.div
-                key={card.id}
-                variants={cardVariants}
-                className="relative overflow-hidden rounded-4xl text-white h-[400px] sm:h-[450px] md:h-[500px] group cursor-pointer"
-                onClick={() => handleCardClick(card.id)}
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out group-hover:scale-110 z-0"
-                  style={{ backgroundImage: `url(${card.bgImage})` }}
-                />
-                <div className="absolute inset-0 bg-black/30 z-10" />
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#2A2C22] border-r-transparent"></div>
+              <p className="mt-4 text-gray-600">Loading products...</p>
+            </div>
+          )}
 
-                <div className="relative z-20 p-8 h-full flex flex-col">
-                  <div className="mb-auto">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">
-                      {card.title}
-                    </h2>
-                    <p className="text-gray-300 text-sm sm:text-base md:text-lg font-extralight">
-                      {card.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {/* Button that slides up */}
-                    <div className="flex-1 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
-                      <button 
-                        className="font-medium py-3 px-7 rounded-full bg-black shadow-sm hover:cursor-pointer w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCardClick(card.id);
-                        }}
-                      >
-                        {card.button}
-                      </button>
+          {/* Cards Grid */}
+          {!loading && (
+            <motion.div
+              key={activeCategory}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {currentProducts.map((product) => (
+                <motion.div
+                  key={product._id}
+                  variants={cardVariants}
+                  className="relative overflow-hidden rounded-4xl text-white h-[400px] sm:h-[450px] md:h-[500px] group"
+                  onClick={() => handleCardClick(product._id)}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out group-hover:scale-110 z-0"
+                    style={{ backgroundImage: `url(${product.productThumbnail})` }}
+                  />
+                  <div className="absolute inset-0 bg-black/30 z-10" />
+
+                  <div className="relative z-20 p-8 h-full flex flex-col">
+                    <div className="mb-auto">
+                      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">
+                        {product.productName}
+                      </h2>
+                      <p className="text-gray-300 text-sm sm:text-base md:text-lg font-extralight line-clamp-3">
+                        {product.productDetails}
+                      </p>
                     </div>
-                    {/* Search icon that slides in from right */}
-                    <div className="opacity-0 translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
-                      <button 
-                        className="p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleQuickView(card);
-                        }}
-                        aria-label="Quick view"
-                      >
-                        <Search className="w-5 h-5 text-white" />
-                      </button>
+                    <div className="flex items-center gap-3">
+                      {/* Button that slides up */}
+                      <div className="flex-1 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                        <button 
+                          className="font-medium py-3 px-7 rounded-full bg-black shadow-sm w-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(product._id);
+                          }}
+                        >
+                          View Product
+                        </button>
+                      </div>
+                      {/* Search icon that slides in from right */}
+                      <div className="opacity-0 translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+                        <button 
+                          className="p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuickView(product);
+                          }}
+                          aria-label="Quick view"
+                        >
+                          <Search className="w-5 h-5 text-white" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Empty State */}
+          {!loading && currentProducts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No products found in this category.</p>
+            </div>
+          )}
         </motion.div>
       </div>
       
