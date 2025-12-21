@@ -210,7 +210,7 @@ export default function CheckoutPage() {
       <Navbar />
       <main className="min-h-screen pt-24 pb-16 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Checkout</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-8">Checkout</h1>
 
           {!isAuthenticated && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">

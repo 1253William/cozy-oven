@@ -17,7 +17,7 @@ export default function Hero() {
   };
 
   return(
-    <section className="relative h-[85vh] flex items-center justify-center text-center">
+    <section className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] flex items-center justify-center text-center">
       <Image
         src={logo}
         alt="Cozy Oven"
@@ -44,7 +44,7 @@ export default function Hero() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search banana bread flavors..."
-              className="w-full px-6 py-4 pr-12 rounded-full text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white/50 border border-white"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 rounded-full text-sm sm:text-base text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white/50 border border-white"
             />
             <button
               type="submit"
@@ -56,7 +56,7 @@ export default function Hero() {
           </div>
         </form>
 
-        <button className="px-6 py-3 bg-gray-900 rounded-full text-white font-semibold hover:bg-gray-800 transition">
+        <button className="px-6 py-3 sm:px-8 sm:py-4 bg-gray-900 rounded-full text-white text-sm sm:text-base font-semibold hover:bg-gray-800 transition">
           View Products
         </button>
       </motion.div>
