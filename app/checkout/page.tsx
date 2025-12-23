@@ -155,8 +155,10 @@ export default function CheckoutPage() {
         deliveryFee: 0, // Delivery fee will be paid on delivery
         deliveryAddress:
           deliveryMethod === "delivery"
-            ? `${deliveryDetails.address.trim()}, ${deliveryDetails.city.trim()}`
+            ? deliveryDetails.address.trim()
             : "Pickup from store",
+        city: deliveryMethod === "delivery" ? deliveryDetails.city.trim() : undefined,
+        specialInstruction: deliveryDetails.notes.trim() || undefined,
         contactNumber: customerInfo.phone.trim(),
         paymentMethod,
       });
@@ -556,20 +558,11 @@ export default function CheckoutPage() {
                       Order Total
                     </h3>
                     <div className="space-y-2 text-gray-700">
-                      <div className="flex justify-between">
-                        <span>Subtotal</span>
-                        <span>GHS {subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
+                      <div className="flex justify-between text-xl font-bold text-gray-900 pt-2">
                         <span>Total</span>
                         <span className="text-[#2A2C22]">
                           GHS {total.toFixed(2)}
                         </span>
-                      </div>
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-xs text-blue-800">
-                          <span className="font-semibold">Note:</span> Delivery fee is not included in this total. Estimated delivery fee is above GHS 30 and may vary based on location. You will pay delivery fee when your order is delivered.
-                        </p>
                       </div>
                     </div>
                   </div>

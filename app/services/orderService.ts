@@ -12,6 +12,8 @@ export interface CheckoutRequest {
   items: OrderItem[];
   deliveryFee: number;
   deliveryAddress: string;
+  city?: string;
+  specialInstruction?: string;
   contactNumber: string;
   paymentMethod: string; // "hubtel" or other payment methods
 }

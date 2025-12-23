@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Package, User, MapPin, CreditCard, Loader2 } from "lucide-react";
+import { X, Package, User, CreditCard, Loader2 } from "lucide-react";
 import { orderService } from "../../../services/orderService";
 import Image from "next/image";
 
@@ -85,12 +85,18 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
         <div
           className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
           onClick={onClose}
+          aria-hidden="true"
         />
+
+        {/* This element is to trick the browser into centering the modal contents. */}
+        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+          &#8203;
+        </span>
 
         {/* Modal panel */}
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
           {/* Header */}
-          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 z-10">
             <h3 className="text-xl font-bold text-gray-900">Order Details</h3>
             <button
               onClick={onClose}
@@ -101,7 +107,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
           </div>
 
           {/* Content */}
-          <div className="bg-white px-6 py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <div className="bg-white px-6 py-6 max-h-[70vh] overflow-y-auto">
             {loading && (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin" />
@@ -206,22 +212,10 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3">Pricing Summary</h4>
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium text-gray-900">
-                        GHS {orderDetails.pricing.subtotal.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Delivery Fee</span>
-                      <span className="font-medium text-gray-900">
-                        GHS {orderDetails.pricing.deliveryFee.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-300">
+                    <div className="flex justify-between text-base font-bold">
                       <span className="text-gray-900">Total Amount</span>
                       <span className="text-[#2A2C22]">
-                        GHS {orderDetails.pricing.totalAmount.toFixed(2)}
+                        GHS {orderDetails.pricing.subtotal.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -281,7 +275,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
+          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end sticky bottom-0 z-10">
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"

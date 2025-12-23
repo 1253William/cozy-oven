@@ -74,20 +74,19 @@ export default function ProductForm({
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Category {!isEdit && "*"}
           </label>
-          <select
+          <input
+            list="categories-list"
             value={productCategory}
             onChange={(e) => onProductCategoryChange(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+            placeholder="Select existing or type new category"
             required={!isEdit}
-          >
-            {isEdit && <option value="">Keep current</option>}
-            {!isEdit && <option value="">Select category</option>}
+          />
+          <datalist id="categories-list">
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
+              <option key={cat} value={cat} />
             ))}
-          </select>
+          </datalist>
         </div>
 
         <div>

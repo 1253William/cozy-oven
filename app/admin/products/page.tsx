@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
@@ -19,16 +19,6 @@ import useProductManagement from "../../hooks/useProductManagement";
 import AddProductModal from "./components/AddProductModal";
 import EditProductModal from "./components/EditProductModal";
 import ProductGrid from "./components/ProductGrid";
-
-const categories = [
-  "Classic",
-  "Chocolate",
-  "Nuts & Seeds",
-  "Fruits",
-  "Specialty",
-  "Family Size",
-  "Mini",
-];
 
 export default function ProductManagementPage() {
   const { user, isAuthenticated } = useAuth();
@@ -62,6 +52,17 @@ export default function ProductManagementPage() {
     sortBy,
     order,
   });
+
+  // Get unique categories dynamically from products
+  const categories = React.useMemo(() => {
+    const categoriesSet = new Set<string>();
+    products.forEach(product => {
+      if (product.productCategory) {
+        categoriesSet.add(product.productCategory);
+      }
+    });
+    return Array.from(categoriesSet).sort();
+  }, [products]);
 
   const {
     loading: actionLoading,
@@ -324,28 +325,30 @@ export default function ProductManagementPage() {
           </button>
         </div>
 
-        {/* Categories */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Categories</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
-            {categories.map((category) => (
-              <div
-                key={category}
-                onClick={() => setCategoryFilter(category === categoryFilter ? "" : category)}
-                className={`bg-white rounded-xl shadow-sm p-4 border transition-all cursor-pointer ${
-                  categoryFilter === category
-                    ? "border-[#2A2C22] ring-2 ring-[#2A2C22]/20"
-                    : "border-gray-100 hover:shadow-md"
-                }`}
-              >
-                <div className="w-12 h-12 bg-[#2A2C22] rounded-full flex items-center justify-center mb-3">
-                  <Package className="w-6 h-6 text-white" />
+        {/* Categories - Only show if there are categories with products */}
+        {categories.length > 0 && (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Categories</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
+              {categories.map((category) => (
+                <div
+                  key={category}
+                  onClick={() => setCategoryFilter(category === categoryFilter ? "" : category)}
+                  className={`bg-white rounded-xl shadow-sm p-4 border transition-all cursor-pointer ${
+                    categoryFilter === category
+                      ? "border-[#2A2C22] ring-2 ring-[#2A2C22]/20"
+                      : "border-gray-100 hover:shadow-md"
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-[#2A2C22] rounded-full flex items-center justify-center mb-3">
+                    <Package className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm">{category}</h3>
                 </div>
-                <h3 className="font-semibold text-gray-900 text-sm">{category}</h3>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">

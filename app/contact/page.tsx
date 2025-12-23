@@ -81,10 +81,10 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                       <a
-                        href="mailto:hello@cozyovens.com"
+                        href="mailto:info@cozyoven.store"
                         className="text-gray-600 hover:text-[#2A2C22] transition-colors"
                       >
-                        hello@cozyovens.com
+                        info@cozyoven.store
                       </a>
                     </div>
                   </div>
@@ -96,7 +96,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                      <p className="text-gray-600">+233 XX XXX XXXX</p>
+                      <p className="text-gray-600">0249612035</p>
                     </div>
                   </div>
 
@@ -107,7 +107,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Location</h3>
-                      <p className="text-gray-600">Accra, Ghana</p>
+                      <p className="text-gray-600">Tema community 22 Nhmf Estates</p>
                     </div>
                   </div>
                 </div>

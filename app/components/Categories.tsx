@@ -188,7 +188,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Search } from "lucide-react";
@@ -199,10 +199,7 @@ import useCustomerProducts from "../hooks/useCustomerProducts";
 import 'react-loading-skeleton/dist/skeleton.css'
 
 
-type Category = "Banana Breads" | "Flight Box" | "Gift Box" | "Family Size";
-
 export default function Categories() {
-  const [activeCategory, setActiveCategory] = useState<Category>("Banana Breads");
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const router = useRouter();
@@ -212,27 +209,28 @@ export default function Categories() {
   // Fetch products from backend
   const { products: allProducts, loading } = useCustomerProducts({ limit: 100 });
 
-  const categories: Category[] = ["Banana Breads", "Flight Box", "Gift Box", "Family Size"];
+  // Get unique categories dynamically from products
+  const availableCategories = useMemo(() => {
+    const categoriesSet = new Set<string>();
+    allProducts.forEach(product => {
+      if (product.productCategory) {
+        categoriesSet.add(product.productCategory);
+      }
+    });
+    return Array.from(categoriesSet).sort();
+  }, [allProducts]);
+
+  const [activeCategory, setActiveCategory] = useState<string>("");
+
+  // Use first available category if active category is empty
+  const effectiveActiveCategory = activeCategory || (availableCategories.length > 0 ? availableCategories[0] : "");
 
   // Filter products by category
-  const getProductsByCategory = (category: Category) => {
-    return allProducts.filter(product => {
-      if (category === "Banana Breads") {
-        return product.productCategory?.toLowerCase().includes("banana") || 
-               product.productCategory?.toLowerCase().includes("bread");
-      } else if (category === "Flight Box") {
-        return product.productCategory?.toLowerCase().includes("flight");
-      } else if (category === "Gift Box") {
-        return product.productCategory?.toLowerCase().includes("gift");
-      }
-      else if (category === "Family Size") {
-        return product.productCategory?.toLowerCase().includes("family");
-      }
-      return false;
-    });
+  const getProductsByCategory = (category: string) => {
+    return allProducts.filter(product => product.productCategory === category);
   };
 
-  const currentProducts = getProductsByCategory(activeCategory);
+  const currentProducts = effectiveActiveCategory ? getProductsByCategory(effectiveActiveCategory) : [];
 
   const handleQuickView = (product: typeof allProducts[0]) => {
     const productData: Product = {
@@ -277,30 +275,33 @@ export default function Categories() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex md:gap-8 gap-4 mb-8 overflow-x-auto pb-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`md:text-3xl text-xl font-bold transition-colors relative whitespace-nowrap ${
-                  activeCategory === category
-                    ? "text-[#2A2C22]"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                {category}
-                {activeCategory === category && (
-                <motion.span
-                  className="absolute bottom-0 left-0 right-0 h-1 bg-[#2A2C22] rounded-full origin-left"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                />
-              )}
+          {/* Only show category tabs if there are categories with products */}
+          {availableCategories.length > 0 && (
+            <div className="flex md:gap-8 gap-4 mb-8 overflow-x-auto pb-2">
+              {availableCategories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`md:text-3xl text-xl font-bold transition-colors relative whitespace-nowrap ${
+                    effectiveActiveCategory === category
+                      ? "text-[#2A2C22]"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {category}
+                  {effectiveActiveCategory === category && (
+                  <motion.span
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#2A2C22] rounded-full origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  />
+                )}
 
-              </button> 
-            ))}
-          </div>
+                </button> 
+              ))}
+            </div>
+          )}
 
           {/* Loading State */}
           {loading && (
