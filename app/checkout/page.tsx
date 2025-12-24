@@ -178,7 +178,6 @@ export default function CheckoutPage() {
 
       // Initiate payment
       const paymentResponse = await orderService.initiatePayment(orderId);
-      console.log("Payment initiation response:", paymentResponse);
 
       // Extract checkout URL from response (supports both Hubtel and Paystack formats)
       const extractPaymentUrl = (response: typeof paymentResponse): string | null => {
