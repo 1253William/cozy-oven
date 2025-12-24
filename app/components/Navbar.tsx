@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Menu, X, ShoppingCart, User, LogOut } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, ShoppingCart, User, LogOut, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
@@ -10,7 +10,9 @@ import CartDrawer from "./CartDrawer";
 import AuthModal from "./AuthModal";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import logo from "@/public/cozy3.png"
+import logo from "@/public/cozy3.png";
+import { customerProductService } from "../services/customerProductService";
+import { Product } from "../services/productService";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -26,6 +28,11 @@ export default function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const { getCartCount } = useCart();
@@ -35,6 +42,43 @@ export default function Navbar() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Close search dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setSearchLoading(true);
+        const response = await customerProductService.searchProducts(searchQuery);
+        if (response.success) {
+          setSearchResults(response.data);
+        }
+      } catch (error) {
+        console.error("Search error:", error);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const cartCount = isMounted ? getCartCount() : 0;
 
@@ -51,6 +95,13 @@ export default function Navbar() {
   const handleAuthClick = () => {
     setAuthModalOpen(true);
     setProfileMenuOpen(false);
+  };
+
+  const handleSearchResultClick = (productId: string) => {
+    setSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    router.push(`/product/${productId}`);
   };
 
   return (
@@ -82,8 +133,81 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Right side: Cart + Profile + Menu */}
+        {/* Right side: Search + Cart + Profile + Menu */}
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Search */}
+          <div className="relative" ref={searchRef}>
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="p-2 rounded-full hover:bg-gray-100/80 transition"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {searchOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-lg border rounded-lg shadow-lg overflow-hidden z-50"
+              >
+                <div className="p-3 border-b">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent text-sm"
+                    autoFocus
+                  />
+                </div>
+
+                {searchLoading && (
+                  <div className="p-4 text-center text-sm text-gray-500">
+                    Searching...
+                  </div>
+                )}
+
+                {!searchLoading && searchQuery && searchResults.length === 0 && (
+                  <div className="p-4 text-center text-sm text-gray-500">
+                    No products found
+                  </div>
+                )}
+
+                {!searchLoading && searchResults.length > 0 && (
+                  <div className="max-h-96 overflow-y-auto">
+                    {searchResults.map((product) => (
+                      <button
+                        key={product._id}
+                        onClick={() => handleSearchResultClick(product._id)}
+                        className="w-full p-3 hover:bg-gray-50 text-left flex items-center gap-3 border-b last:border-b-0"
+                      >
+                        <div className="w-12 h-12 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
+                          {product.productThumbnail && (
+                            <Image
+                              src={product.productThumbnail}
+                              alt={product.productName}
+                              fill
+                              className="object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {product.productName}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            GHS {product.price.toFixed(2)} • {product.productCategory}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </div>
+
           {/* Cart */}
           {isMounted && (
             <button

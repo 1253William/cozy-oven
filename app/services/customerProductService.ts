@@ -16,6 +16,12 @@ export interface CustomerProductResponse {
   data: Product;
 }
 
+export interface SearchProductsResponse {
+  success: boolean;
+  message: string;
+  data: Product[];
+}
+
 export const customerProductService = {
   // GET /api/v1/store/customer/products - Get all products for customers
   getAllProducts: async (params?: {
@@ -36,6 +42,12 @@ export const customerProductService = {
   // GET /api/v1/store/customer/products/{productId} - Get single product by ID
   getProductById: async (productId: string): Promise<CustomerProductResponse> => {
     const response = await apiClient.get(`/api/v1/store/customer/products/${productId}`);
+    return response.data;
+  },
+
+  // GET /api/v1/search/products - Search products by keyword
+  searchProducts: async (query: string): Promise<SearchProductsResponse> => {
+    const response = await apiClient.get(`/api/v1/search/products?query=${encodeURIComponent(query)}`);
     return response.data;
   },
 };

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Package, User, CreditCard, Loader2 } from "lucide-react";
 import { orderService } from "../../../services/orderService";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OrderItem {
   productId: string;
@@ -79,35 +80,36 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
   if (!orderId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
-        <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
-          onClick={onClose}
-          aria-hidden="true"
-        />
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          className="relative bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition z-10"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        {/* This element is to trick the browser into centering the modal contents. */}
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-          &#8203;
-        </span>
-
-        {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-          {/* Header */}
-          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 z-10">
-            <h3 className="text-xl font-bold text-gray-900">Order Details</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="bg-white px-6 py-6 max-h-[70vh] overflow-y-auto">
+          <div className="p-8">
+            {/* Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+              <p className="text-gray-600 mt-2">View complete order information</p>
+            </div>
+            {/* Error and Loading States */}
             {loading && (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin" />
@@ -115,15 +117,15 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-red-800">{error}</p>
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
               </div>
             )}
 
             {!loading && !error && orderDetails && (
               <div className="space-y-6">
                 {/* Order ID and Status */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <h4 className="text-sm font-medium text-gray-600">Order ID</h4>
                     <p className="text-lg font-bold text-gray-900">{orderDetails.orderId}</p>
@@ -144,7 +146,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 </div>
 
                 {/* Customer Information */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-gray-600" />
                     <h4 className="text-sm font-semibold text-gray-900">Customer Information</h4>
@@ -209,7 +211,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 </div>
 
                 {/* Pricing */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3">Pricing Summary</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-base font-bold">
@@ -222,7 +224,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 </div>
 
                 {/* Payment Information */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
                     <CreditCard className="w-5 h-5 text-gray-600" />
                     <h4 className="text-sm font-semibold text-gray-900">Payment Information</h4>
@@ -272,19 +274,19 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end sticky bottom-0 z-10">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Close
-            </button>
+            {/* Footer */}
+            <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
+              <button
+                onClick={onClose}
+                className="px-6 py-3 bg-[#2A2C22] text-white rounded-full font-semibold hover:bg-[#1a1c12] transition"
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
