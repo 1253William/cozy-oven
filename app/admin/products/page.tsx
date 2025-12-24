@@ -207,7 +207,6 @@ export default function ProductManagementPage() {
         JSON.stringify(selectOptions) !== JSON.stringify(selectedProduct.selectOptions);
       
       if (!hasChanges) {
-        console.log("No changes detected");
         setShowEditModal(false);
         setSelectedProduct(null);
         resetForm();
