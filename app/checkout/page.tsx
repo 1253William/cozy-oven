@@ -148,6 +148,8 @@ export default function CheckoutPage() {
         productId: item.id,
         quantity: item.quantity,
         unitPrice: parseFloat(item.price.replace("GHS ", "")),
+        // Include size information - backend will store this in order details
+        ...(item.selectedSize ? { size: item.selectedSize } : {}),
       }));
 
       const checkoutResponse = await orderService.checkout({

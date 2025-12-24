@@ -2,7 +2,7 @@
 
 interface SizeSelectorProps {
   sizes: string[];
-  selectedSize: string;
+  selectedSize: string | null;
   onSizeChange: (size: string) => void;
 }
 

@@ -13,6 +13,7 @@ interface OrderItem {
   unitPrice: number;
   quantity: number;
   total: number;
+  size?: string; // Add size variation field
 }
 
 interface PickUpDetails {
@@ -227,7 +228,10 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                         </div>
                         <div className="flex-1">
                           <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
-                          <p className="text-xs text-gray-600">
+                          {item.size && (
+                            <p className="text-xs text-gray-500 mt-0.5">Size: {item.size}</p>
+                          )}
+                          <p className="text-xs text-gray-600 mt-1">
                             GHS {item.unitPrice.toFixed(2)} x {item.quantity}
                           </p>
                         </div>
