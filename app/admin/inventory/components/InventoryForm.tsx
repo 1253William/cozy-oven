@@ -88,7 +88,7 @@ export default function InventoryForm({
         </select>
       </div>
 
-      {/* Quantity and Prices */}
+      {/* Quantity and Cost Price */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

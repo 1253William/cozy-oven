@@ -200,7 +200,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                   {orderDetails.orderDetails?.orderItems && orderDetails.orderDetails.orderItems.length > 0 ? (
                     <div className="space-y-2 mb-4">
                       {orderDetails.orderDetails.orderItems.map((item, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                        <div key={`order-item-${index}-${item.substring(0, 20)}`} className="p-3 bg-gray-50 rounded-lg">
                           <p className="text-sm text-gray-900">{item}</p>
                         </div>
                       ))}
@@ -210,7 +210,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                   {/* Display detailed items with images and prices */}
                   <div className="space-y-3">
                     {orderDetails.items.map((item, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                      <div key={`${item.productId}-${index}`} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                         <div className="w-16 h-16 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
                           {item.thumbnail ? (
                             <Image
