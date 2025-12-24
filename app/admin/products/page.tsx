@@ -179,6 +179,7 @@ export default function ProductManagementPage() {
       formData.append("productDetails", newProduct.productDetails.trim());
       formData.append("price", newProduct.price.toString());
       formData.append("selectOptions", JSON.stringify(selectOptions));
+      // Backend expects 'thumbnail' field name for multer file upload
       formData.append("thumbnail", imageFile);
 
       await createProductWithImage(formData);
@@ -241,6 +242,7 @@ export default function ProductManagementPage() {
         formData.append("productDetails", newProduct.productDetails.trim());
       if (newProduct.price) formData.append("price", newProduct.price.toString());
       formData.append("selectOptions", JSON.stringify(selectOptions));
+      // Backend expects 'thumbnail' field name for multer file upload
       if (imageFile) formData.append("thumbnail", imageFile);
 
       await updateProductWithImage(selectedProduct._id, formData);

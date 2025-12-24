@@ -55,29 +55,37 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debounced search
+  // Debounced search with abort controller to prevent race conditions
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
       return;
     }
 
+    const abortController = new AbortController();
     const timer = setTimeout(async () => {
       try {
         setSearchLoading(true);
         const response = await customerProductService.searchProducts(searchQuery);
-        if (response.success) {
+        if (response.success && !abortController.signal.aborted) {
           setSearchResults(response.data);
         }
       } catch (error) {
-        console.error("Search error:", error);
-        setSearchResults([]);
+        if (!abortController.signal.aborted) {
+          console.error("Search error:", error);
+          setSearchResults([]);
+        }
       } finally {
-        setSearchLoading(false);
+        if (!abortController.signal.aborted) {
+          setSearchLoading(false);
+        }
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      abortController.abort();
+    };
   }, [searchQuery]);
 
   const cartCount = isMounted ? getCartCount() : 0;
