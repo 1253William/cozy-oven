@@ -305,7 +305,7 @@ export default function OrdersPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
-                  <tr>
+                  <tr >
                     <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       Loading orders...
                     </td>
@@ -317,8 +317,8 @@ export default function OrdersPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredOrders.map((order) => (
-                    <tr key={order._id} className="hover:bg-gray-50">
+                  filteredOrders.map((order, idx) => (
+                    <tr key={order.orderId || order._id || idx} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-semibold text-gray-900">{order.orderId}</span>
                       </td>

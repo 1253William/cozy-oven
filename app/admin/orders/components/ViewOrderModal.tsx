@@ -181,6 +181,11 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                       <p className="text-xs text-gray-600">Delivery Address</p>
                       <p className="text-sm font-medium text-gray-900">{orderDetails.customer.deliveryAddress}</p>
                     </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Delivery Address</p>
+                      <p className="text-sm font-medium text-gray-900">{orderDetails.customer.deliveryAddress}</p>
+                      
+                    </div>
                     {orderDetails.customer.city && (
                       <div>
                         <p className="text-xs text-gray-600">City</p>
