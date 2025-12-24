@@ -35,7 +35,6 @@ export default function InventoryPage() {
   const [addItemName, setAddItemName] = useState("");
   const [addQuantityPurchased, setAddQuantityPurchased] = useState(0);
   const [addCostPrice, setAddCostPrice] = useState(0);
-  const [addSellingPrice, setAddSellingPrice] = useState(0);
   const [addVendorName, setAddVendorName] = useState("");
   const [addVendorContact, setAddVendorContact] = useState("");
   const [addPurchasePurpose, setAddPurchasePurpose] = useState("");
@@ -48,7 +47,6 @@ export default function InventoryPage() {
   const [editItemName, setEditItemName] = useState("");
   const [editQuantityPurchased, setEditQuantityPurchased] = useState(0);
   const [editCostPrice, setEditCostPrice] = useState(0);
-  const [editSellingPrice, setEditSellingPrice] = useState(0);
   const [editVendorName, setEditVendorName] = useState("");
   const [editVendorContact, setEditVendorContact] = useState("");
   const [editPurchasePurpose, setEditPurchasePurpose] = useState("");
@@ -110,7 +108,6 @@ export default function InventoryPage() {
         itemName: addItemName,
         quantityPurchased: addQuantityPurchased,
         costPrice: addCostPrice,
-        sellingPrice: addSellingPrice,
         vendorName: addVendorName,
         vendorContact: addVendorContact,
         purchasePurpose: addPurchasePurpose,
@@ -134,7 +131,6 @@ export default function InventoryPage() {
     setAddItemName("");
     setAddQuantityPurchased(0);
     setAddCostPrice(0);
-    setAddSellingPrice(0);
     setAddVendorName("");
     setAddVendorContact("");
     setAddPurchasePurpose("");
@@ -152,7 +148,6 @@ export default function InventoryPage() {
         setEditItemName(fullItem.itemName);
         setEditQuantityPurchased(fullItem.quantityRemaining);
         setEditCostPrice(fullItem.costPrice);
-        setEditSellingPrice(fullItem.sellingPrice || 0);
         setEditVendorName(fullItem.vendorName);
         setEditVendorContact(fullItem.vendorContact || "");
         setEditPurchasePurpose(fullItem.purchasePurpose || "");
@@ -555,7 +550,6 @@ export default function InventoryPage() {
         itemName={addItemName}
         quantityPurchased={addQuantityPurchased}
         costPrice={addCostPrice}
-        sellingPrice={addSellingPrice}
         vendorName={addVendorName}
         vendorContact={addVendorContact}
         purchasePurpose={addPurchasePurpose}
@@ -564,7 +558,6 @@ export default function InventoryPage() {
         onItemNameChange={setAddItemName}
         onQuantityPurchasedChange={setAddQuantityPurchased}
         onCostPriceChange={setAddCostPrice}
-        onSellingPriceChange={setAddSellingPrice}
         onVendorNameChange={setAddVendorName}
         onVendorContactChange={setAddVendorContact}
         onPurchasePurposeChange={setAddPurchasePurpose}
@@ -583,7 +576,6 @@ export default function InventoryPage() {
         itemName={editItemName}
         quantityPurchased={editQuantityPurchased}
         costPrice={editCostPrice}
-        sellingPrice={editSellingPrice}
         vendorName={editVendorName}
         vendorContact={editVendorContact}
         purchasePurpose={editPurchasePurpose}
@@ -592,7 +584,6 @@ export default function InventoryPage() {
         onItemNameChange={setEditItemName}
         onQuantityPurchasedChange={setEditQuantityPurchased}
         onCostPriceChange={setEditCostPrice}
-        onSellingPriceChange={setEditSellingPrice}
         onVendorNameChange={setEditVendorName}
         onVendorContactChange={setEditVendorContact}
         onPurchasePurposeChange={setEditPurchasePurpose}

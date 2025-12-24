@@ -10,7 +10,6 @@ interface EditInventoryModalProps {
   itemName: string;
   quantityPurchased: number;
   costPrice: number;
-  sellingPrice: number;
   vendorName: string;
   vendorContact: string;
   purchasePurpose: string;
@@ -19,7 +18,6 @@ interface EditInventoryModalProps {
   onItemNameChange: (value: string) => void;
   onQuantityPurchasedChange: (value: number) => void;
   onCostPriceChange: (value: number) => void;
-  onSellingPriceChange: (value: number) => void;
   onVendorNameChange: (value: string) => void;
   onVendorContactChange: (value: string) => void;
   onPurchasePurposeChange: (value: string) => void;
@@ -34,7 +32,6 @@ export default function EditInventoryModal({
   itemName,
   quantityPurchased,
   costPrice,
-  sellingPrice,
   vendorName,
   vendorContact,
   purchasePurpose,
@@ -43,7 +40,6 @@ export default function EditInventoryModal({
   onItemNameChange,
   onQuantityPurchasedChange,
   onCostPriceChange,
-  onSellingPriceChange,
   onVendorNameChange,
   onVendorContactChange,
   onPurchasePurposeChange,
@@ -69,7 +65,6 @@ export default function EditInventoryModal({
           itemName={itemName}
           quantityPurchased={quantityPurchased}
           costPrice={costPrice}
-          sellingPrice={sellingPrice}
           vendorName={vendorName}
           vendorContact={vendorContact}
           purchasePurpose={purchasePurpose}
@@ -78,7 +73,6 @@ export default function EditInventoryModal({
           onItemNameChange={onItemNameChange}
           onQuantityPurchasedChange={onQuantityPurchasedChange}
           onCostPriceChange={onCostPriceChange}
-          onSellingPriceChange={onSellingPriceChange}
           onVendorNameChange={onVendorNameChange}
           onVendorContactChange={onVendorContactChange}
           onPurchasePurposeChange={onPurchasePurposeChange}

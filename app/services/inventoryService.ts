@@ -25,7 +25,6 @@ export interface CreateInventoryRequest {
   itemName: string;
   quantityPurchased: number;
   costPrice: number;
-  sellingPrice: number;
   vendorName: string;
   vendorContact: string;
   purchasePurpose: string;

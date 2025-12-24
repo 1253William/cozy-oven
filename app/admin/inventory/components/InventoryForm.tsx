@@ -4,7 +4,6 @@ interface InventoryFormProps {
   itemName: string;
   quantityPurchased: number;
   costPrice: number;
-  sellingPrice: number;
   vendorName: string;
   vendorContact: string;
   purchasePurpose: string;
@@ -13,7 +12,6 @@ interface InventoryFormProps {
   onItemNameChange: (value: string) => void;
   onQuantityPurchasedChange: (value: number) => void;
   onCostPriceChange: (value: number) => void;
-  onSellingPriceChange: (value: number) => void;
   onVendorNameChange: (value: string) => void;
   onVendorContactChange: (value: string) => void;
   onPurchasePurposeChange: (value: string) => void;
@@ -36,7 +34,6 @@ export default function InventoryForm({
   itemName,
   quantityPurchased,
   costPrice,
-  sellingPrice,
   vendorName,
   vendorContact,
   purchasePurpose,
@@ -45,7 +42,6 @@ export default function InventoryForm({
   onItemNameChange,
   onQuantityPurchasedChange,
   onCostPriceChange,
-  onSellingPriceChange,
   onVendorNameChange,
   onVendorContactChange,
   onPurchasePurposeChange,
@@ -92,8 +88,8 @@ export default function InventoryForm({
         </select>
       </div>
 
-      {/* Quantity and Prices */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Quantity and Cost Price */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Quantity Purchased *
@@ -121,22 +117,6 @@ export default function InventoryForm({
             onChange={(e) => onCostPriceChange(Number(e.target.value))}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
             placeholder="180.00"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selling Price (GHS) *
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={sellingPrice}
-            onChange={(e) => onSellingPriceChange(Number(e.target.value))}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-            placeholder="300.00"
             required
           />
         </div>

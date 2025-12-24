@@ -376,7 +376,7 @@ export default function Categories() {
           )}
 
           {/* Empty State */}
-          {!loading && currentProducts.length === 0 && (
+          {!loading && currentProducts.length === 0 && availableCategories.length > 0 && (
             <div className="text-center py-12">
               <p className="text-gray-600">No products found in this category.</p>
             </div>

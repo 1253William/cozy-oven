@@ -10,7 +10,6 @@ import {
   Phone,
   MapPin,
   Building,
-  Calendar,
   Edit2,
   Save,
   X,
@@ -37,7 +36,6 @@ export default function ProfilePage() {
     address: "",
     city: "",
     role: user?.role || "Admin",
-    joinedDate: "2024-01-15",
   });
 
   // Password form state
@@ -75,7 +73,6 @@ export default function ProfilePage() {
       address: "",
       city: "",
       role: user?.role || "Admin",
-      joinedDate: "2024-01-15",
     });
   };
 
@@ -282,29 +279,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Account Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Account Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Member Since
-                    </label>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
-                      <Calendar className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-900">
-                        {new Date(profileData.joinedDate).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               {/* Action Buttons */}
               {isEditing && (

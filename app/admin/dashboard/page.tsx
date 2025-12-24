@@ -353,6 +353,10 @@ export default function AdminDashboardPage() {
               <div className="h-full flex items-center justify-center">
                 <Loader2 className="w-8 h-8 text-[#2A2C22] animate-spin" />
               </div>
+            ) : chartData.length === 0 || chartData.every(point => point.value === 0) ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-gray-500">No sales data available</p>
+              </div>
             ) : (
               <div className="h-full flex items-end justify-between gap-4 px-4">
                 {chartData.map((dataPoint, index) => (

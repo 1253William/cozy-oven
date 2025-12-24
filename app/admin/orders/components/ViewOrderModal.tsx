@@ -15,6 +15,16 @@ interface OrderItem {
   total: number;
 }
 
+interface PickUpDetails {
+  pickupDate?: string;
+  specialInstructions?: string;
+}
+
+interface OrderDetailsData {
+  orderItems?: string[];
+  pickUpDetails?: PickUpDetails;
+}
+
 interface OrderDetails {
   orderId: string;
   customer: {
@@ -22,8 +32,10 @@ interface OrderDetails {
     email: string;
     contactNumber: string;
     deliveryAddress: string;
+    city?: string;
   };
   items: OrderItem[];
+  orderDetails?: OrderDetailsData;
   pricing: {
     subtotal: number;
     deliveryFee: number;
@@ -168,6 +180,12 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                       <p className="text-xs text-gray-600">Delivery Address</p>
                       <p className="text-sm font-medium text-gray-900">{orderDetails.customer.deliveryAddress}</p>
                     </div>
+                    {orderDetails.customer.city && (
+                      <div>
+                        <p className="text-xs text-gray-600">City</p>
+                        <p className="text-sm font-medium text-gray-900">{orderDetails.customer.city}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -177,9 +195,22 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                     <Package className="w-5 h-5 text-gray-600" />
                     <h4 className="text-sm font-semibold text-gray-900">Order Items</h4>
                   </div>
+                  
+                  {/* Display order items from orderDetails.orderItems if available */}
+                  {orderDetails.orderDetails?.orderItems && orderDetails.orderDetails.orderItems.length > 0 ? (
+                    <div className="space-y-2 mb-4">
+                      {orderDetails.orderDetails.orderItems.map((item, index) => (
+                        <div key={`order-item-${index}-${item.substring(0, 20)}`} className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-900">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  
+                  {/* Display detailed items with images and prices */}
                   <div className="space-y-3">
                     {orderDetails.items.map((item, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                      <div key={`${item.productId}-${index}`} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                         <div className="w-16 h-16 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
                           {item.thumbnail ? (
                             <Image
@@ -209,6 +240,31 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                     ))}
                   </div>
                 </div>
+
+                {/* Pickup Details */}
+                {orderDetails.orderDetails?.pickUpDetails && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">Pickup Details</h4>
+                    <div className="space-y-2">
+                      {orderDetails.orderDetails.pickUpDetails.pickupDate && (
+                        <div>
+                          <p className="text-xs text-gray-600">Pickup Date</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {orderDetails.orderDetails.pickUpDetails.pickupDate}
+                          </p>
+                        </div>
+                      )}
+                      {orderDetails.orderDetails.pickUpDetails.specialInstructions && (
+                        <div>
+                          <p className="text-xs text-gray-600">Special Instructions</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {orderDetails.orderDetails.pickUpDetails.specialInstructions}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Pricing */}
                 <div className="p-4 bg-gray-50 rounded-lg">

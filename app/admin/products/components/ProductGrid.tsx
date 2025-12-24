@@ -36,17 +36,6 @@ export default function ProductGrid({ products, onEdit, onDelete }: ProductGridP
               <h3 className="font-semibold text-gray-900 flex-1">
                 {product.productName}
               </h3>
-              {product.stockQuantity !== undefined && (
-                <span
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${
-                    product.stockQuantity > 0
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {product.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
-                </span>
-              )}
             </div>
             <p className="text-sm text-gray-600 mb-2">{product.productCategory}</p>
             <div className="flex items-center justify-between mb-3">
