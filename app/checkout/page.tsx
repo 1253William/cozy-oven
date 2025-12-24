@@ -148,7 +148,7 @@ export default function CheckoutPage() {
         productId: item.id,
         quantity: item.quantity,
         unitPrice: parseFloat(item.price.replace("GHS ", "")),
-        // Include size information in a custom field if API supports it
+        // Include size information - backend will store this in order details
         ...(item.selectedSize ? { size: item.selectedSize } : {}),
       }));
 

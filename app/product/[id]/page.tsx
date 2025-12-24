@@ -18,7 +18,7 @@ export default function ProductDetails() {
   const router = useRouter();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   const imageRef = useRef(null);
   const detailsRef = useRef(null);
@@ -39,6 +39,10 @@ export default function ProductDetails() {
     if (!product) return 0;
     
     const basePrice = product.price;
+    
+    // Return base price if no size is selected yet
+    if (!selectedSize) return basePrice;
+    
     const selectedOption = product.selectOptions?.find(opt => opt.label === selectedSize);
     const additionalPrice = selectedOption?.additionalPrice || 0;
     
@@ -129,7 +133,7 @@ export default function ProductDetails() {
       sizes: product.selectOptions?.map((opt: { label: string }) => opt.label) || DEFAULT_SIZES,
       details: product.productDetails || "",
     };
-    addToCart(cartItem, quantity, selectedSize);
+    addToCart(cartItem, quantity, selectedSize || undefined);
   };
 
   // Extract sizes from selectOptions
