@@ -16,6 +16,12 @@ export interface CheckoutRequest {
   specialInstruction?: string;
   contactNumber: string;
   paymentMethod: string; // "hubtel" or other payment methods
+  orderDetails?: {
+    pickUpDetails?: {
+      pickupDate?: string;
+      specialInstructions?: string;
+    };
+  };
 }
 
 // Order interface

@@ -160,9 +160,17 @@ export default function CheckoutPage() {
             ? deliveryDetails.address.trim()
             : "Pickup from store",
         city: deliveryMethod === "delivery" ? deliveryDetails.city.trim() : undefined,
-        specialInstruction: deliveryDetails.notes.trim() || undefined,
+        specialInstruction: deliveryMethod === "delivery" ? deliveryDetails.notes.trim() || undefined : undefined,
         contactNumber: customerInfo.phone.trim(),
         paymentMethod,
+        ...(deliveryMethod === "pickup" && {
+          orderDetails: {
+            pickUpDetails: {
+              pickupDate: `${deliveryDetails.date} at ${deliveryDetails.time}`,
+              specialInstructions: deliveryDetails.notes.trim() || undefined,
+            },
+          },
+        }),
       });
 
       if (!checkoutResponse.success || !checkoutResponse.order) {

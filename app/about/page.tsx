@@ -146,10 +146,10 @@ export default function AboutPage() {
               className="text-left md:text-center space-y-3 text-base sm:text-lg md:text-xl"
             >
               <p>Cozy Oven represents that feeling of:</p>
-              <p>✨ Warmth after a long day</p>
-              <p>✨ A sweet treat that lifts your mood</p>
-              <p>✨ Something familiar, trustworthy, and made with love</p>
-              <p>✨ A reminder that God knows how to use simple things to bless others</p>
+              <p>Warmth after a long day</p>
+              <p>A sweet treat that lifts your mood</p>
+              <p>Something familiar, trustworthy, and made with love</p>
+              <p>A reminder that God knows how to use simple things to bless others</p>
               <p className="mt-6 pt-6 border-t border-white/20">
                 Every loaf is a small piece of comfort—fresh, wholesome, and thoughtfully made.
               </p>
@@ -197,11 +197,11 @@ export default function AboutPage() {
                   </p>
                   <div className="mt-6 space-y-2">
                     <p className="font-semibold">We believe in:</p>
-                    <p>✔ Excellence</p>
-                    <p>✔ Simplicity</p>
-                    <p>✔ Thoughtfulness</p>
-                    <p>✔ God-led creativity</p>
-                    <p>✔ Serving our customers with joy</p>
+                    <p>Excellence</p>
+                    <p>Simplicity</p>
+                    <p>Thoughtfulness</p>
+                    <p>God-led creativity</p>
+                    <p>Serving our customers with joy</p>
                   </div>
                 </div>
               </motion.div>
