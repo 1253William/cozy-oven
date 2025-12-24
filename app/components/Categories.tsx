@@ -268,7 +268,11 @@ export default function Categories() {
 
   return (
     <>
-      <div ref={sectionRef} className="flex flex-col items-center justify-center min-h-screen font-[Euclid-Circular-B] mt-12">
+      <div
+        ref={sectionRef}
+        className="flex flex-col items-center justify-center min-h-screen font-[Euclid-Circular-B] mt-12"
+        style={{ display: availableCategories.length === 0 ? "none" : "block" }}
+      >
         <motion.div 
           className="w-full max-w-7xl px-4 md:py-8 "
           initial={{ opacity: 0, y: 30 }}

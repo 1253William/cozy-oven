@@ -66,7 +66,7 @@ export default function Hero() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim() && searchResults.length > 0) {
+    if (searchQuery.trim() && searchResults?.length > 0) {
       // Navigate to first result or search results page
       router.push(`/product/${searchResults[0]._id}`);
       setShowResults(false);
@@ -106,7 +106,7 @@ export default function Hero() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for banana bread, chocolate chip, walnut..."
-              className="w-full px-6 py-4 pr-12 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2A2C22] border border-white bg-white/90 backdrop-blur-sm"
+              className="w-full px-6 py-4 pr-12 rounded-full text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-[#2A2C22] border border-white bg-white/20 backdrop-blur-sm"
             />
             <button
               type="submit"
@@ -169,10 +169,6 @@ export default function Hero() {
             </motion.div>
           )}
         </div>
-
-        <button className="px-6 py-3 bg-gray-900 rounded-full text-white font-semibold hover:bg-gray-800 transition">
-          View Products
-        </button>
       </motion.div>
       
     </section>

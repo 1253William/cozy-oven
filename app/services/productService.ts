@@ -61,6 +61,11 @@ export interface ProductResponse {
   data: Product;
 }
 
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface ProductsQueryParams {
   page?: number;
   limit?: number;
@@ -122,6 +127,12 @@ export const productService = {
       `/api/v1/dashboard/admin/products/${productId}`,
       formData
     );
+    return response.data;
+  },
+
+  // DELETE /api/v1/dashboard/admin/products/{productId} - Delete product
+  deleteProduct: async (productId: string): Promise<ApiResponse> => {
+    const response = await apiClient.delete(`/api/v1/dashboard/admin/products/${productId}`);
     return response.data;
   },
 };

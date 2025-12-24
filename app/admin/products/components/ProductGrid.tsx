@@ -61,14 +61,14 @@ export default function ProductGrid({ products, onEdit, onDelete }: ProductGridP
                 <Edit2 className="w-4 h-4" />
                 Edit
               </button>
-              {onDelete && (
-                <button
-                  onClick={() => onDelete(product)}
-                  className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
+     
+              <button
+                onClick={() => onDelete?.(product)}
+                className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+ 
             </div>
           </div>
         </div>

@@ -78,18 +78,15 @@ export default function Footer() {
                   href="mailto:hello@cozyovens.com"
                   className="text-gray-700 hover:text-gray-900 transition-colors"
                 >
-                  hello@cozyovens.com
+                  info@cozyoven.store
                 </a>
-              </li>
-              <li>
-                <p className="text-gray-700">8:00am - 3:00pm, Mon to Fri</p>
               </li>
               <li>
                 <a
                   href="/locations"
                   className="text-gray-700 hover:text-gray-900 transition-colors"
                 >
-                  Store Locations
+                  Location: Tema community 22 Nhmf Estates
                 </a>
               </li>
             </ul>

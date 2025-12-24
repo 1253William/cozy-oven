@@ -70,6 +70,7 @@ export default function ProductManagementPage() {
     success: actionSuccess,
     createProductWithImage,
     updateProductWithImage,
+    deleteProduct,
     clearMessages,
   } = useProductManagement();
 
@@ -269,6 +270,15 @@ export default function ProductManagementPage() {
     setShowEditModal(true);
   };
 
+  const handleDelete = async (product: Product) => {
+    try {
+      await deleteProduct(product._id);
+      await refetch();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     resetForm();
@@ -389,7 +399,7 @@ export default function ProductManagementPage() {
         {/* Products Grid */}
         {!loading && (
           <>
-            <ProductGrid products={filteredProducts} onEdit={openEditModal} />
+            <ProductGrid products={filteredProducts} onEdit={openEditModal} onDelete={handleDelete} />
 
             {/* Empty State */}
             {filteredProducts.length === 0 && !loading && (

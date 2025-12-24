@@ -1,5 +1,5 @@
 import { useState } from "react";
-import productService, { CreateProductData, UpdateProductData } from "../services/productService";
+import productService, { UpdateProductData } from "../services/productService";
 
 export const useProductManagement = () => {
   const [loading, setLoading] = useState(false);
@@ -59,6 +59,23 @@ export const useProductManagement = () => {
     }
   };
 
+  const deleteProduct = async (productId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      const response = await productService.deleteProduct(productId);
+      setSuccess("Product deleted successfully!");
+      return response;
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      setError("Failed to delete product. Please try again.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearMessages = () => {
     setError(null);
     setSuccess(null);
@@ -71,6 +88,7 @@ export const useProductManagement = () => {
     createProductWithImage,
     updateProduct,
     updateProductWithImage,
+    deleteProduct,
     clearMessages,
   };
 };
