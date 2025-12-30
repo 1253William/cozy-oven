@@ -157,9 +157,9 @@ export default function Navbar() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-lg border rounded-lg shadow-lg overflow-hidden z-50"
+                className="absolute right-0 mt-2 w-[calc(100vw-8rem)] sm:w-96 md:w-80 bg-white/95 backdrop-blur-lg border-gray-200 border rounded-lg shadow-lg overflow-hidden z-50"
               >
-                <div className="p-3 border-b">
+                <div className="p-3 border-b border-gray-200">
                   <input
                     type="text"
                     value={searchQuery}
@@ -188,7 +188,7 @@ export default function Navbar() {
                       <button
                         key={product._id}
                         onClick={() => handleSearchResultClick(product._id)}
-                        className="w-full p-3 hover:bg-gray-50 text-left flex items-center gap-3 border-b last:border-b-0"
+                        className="w-full p-3 hover:bg-gray-50 text-left flex items-center gap-3 border-b border-gray-200 last:border-b-0"
                       >
                         <div className="w-12 h-12 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
                           {product.productThumbnail && (

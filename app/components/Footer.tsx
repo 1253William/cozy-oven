@@ -83,7 +83,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="/locations"
+                  href="#"
                   className="text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   Location: Tema community 22 Nhmf Estates

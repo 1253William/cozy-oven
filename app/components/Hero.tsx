@@ -122,7 +122,7 @@ export default function Hero() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-2xl bg-white/95 backdrop-blur-lg border rounded-lg shadow-lg overflow-hidden z-50"
+              className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-2xl bg-white/95 backdrop-blur-lg rounded-lg shadow-lg overflow-hidden z-50"
             >
               {searchLoading && (
                 <div className="p-4 text-center text-sm text-gray-500">

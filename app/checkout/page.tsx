@@ -225,7 +225,7 @@ export default function CheckoutPage() {
           {!isAuthenticated && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-800">
-                You&apos;ll need to sign in before placing your order.
+               The minimum delivery charge is GHS 30, and the final fee may vary depending on your location and other delivery factors..
               </p>
             </div>
           )}
@@ -329,6 +329,7 @@ export default function CheckoutPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   Delivery Details
                 </h2>
+            
 
                 {/* Delivery/Pickup Toggle */}
                 <div className="mb-6">
@@ -361,6 +362,11 @@ export default function CheckoutPage() {
 
                 {deliveryMethod === "delivery" && (
                   <div className="space-y-4">
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-800">
+              The minimum delivery charge is GHS 30, and the final fee may vary depending on your location and other delivery factors.
+              </p>
+            </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Delivery Address *
