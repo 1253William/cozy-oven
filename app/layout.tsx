@@ -3,6 +3,7 @@ import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import CartToastWrapper from "./components/CartToastWrapper";
 
 export const metadata: Metadata = {
   title: "Cozy Oven - Delicious Baked Goods",
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body className="antialiased">
         <AuthProvider>
           <WishlistProvider>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+              <CartToastWrapper>{children}</CartToastWrapper>
+            </CartProvider>
           </WishlistProvider>
         </AuthProvider>
       </body>

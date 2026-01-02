@@ -28,11 +28,14 @@ interface CartContextType {
   moveAllToWishlist: () => CartItem[];
   getCartCount: () => number;
   getCartTotal: () => number;
+  toastMessage: string | null;
+  clearToast: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     // Load from localStorage initially
@@ -50,6 +53,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart]);
 
+  // Clear toast message after 5 seconds
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const addToCart = (product: Product, quantity: number = 1, size?: string) => {
     setCart((prevCart) => {
@@ -60,11 +72,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existingItemIndex > -1) {
         const updatedCart = [...prevCart];
         updatedCart[existingItemIndex].quantity += quantity;
+        setToastMessage("Item quantity updated in cart!");
         return updatedCart;
       }
 
+      setToastMessage("Item added to cart!");
       return [...prevCart, { ...product, quantity, selectedSize: size }];
     });
+  };
+
+  const clearToast = () => {
+    setToastMessage(null);
   };
 
   const removeFromCart = (productId: string, size?: string) => {
@@ -120,6 +138,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         moveAllToWishlist,
         getCartCount,
         getCartTotal,
+        toastMessage,
+        clearToast,
       }}
     >
       {children}
