@@ -26,7 +26,7 @@ export default function SubscribersPage() {
     if (isAuthenticated && user?.role === "Admin") {
       fetchSubscribers();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isAuthenticated, user]);
 
   const fetchSubscribers = async () => {
@@ -56,7 +56,7 @@ export default function SubscribersPage() {
     const csvContent = [
       ["First Name", "Email", "Subscribed Date"],
       ...filtered.map((sub) => [
-        sub.firstName,
+        sub.fullName,
         sub.email,
         new Date(sub.createdAt).toLocaleDateString(),
       ]),
@@ -80,7 +80,7 @@ export default function SubscribersPage() {
     const query = searchQuery.toLowerCase();
     return subscribers.filter(
       (sub) =>
-        sub.firstName.toLowerCase().includes(query) ||
+        sub.fullName.toLowerCase().includes(query) ||
         sub.email.toLowerCase().includes(query)
     );
   };
@@ -225,7 +225,7 @@ export default function SubscribersPage() {
                               <UserPlus className="w-5 h-5 text-[#bd6325]" />
                             </div>
                             <span className="text-sm font-medium text-gray-900">
-                              {subscriber.firstName}
+                              {subscriber.fullName}
                             </span>
                           </div>
                         </td>
