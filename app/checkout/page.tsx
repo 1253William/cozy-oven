@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AuthModal from "../components/AuthModal";
+import IncompleteOrderModal from "../components/IncompleteOrderModal";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { orderService, type OrderItem } from "../services/orderService";
@@ -19,8 +20,10 @@ export default function CheckoutPage() {
   const { isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("info");
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [incompleteOrderModalOpen, setIncompleteOrderModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasStartedCheckout, setHasStartedCheckout] = useState(false);
 
   const [customerInfo, setCustomerInfo] = useState({
     name: user?.fullName || "",
@@ -46,6 +49,52 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [cart, router]);
+
+  // Track when user starts checkout
+  useEffect(() => {
+    if (cart.length > 0) {
+      setHasStartedCheckout(true);
+    }
+  }, [cart.length]);
+
+  // Show incomplete order modal when user tries to leave
+  useEffect(() => {
+    if (!hasStartedCheckout) return;
+
+    // Handle browser back/forward buttons
+    const handlePopState = (e: PopStateEvent) => {
+      if (!isProcessing) {
+        e.preventDefault();
+        // Push state back to prevent navigation
+        window.history.pushState({ page: "checkout" }, "", window.location.href);
+        setIncompleteOrderModalOpen(true);
+      }
+    };
+
+    // Push initial state
+    window.history.pushState({ page: "checkout" }, "", window.location.href);
+    
+    window.addEventListener("popstate", handlePopState);
+
+    // Intercept link clicks
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest("a");
+      if (link && link.href && !link.href.includes("#")) {
+        e.preventDefault();
+        e.stopPropagation();
+        setIncompleteOrderModalOpen(true);
+        return false;
+      }
+    };
+
+    document.addEventListener("click", handleLinkClick, true);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      document.removeEventListener("click", handleLinkClick, true);
+    };
+  }, [hasStartedCheckout, isProcessing]);
 
   if (cart.length === 0) return null;
 
@@ -98,9 +147,16 @@ export default function CheckoutPage() {
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
     } else {
-      router.push("/cart");
+      // Show incomplete order modal if user has started checkout (from any step)
+      if (hasStartedCheckout) {
+        setIncompleteOrderModalOpen(true);
+      } else {
+        router.push("/cart");
+      }
     }
   };
+
+
 
   const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
@@ -239,7 +295,7 @@ export default function CheckoutPage() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                       index <= currentStepIndex
-                        ? "bg-[#2A2C22] text-white"
+                        ? "bg-[#5d6043] text-white"
                         : "bg-gray-200 text-gray-600"
                     }`}
                   >
@@ -251,7 +307,7 @@ export default function CheckoutPage() {
                 {index < steps.length - 1 && (
                   <div
                     className={`flex-1 h-1 mx-2 ${
-                      index < currentStepIndex ? "bg-[#2A2C22]" : "bg-gray-200"
+                      index < currentStepIndex ? "bg-[#5d6043]" : "bg-gray-200"
                     }`}
                   />
                 )}
@@ -285,7 +341,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, name: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       placeholder="John Doe"
                       autoComplete="name"
                     />
@@ -300,7 +356,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, email: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       placeholder="john@example.com"
                       autoComplete="email"
                     />
@@ -315,7 +371,7 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerInfo({ ...customerInfo, phone: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       placeholder="+233 123 456 789"
                       autoComplete="tel"
                     />
@@ -342,7 +398,7 @@ export default function CheckoutPage() {
                       onClick={() => setDeliveryMethod("delivery")}
                       className={`flex-1 py-3 px-4 rounded-full border-2 font-semibold transition-colors ${
                         deliveryMethod === "delivery"
-                          ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
+                          ? "border-[#5d6043] bg-orange-50 text-[#5d6043]"
                           : "border-gray-300 text-gray-700 hover:border-gray-400"
                       }`}
                     >
@@ -352,7 +408,7 @@ export default function CheckoutPage() {
                       onClick={() => setDeliveryMethod("pickup")}
                       className={`flex-1 py-3 px-4 rounded-full border-2 font-semibold transition-colors ${
                         deliveryMethod === "pickup"
-                          ? "border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
+                          ? "border-[#5d6043] bg-orange-50 text-[#5d6043]"
                           : "border-gray-300 text-gray-700 hover:border-gray-400"
                       }`}
                     >
@@ -381,7 +437,7 @@ export default function CheckoutPage() {
                             address: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                         placeholder="123 Main Street"
                         autoComplete="street-address"
                       />
@@ -399,7 +455,7 @@ export default function CheckoutPage() {
                             city: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                         placeholder="Accra"
                         autoComplete="address-level2"
                       />
@@ -424,7 +480,7 @@ export default function CheckoutPage() {
                           })
                         }
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -440,7 +496,7 @@ export default function CheckoutPage() {
                             time: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -459,7 +515,7 @@ export default function CheckoutPage() {
                       })
                     }
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                     placeholder="Please ring bell once, no nuts..."
                   />
                 </div>
@@ -481,7 +537,7 @@ export default function CheckoutPage() {
                     <div className="space-y-3">
                       <button
                         onClick={() => setPaymentMethod("hubtel")}
-                        className="w-full py-3 px-4 rounded-lg border-2 text-left font-semibold transition-colors border-[#2A2C22] bg-orange-50 text-[#2A2C22]"
+                        className="w-full py-3 px-4 rounded-lg border-2 text-left font-semibold transition-colors border-[#5d6043] bg-orange-50 text-[#5d6043]"
                       >
                         Hubtel Payment (Mobile Money, Cards, & More)
                       </button>
@@ -582,7 +638,7 @@ export default function CheckoutPage() {
                     <div className="space-y-2 text-gray-700">
                       <div className="flex justify-between text-xl font-bold text-gray-900 pt-2">
                         <span>Total</span>
-                        <span className="text-[#2A2C22]">
+                        <span className="text-[#5d6043]">
                           GHS {total.toFixed(2)}
                         </span>
                       </div>
@@ -591,11 +647,11 @@ export default function CheckoutPage() {
 
                   <div className="p-4 bg-gray-50 rounded-lg text-xs text-gray-600">
                     By placing this order, you agree to our{" "}
-                    <a href="#" className="text-[#2A2C22] hover:underline">
+                    <a href="#" className="text-[#5d6043] hover:underline">
                       Terms and Conditions
                     </a>{" "}
                     and{" "}
-                    <a href="#" className="text-[#2A2C22] hover:underline">
+                    <a href="#" className="text-[#5d6043] hover:underline">
                       Privacy Policy
                     </a>
                     .
@@ -625,14 +681,14 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={isProcessing}
-                className="flex-1 bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-[#5d6043] text-white font-bold py-3 px-6 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? "Processing..." : "Place Order & Pay"}
               </button>
             ) : (
               <button
                 onClick={handleNext}
-                className="flex-1 bg-[#2A2C22] text-white font-bold py-3 px-6 rounded-full"
+                className="flex-1 bg-[#5d6043] text-white font-bold py-3 px-6 rounded-full"
               >
                 Continue
               </button>
@@ -648,6 +704,16 @@ export default function CheckoutPage() {
       </main>
       <Footer />
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      <IncompleteOrderModal 
+        isOpen={incompleteOrderModalOpen} 
+        onClose={() => {
+          setIncompleteOrderModalOpen(false);
+        }}
+        onConfirmLeave={() => {
+          setIncompleteOrderModalOpen(false);
+          router.push("/cart");
+        }}
+      />
     </>
   );
 }

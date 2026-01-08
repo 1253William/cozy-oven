@@ -6,10 +6,10 @@ export default function Footer() {
   return (
     <footer
       className="relative bg-cover bg-center bg-no-repeat text-gray-900"
-      style={{ backgroundImage: "url('/cozy4.png')" }} 
+      style={{ backgroundImage: "url('/cozy4.PNG')" }} 
     >
       {/* Overlay to keep text readable */}
-      <div className="absolute inset-0 bg-[#2A2C22]/20" />
+      <div className="absolute inset-0 bg-[#5d6043]/20" />
 
       {/* Main Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -26,7 +26,7 @@ export default function Footer() {
                 placeholder="Email"
                 className="flex-1 bg-gray-100 px-4 py-3 text-sm focus:outline-none rounded-l-full"
               />
-              <button className="bg-[#2A2C22]/80 px-4 py-3 transition-colors rounded-r-full hover:cursor-pointer">
+              <button className="bg-[#5d6043]/80 px-4 py-3 transition-colors rounded-r-full hover:cursor-pointer">
                 <ArrowRight className="w-5 h-5 text-white hover:translate-x-2 transition-transform duration-200" />
               </button>
             </div>

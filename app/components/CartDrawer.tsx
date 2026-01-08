@@ -85,7 +85,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {item.selectedSize && (
                         <p className="text-xs text-gray-500">Size: {item.selectedSize}</p>
                       )}
-                      <p className="text-[#2A2C22] font-semibold mt-1">{item.price}</p>
+                      <p className="text-[#5d6043] font-semibold mt-1">{item.price}</p>
                     </div>
 
                     {/* Quantity Selector */}
@@ -117,14 +117,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span className="text-[#2A2C22]">GHS {cartTotal.toFixed(2)}</span>
+              <span className="text-[#5d6043]">GHS {cartTotal.toFixed(2)}</span>
             </div>
           </div>
           
           <Link href="/cart">
             <button
               onClick={onClose}
-              className="w-full bg-[#2A2C22] hover:bg-[#2A2C22] text-white font-semibold py-3 rounded-full transition-colors hover:cursor-pointer"
+              className="w-full bg-[#5d6043] hover:bg-[#5d6043] text-white font-semibold py-3 rounded-full transition-colors hover:cursor-pointer"
             >
               View Cart
             </button>

@@ -13,7 +13,7 @@ export default function BestSellers() {
   const { products, loading } = useCustomerProducts({ limit: 6 });
 
   return (
-    <section ref={sectionRef} className="py-20 bg-[#2A2C22]/10">
+    <section ref={sectionRef} className="py-20 bg-[#faf9f5]">
       <motion.div 
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         initial={{ opacity: 0, y: 30 }}
@@ -36,7 +36,7 @@ export default function BestSellers() {
           <div className="lg:w-2/3 w-full">
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2A2C22]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5d6043]"></div>
               </div>
             ) : (
               <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
@@ -49,15 +49,17 @@ export default function BestSellers() {
                   >
                     <Link
                       href={`/product/${product._id}`}
-                      className="relative flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden cursor-pointer group snap-start transition-transform duration-300 hover:scale-105 block"
+                      className="relative flex-shrink-0 w-72 h-80 rounded-3xl overflow-hidden cursor-pointer group snap-start block"
                     >
                       {/* Product Image */}
-                      <Image
-                        src={product.productThumbnail || "/placeholder.svg"}
-                        alt={product.productName}
-                        fill
-                        className="object-cover"
-                      />
+                      <div className="absolute inset-0 overflow-hidden">
+                        <Image
+                          src={product.productThumbnail || "/placeholder.svg"}
+                          alt={product.productName}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </div>
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
                         <div className="flex items-end justify-between">

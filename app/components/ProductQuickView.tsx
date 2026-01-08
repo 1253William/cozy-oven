@@ -200,7 +200,7 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
                 {/* Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#2A2C22] hover:bg-[#3A3C32] text-white font-semibold py-3 rounded-full transition-colors hover:cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#5d6043] hover:bg-[#4a4d35] text-white font-semibold py-3 rounded-full transition-colors hover:cursor-pointer"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart
@@ -209,7 +209,7 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
 
               {/* View Full Details Link */}
               <Link href={`/product/${product.id}`} onClick={onClose}>
-                <button className="w-full border-2 border-[#2A2C22] text-[#2A2C22] font-semibold py-3 rounded-full hover:bg-[#2A2C22] hover:text-white transition-colors hover:cursor-pointer">
+                <button className="w-full border-2 border-[#5d6043] text-[#5d6043] font-semibold py-3 rounded-full hover:bg-[#5d6043] hover:text-white transition-colors hover:cursor-pointer">
                   View Full Details
                 </button>
               </Link>

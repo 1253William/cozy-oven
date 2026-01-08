@@ -106,11 +106,11 @@ export default function Hero() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for banana bread, chocolate chip, walnut..."
-              className="w-full px-6 py-4 pr-12 rounded-full text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-[#2A2C22] border border-white bg-white/20 backdrop-blur-sm"
+              className="w-full px-6 py-4 pr-12 rounded-full text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-[#5d6043] border border-white bg-white/20 backdrop-blur-sm"
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#2A2C22] rounded-full hover:bg-[#1a1c12] transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#5d6043] rounded-full hover:bg-[#4a4d35] transition-colors"
               aria-label="Search"
             >
               <Search className="w-5 h-5 text-white" />

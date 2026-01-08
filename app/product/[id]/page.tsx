@@ -43,7 +43,7 @@ export default function ProductDetails() {
       <>
         <Navbar />
         <main className="min-h-screen pt-20 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2A2C22]" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5d6043]" />
         </main>
         <Footer />
       </>
@@ -162,7 +162,7 @@ export default function ProductDetails() {
 
               <button
                 onClick={handleAddToCart}
-                className="flex items-center justify-center gap-3 bg-[#2A2C22] text-white font-bold py-4 px-8 rounded-full w-full"
+                className="flex items-center justify-center gap-3 bg-[#5d6043] text-white font-bold py-4 px-8 rounded-full w-full"
               >
                 <ShoppingCart className="w-6 h-6" />
                 Add to Cart

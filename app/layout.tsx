@@ -4,6 +4,7 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import CartToastWrapper from "./components/CartToastWrapper";
+import PurchaseToast from "./components/PurchaseToast";
 
 export const metadata: Metadata = {
   title: "Cozy Oven - Delicious Baked Goods",
@@ -21,7 +22,10 @@ export default function RootLayout({
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>
-              <CartToastWrapper>{children}</CartToastWrapper>
+              <CartToastWrapper>
+                {children}
+                <PurchaseToast />
+              </CartToastWrapper>
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>
