@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import useCustomerProducts from "../hooks/useCustomerProducts";
 
 interface PurchaseNotification {
@@ -19,11 +20,16 @@ const fakeUsers = [
 ];
 
 export default function PurchaseToast() {
+  const pathname = usePathname();
   const [currentNotification, setCurrentNotification] = useState<PurchaseNotification | null>(null);
   const { products } = useCustomerProducts({ limit: 20 });
 
+  // Don't show toast on admin pages
+  const isAdminPage = pathname?.startsWith("/admin");
+
   useEffect(() => {
-    if (products.length === 0) return;
+    // Don't show notifications on admin pages
+    if (isAdminPage || products.length === 0) return;
 
     const showNotification = () => {
       // Pick a random user
@@ -60,11 +66,14 @@ export default function PurchaseToast() {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [products]);
+  }, [products, isAdminPage]);
 
   const handleClose = () => {
     setCurrentNotification(null);
   };
+
+  // Don't render anything on admin pages
+  if (isAdminPage) return null;
 
   return (
     <AnimatePresence>
@@ -74,7 +83,7 @@ export default function PurchaseToast() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -300 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="fixed bottom-6 left-6 z-50 bg-[#bd6325] text-white rounded-lg shadow-2xl overflow-hidden max-w-sm"
+          className="fixed bottom-6 left-6 z-50 bg-[#bd6325] text-white rounded-lg shadow-2xl overflow-hidden max-w-sm border-2 border-white/20"
           style={{ minWidth: "320px" }}
         >
           <div className="flex items-center gap-3 p-4">

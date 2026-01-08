@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import apiClient from "../services/apiClient";
+import subscriberService from "../services/subscriberService";
 
 interface IncompleteOrderModalProps {
   isOpen: boolean;
@@ -61,7 +61,8 @@ export default function IncompleteOrderModal({
     setIsSubmitting(true);
 
     try {
-      await apiClient.post("/api/v1/store/customer/incomplete-order", {
+      // Add to VIP email subscribers list
+      await subscriberService.addSubscriber({
         fullName: fullName.trim(),
         email: email.trim(),
       });
@@ -165,7 +166,7 @@ export default function IncompleteOrderModal({
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bd6325] focus:border-transparent"
                         placeholder="John Doe"
                         required
                       />
@@ -180,7 +181,7 @@ export default function IncompleteOrderModal({
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bd6325] focus:border-transparent"
                         placeholder="john@example.com"
                         required
                       />
@@ -195,7 +196,7 @@ export default function IncompleteOrderModal({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-[#5d6043] text-white font-semibold py-3 px-6 rounded-full hover:bg-[#4a4d35] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-[#bd6325] text-white font-semibold py-3 px-6 rounded-full hover:bg-[#a8551f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? "Saving..." : "Save My Details"}
                     </button>

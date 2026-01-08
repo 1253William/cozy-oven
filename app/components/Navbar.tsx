@@ -136,7 +136,7 @@ export default function Navbar() {
               className="relative text-gray-700 hover:text-gray-900 transition-colors group"
             >
               {link.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#5d6043] transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#bd6325] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </div>
@@ -225,7 +225,7 @@ export default function Navbar() {
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#5d6043] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#bd6325] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -297,7 +297,7 @@ export default function Navbar() {
               <div className="flex flex-col items-center w-full gap-6">
                 {navLinks.map((link, i) => (
                   <motion.div key={link.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ delay: i * 0.08 }}>
-                    <Link href={link.href} className="text-2xl font-semibold text-gray-900 hover:text-[#5d6043] transition-colors" onClick={() => setMenuOpen(false)}>
+                    <Link href={link.href} className="text-2xl font-semibold text-gray-900 hover:text-[#bd6325] transition-colors" onClick={() => setMenuOpen(false)}>
                       {link.label}
                     </Link>
                   </motion.div>
@@ -318,7 +318,7 @@ export default function Navbar() {
                       </motion.button>
                     </>
                   ) : (
-                    <motion.button onClick={handleAuthClick} className="text-lg py-3 rounded-xl bg-[#5d6043] text-white hover:bg-[#4a4d35] transition">Sign In / Sign Up</motion.button>
+                    <motion.button onClick={handleAuthClick} className="text-lg py-3 rounded-xl bg-[#bd6325] text-white hover:bg-[#a8551f] transition">Sign In / Sign Up</motion.button>
                   )}
                 </div>
               </div>

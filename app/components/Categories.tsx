@@ -100,14 +100,14 @@ export default function Categories() {
                   onClick={() => setActiveCategory(category)}
                   className={`md:text-3xl text-xl font-bold transition-colors relative whitespace-nowrap ${
                     effectiveActiveCategory === category
-                      ? "text-[#5d6043]"
+                      ? "text-[#bd6325]"
                       : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
                   {category}
                   {effectiveActiveCategory === category && (
                   <motion.span
-                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#5d6043] rounded-full origin-left"
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-[#bd6325] rounded-full origin-left"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
@@ -122,7 +122,7 @@ export default function Categories() {
           {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#5d6043] border-r-transparent"></div>
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#bd6325] border-r-transparent"></div>
               <p className="mt-4 text-gray-600">Loading products...</p>
             </div>
           )}

@@ -38,7 +38,7 @@ export default function CartPage() {
               </p>
               <button
                 onClick={() => router.push("/")}
-                className="bg-[#5d6043] hover:bg-[#5d6043] text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+                className="bg-[#bd6325] hover:bg-[#bd6325] text-white font-semibold py-3 px-8 rounded-lg transition-colors"
               >
                 Shop Now
               </button>
@@ -136,7 +136,7 @@ export default function CartPage() {
                             <p className="text-sm text-gray-600">
                               GHS {itemPrice.toFixed(2)} each
                             </p>
-                            <p className="text-lg font-bold text-[#5d6043]">
+                            <p className="text-lg font-bold text-[#bd6325]">
                               GHS {itemTotal.toFixed(2)}
                             </p>
                           </div>
@@ -162,13 +162,13 @@ export default function CartPage() {
                   </div>
                   <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900">
                     <span>Total</span>
-                    <span className="text-[#5d6043]">GHS {total.toFixed(2)}</span>
+                    <span className="text-[#bd6325]">GHS {total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => router.push("/checkout")}
-                  className="w-full bg-[#5d6043] hover:bg-[#5d6043] text-white font-bold py-3 px-6 rounded-full transition-colors mb-3 hover:cursor-pointer"
+                  className="w-full bg-[#bd6325] hover:bg-[#bd6325] text-white font-bold py-3 px-6 rounded-full transition-colors mb-3 hover:cursor-pointer"
                 >
                   Proceed to Checkout
                 </button>

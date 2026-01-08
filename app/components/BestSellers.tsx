@@ -36,7 +36,7 @@ export default function BestSellers() {
           <div className="lg:w-2/3 w-full">
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5d6043]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#bd6325]"></div>
               </div>
             ) : (
               <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>

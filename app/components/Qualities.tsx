@@ -53,40 +53,43 @@ export default function Qualities() {
     { 
       icon: Truck, 
       title: "Quick Delivery", 
-      bgColor: "bg-[#bd6325]/10", 
+      bgColor: "bg-[#bd6325]/15",
+      borderColor: "border-[#bd6325]/30", 
       iconColor: "text-[#bd6325]",
       bubbles: [
         { size: 20, color: "#bd6325", left: "10%", top: "15%", delay: 0, duration: 3 },
-        { size: 15, color: "#5d6043", left: "80%", top: "25%", delay: 0.5, duration: 4 },
-        { size: 25, color: "#b9aca2", left: "20%", top: "70%", delay: 1, duration: 3.5 },
+        { size: 15, color: "#bd6325", left: "80%", top: "25%", delay: 0.5, duration: 4 },
+        { size: 25, color: "#bd6325", left: "20%", top: "70%", delay: 1, duration: 3.5 },
         { size: 18, color: "#bd6325", left: "75%", top: "65%", delay: 1.5, duration: 4.5 },
-        { size: 12, color: "#5d6043", left: "50%", top: "10%", delay: 0.8, duration: 3.2 },
+        { size: 12, color: "#bd6325", left: "50%", top: "10%", delay: 0.8, duration: 3.2 },
       ]
     },
     { 
       icon: ShieldCheck, 
       title: "Customer Satisfaction Guarantee", 
-      bgColor: "bg-[#5d6043]/10", 
-      iconColor: "text-[#5d6043]",
+      bgColor: "bg-[#bd6325]/15",
+      borderColor: "border-[#bd6325]/30", 
+      iconColor: "text-[#bd6325]",
       bubbles: [
-        { size: 22, color: "#5d6043", left: "15%", top: "20%", delay: 0, duration: 3.5 },
+        { size: 22, color: "#bd6325", left: "15%", top: "20%", delay: 0, duration: 3.5 },
         { size: 16, color: "#bd6325", left: "85%", top: "30%", delay: 0.7, duration: 4 },
-        { size: 20, color: "#b9aca2", left: "25%", top: "75%", delay: 1.2, duration: 3.8 },
-        { size: 14, color: "#5d6043", left: "70%", top: "60%", delay: 0.3, duration: 4.2 },
+        { size: 20, color: "#bd6325", left: "25%", top: "75%", delay: 1.2, duration: 3.8 },
+        { size: 14, color: "#bd6325", left: "70%", top: "60%", delay: 0.3, duration: 4.2 },
         { size: 19, color: "#bd6325", left: "45%", top: "15%", delay: 1, duration: 3.3 },
       ]
     },
     { 
       icon: CreditCard, 
       title: "Secure Payments", 
-      bgColor: "bg-[#b9aca2]/10", 
-      iconColor: "text-[#b9aca2]",
+      bgColor: "bg-[#bd6325]/15",
+      borderColor: "border-[#bd6325]/30", 
+      iconColor: "text-[#bd6325]",
       bubbles: [
-        { size: 18, color: "#b9aca2", left: "12%", top: "18%", delay: 0, duration: 4 },
-        { size: 24, color: "#5d6043", left: "82%", top: "28%", delay: 0.6, duration: 3.5 },
+        { size: 18, color: "#bd6325", left: "12%", top: "18%", delay: 0, duration: 4 },
+        { size: 24, color: "#bd6325", left: "82%", top: "28%", delay: 0.6, duration: 3.5 },
         { size: 16, color: "#bd6325", left: "22%", top: "72%", delay: 1.1, duration: 4.3 },
-        { size: 20, color: "#b9aca2", left: "78%", top: "62%", delay: 0.4, duration: 3.7 },
-        { size: 14, color: "#5d6043", left: "48%", top: "12%", delay: 0.9, duration: 4.1 },
+        { size: 20, color: "#bd6325", left: "78%", top: "62%", delay: 0.4, duration: 3.7 },
+        { size: 14, color: "#bd6325", left: "48%", top: "12%", delay: 0.9, duration: 4.1 },
       ]
     },
   ];
@@ -103,7 +106,7 @@ export default function Qualities() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`${quality.bgColor} rounded-2xl py-6 px-6 shadow-sm transition-all duration-300 transform hover:scale-105 hover:shadow-md relative overflow-hidden`}
+                className={`${quality.bgColor} border-2 ${quality.borderColor} rounded-2xl py-6 px-6 shadow-sm transition-all duration-300 transform hover:scale-105 hover:shadow-md relative overflow-hidden`}
               >
                 {/* Floating Bubbles */}
                 {quality.bubbles.map((bubble, bubbleIndex) => (
@@ -139,7 +142,7 @@ export default function Qualities() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <p className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#5d6043] mb-2">
+          <p className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#bd6325] mb-2">
             1,300+
           </p>
           <p className="text-lg sm:text-xl text-[#222222] font-medium">
