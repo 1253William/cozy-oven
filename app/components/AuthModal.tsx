@@ -253,7 +253,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                 {activeTab === "login" && "Sign in to continue to Cozy Oven"}
                 {activeTab === "signup" && "Join us and start ordering delicious treats"}
                 {activeTab === "forgot-password" && "We'll send you a code to reset your password"}
-                {activeTab === "verify-otp" && "Enter the 5-digit code sent to your email"}
+                {activeTab === "verify-otp" && "Enter the OTP sent to your  phone number"}
                 {activeTab === "reset-password" && "Create a new secure password"}
               </p>
             </div>
