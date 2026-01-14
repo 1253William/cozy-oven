@@ -86,7 +86,7 @@ export default function Categories() {
         style={{ display: availableCategories.length === 0 ? "none" : "block" }}
       >
         <motion.div 
-          className="w-full max-w-7xl px-4 md:py-8 "
+          className="w-full max-w-8xl px-4 md:py-8 "
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.6 }}
