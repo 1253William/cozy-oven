@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import useCustomerProducts from "../hooks/useCustomerProducts";
+import purchaseToastService, { PurchaseData } from "../services/purchaseToastService";
 
 interface PurchaseNotification {
   name: string;
@@ -13,47 +14,113 @@ interface PurchaseNotification {
   timeAgo: string;
 }
 
-// Fake user names for purchase notifications
+// Fallback fake user names and products for when API returns empty array
 const fakeUsers = [
   "Elton", "Sarah", "Michael", "Ama", "Kwame", "Grace", "David", "Akosua",
   "James", "Efua", "John", "Adjoa", "Paul", "Mariama", "Peter", "Fatima"
 ];
 
+// Format time ago from ISO date string
+const formatTimeAgo = (dateString: string): string => {
+  const now = new Date();
+  const purchaseDate = new Date(dateString);
+  const diffInMs = now.getTime() - purchaseDate.getTime();
+  const diffInMinutes = Math.floor(diffInMs / 60000);
+  
+  if (diffInMinutes < 1) {
+    return "just now";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+  } else {
+    const hours = Math.floor(diffInMinutes / 60);
+    if (hours < 24) {
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(hours / 24);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+  }
+};
+
 export default function PurchaseToast() {
   const pathname = usePathname();
   const [currentNotification, setCurrentNotification] = useState<PurchaseNotification | null>(null);
+  const [purchases, setPurchases] = useState<PurchaseData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { products } = useCustomerProducts({ limit: 20 });
 
   // Don't show toast on admin pages
   const isAdminPage = pathname?.startsWith("/admin");
 
+  // Fetch purchases from API
+  useEffect(() => {
+    const fetchPurchases = async () => {
+      try {
+        setIsLoading(true);
+        const data = await purchaseToastService.getRecentPurchases();
+        console.log("Data",data)
+        setPurchases(data);
+      } catch (error) {
+        console.error("Error fetching purchases:", error);
+        setPurchases([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (!isAdminPage) {
+      fetchPurchases();
+      // Refresh purchases every 5 minutes
+      const refreshInterval = setInterval(fetchPurchases, 5 * 60 * 1000);
+      return () => clearInterval(refreshInterval);
+    }
+  }, [isAdminPage]);
+
   useEffect(() => {
     // Don't show notifications on admin pages
-    if (isAdminPage || products.length === 0) return;
+    if (isAdminPage || isLoading) return;
 
     const showNotification = () => {
-      // Pick a random user
-      const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-      
-      // Pick a random product
-      const randomProduct = products[Math.floor(Math.random() * products.length)];
-      
-      // Generate random time ago (5 minutes to 2 hours)
-      const minutesAgo = Math.floor(Math.random() * 115) + 5;
-      let timeAgo = "";
-      if (minutesAgo < 60) {
-        timeAgo = `${minutesAgo} minutes ago`;
-      } else {
-        const hours = Math.floor(minutesAgo / 60);
-        timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      let notification: PurchaseNotification | null = null;
+
+      // Use API data if available, otherwise fall back to fake data
+      if (purchases.length > 0) {
+        // Pick a random purchase from API data
+        const randomPurchase = purchases[Math.floor(Math.random() * purchases.length)];
+        const firstName = randomPurchase.customerName.split(' ')[0]; // Get first name
+        
+        notification = {
+          name: firstName,
+          productName: randomPurchase.productName,
+          productImage: randomPurchase.thumbnail,
+          timeAgo: formatTimeAgo(randomPurchase.purchasedAt),
+        };
+      } else if (products.length > 0) {
+        // Fallback to fake data
+        const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+        const randomProduct = products[Math.floor(Math.random() * products.length)];
+        
+        // Generate random time ago (5 minutes to 2 hours)
+        const minutesAgo = Math.floor(Math.random() * 115) + 5;
+        let timeAgo = "";
+        if (minutesAgo < 60) {
+          timeAgo = `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
+        } else {
+          const hours = Math.floor(minutesAgo / 60);
+          timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        }
+
+        notification = {
+          name: randomUser,
+          productName: randomProduct.productName,
+          productImage: randomProduct.productThumbnail,
+          timeAgo,
+        };
       }
 
-      setCurrentNotification({
-        name: randomUser,
-        productName: randomProduct.productName,
-        productImage: randomProduct.productThumbnail,
-        timeAgo,
-      });
+      if (notification) {
+        setCurrentNotification(notification);
+      }
     };
 
     // Show first notification after 2 seconds
@@ -66,7 +133,7 @@ export default function PurchaseToast() {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [products, isAdminPage]);
+  }, [purchases, products, isAdminPage, isLoading]);
 
   const handleClose = () => {
     setCurrentNotification(null);
@@ -88,7 +155,7 @@ export default function PurchaseToast() {
         >
           <div className="flex items-center gap-3 p-4">
             {/* Product Image */}
-            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-white">
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-white">
               <Image
                 src={currentNotification.productImage || "/placeholder.svg"}
                 alt={currentNotification.productName}
@@ -111,7 +178,7 @@ export default function PurchaseToast() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="flex-shrink-0 p-1 hover:bg-white/20 rounded-full transition-colors"
+              className="shrink-0 p-1 hover:bg-white/20 rounded-full transition-colors"
               aria-label="Close notification"
             >
               <svg

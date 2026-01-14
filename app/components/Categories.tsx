@@ -127,22 +127,23 @@ export default function Categories() {
             </div>
           )}
 
-          {/* Cards Grid */}
+          {/* Cards Horizontal Scroll */}
           {!loading && (
-            <motion.div
-              key={activeCategory}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {currentProducts.map((product) => (
-                <motion.div
-                  key={product._id}
-                  variants={cardVariants}
-                  className="relative overflow-hidden rounded-4xl text-white h-[400px] sm:h-[450px] md:h-[500px] group"
-                  onClick={() => handleCardClick(product._id)}
-                >
+            <div className="overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              <motion.div
+                key={activeCategory}
+                className="flex gap-6 min-w-max"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {currentProducts.map((product) => (
+                  <motion.div
+                    key={product._id}
+                    variants={cardVariants}
+                    className="relative overflow-hidden rounded-4xl text-white h-[400px] sm:h-[450px] md:h-[500px] w-[300px] shrink-0 group snap-start"
+                    onClick={() => handleCardClick(product._id)}
+                  >
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out group-hover:scale-110 z-0"
                     style={{ backgroundImage: `url(${product.productThumbnail})` }}
@@ -186,9 +187,10 @@ export default function Categories() {
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
           )}
 
           {/* Empty State */}

@@ -5,8 +5,12 @@ import Categories from "./components/Categories";
 import Qualities from "./components/Qualities";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
+import TestimonialsMarquee from "./components/TestimonialsMarquee";
+import WelcomeModal from "./components/WelcomeModal";
+import { testimonials } from "./data/testimonials";
 
 export default function Home() {
+
   return (
     <>
     <Navbar />
@@ -15,8 +19,10 @@ export default function Home() {
         <Categories />
         <Qualities />
         <BestSellers />
+        <TestimonialsMarquee testimonials={testimonials} speed={30} />
       </main>
       <Footer />
+      <WelcomeModal />
     </>
 
   );
