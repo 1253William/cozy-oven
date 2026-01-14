@@ -12,10 +12,10 @@ export default function SizeSelector({
   onSizeChange,
 }: SizeSelectorProps) {
   return (
-    <div className="flex gap-3">
-      {sizes.map((size) => (
+    <div className="flex flex-wrap gap-3">
+      {sizes.map((size, index) => (
         <button
-          key={size}
+          key={`${size}-${index}`}
           onClick={() => onSizeChange(size)}
           className={`px-6 py-2 rounded-full border-2 font-semibold transition-all ${
             selectedSize === size
