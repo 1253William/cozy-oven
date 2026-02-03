@@ -23,15 +23,29 @@ export default function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
   const { product, loading } = useCustomerProduct(id as string);
   
+  // Filter to only show available options
+  const availableOptions = product?.selectOptions?.filter(opt => opt.isAvailable !== false) ?? [];
+  const sizes = availableOptions.map(opt => opt.label) ?? ["Regular"];
+  
   const [selectedSize, setSelectedSize] = useState<string | null>(
-    product?.selectOptions?.[0]?.label ?? null
+    availableOptions?.[0]?.label ?? null
   );
+
+  // Update selectedSize when product loads or available options change
+  useEffect(() => {
+    if (product && availableOptions.length > 0) {
+      const firstAvailable = availableOptions[0]?.label;
+      if (firstAvailable && (!selectedSize || !availableOptions.find(opt => opt.label === selectedSize))) {
+        setSelectedSize(firstAvailable);
+      }
+    }
+  }, [product, availableOptions]);
 
   // ✅ FINAL PRICE = size price (not base + size)
   const currentPrice = (() => {
     if (!product) return 0;
 
-    const option = product.selectOptions?.find(
+    const option = availableOptions.find(
       opt => opt.label === selectedSize
     );
 
@@ -70,8 +84,6 @@ export default function ProductDetails() {
     );
   }
 
-  const sizes =
-    product.selectOptions?.map(opt => opt.label) ?? ["Regular"];
 
   const handleAddToCart = () => {
     addToCart(
@@ -115,12 +127,25 @@ export default function ProductDetails() {
                 className="object-cover"
                 priority
               />
+              {/* Sold Out Badge */}
+              {product.isAvailable === false && (
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-10">
+                  Sold Out
+                </div>
+              )}
             </div>
 
             <div>
-              <h1 className="text-3xl font-bold mb-4">
-                {product.productName}
-              </h1>
+              <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-3xl font-bold">
+                  {product.productName}
+                </h1>
+                {product.isAvailable === false && (
+                  <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Sold Out
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center gap-1 mb-4">
                 {[1, 2, 3, 4, 5].map(star => (
@@ -162,10 +187,15 @@ export default function ProductDetails() {
 
               <button
                 onClick={handleAddToCart}
-                className="flex items-center justify-center gap-3 bg-[#bd6325] text-white font-bold py-4 px-8 rounded-full w-full"
+                disabled={product.isAvailable === false}
+                className={`flex items-center justify-center gap-3 font-bold py-4 px-8 rounded-full w-full transition-all ${
+                  product.isAvailable === false
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-[#bd6325] text-white hover:bg-[#a8551f]"
+                }`}
               >
                 <ShoppingCart className="w-6 h-6" />
-                Add to Cart
+                {product.isAvailable === false ? "Sold Out" : "Add to Cart"}
               </button>
             </div>
           </div>

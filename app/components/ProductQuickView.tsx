@@ -100,9 +100,16 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
               </div>
 
               {/* Product Name */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {product.name}
-              </h3>
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {product.name}
+                </h3>
+                {product.isAvailable === false && (
+                  <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Sold Out
+                  </span>
+                )}
+              </div>
 
               {/* Price */}
               <p className="text-3xl font-bold text-[#2A2C22] mb-4">
@@ -200,10 +207,15 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
                 {/* Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#bd6325] hover:bg-[#a8551f] text-white font-semibold py-3 rounded-full transition-colors hover:cursor-pointer"
+                  disabled={product.isAvailable === false}
+                  className={`flex-1 flex items-center justify-center gap-2 font-semibold py-3 rounded-full transition-colors ${
+                    product.isAvailable === false
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-[#bd6325] hover:bg-[#a8551f] text-white hover:cursor-pointer"
+                  }`}
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
+                  {product.isAvailable === false ? "Sold Out" : "Add to Cart"}
                 </button>
               </div>
 

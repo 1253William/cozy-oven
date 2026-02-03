@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { orderService, type Order } from "../../services/orderService";
 import ViewOrderModal from "./components/ViewOrderModal";
+import AddOrderModal from "./components/AddOrderModal";
 
 const statusOptions = [
   { value: "all", label: "All Orders" },
@@ -70,11 +71,13 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [newStatus, setNewStatus] = useState<string>("");
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
+  const [showAddOrderModal, setShowAddOrderModal] = useState(false);
   const [statistics, setStatistics] = useState({
     total: 0,
     pending: 0,
@@ -195,20 +198,32 @@ export default function OrdersPage() {
       !q ||
       (order.orderId?.toLowerCase().includes(q) ?? false) ||
       (order.deliveryAddress?.toLowerCase().includes(q) ?? false) ||
-      (order.contactNumber?.toLowerCase().includes(q) ?? false);
+      (order.contactNumber?.toLowerCase().includes(q) ?? false) ||
+      (order.customer?.toLowerCase().includes(q) ?? false) ||
+      (order.email?.toLowerCase().includes(q) ?? false);
 
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+    const matchesPaymentMethod = paymentMethodFilter === "all" || order.paymentMethod === paymentMethodFilter;
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesPaymentMethod;
   });
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-          <p className="text-gray-600 mt-1">Manage all customer orders</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
+            <p className="text-gray-600 mt-1">Manage all customer orders</p>
+          </div>
+          <button
+            onClick={() => setShowAddOrderModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
+          >
+            <Package className="w-5 h-5" />
+            Add Order
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -265,6 +280,24 @@ export default function OrdersPage() {
                     {option.label}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Payment Method Filter */}
+            <div className="flex items-center gap-2">
+              <select
+                value={paymentMethodFilter}
+                onChange={(e) => {
+                  setPaymentMethodFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
+              >
+                <option value="all">All Payment Methods</option>
+                <option value="cash">Cash</option>
+                <option value="hubtel">Hubtel</option>
+                <option value="paystack">Paystack</option>
+                <option value="mobile_money">Mobile Money</option>
               </select>
             </div>
           </div>
@@ -548,6 +581,16 @@ export default function OrdersPage() {
           onClose={() => setViewingOrderId(null)}
         />
       )}
+      
+      {/* Add Order Modal */}
+      <AddOrderModal
+        isOpen={showAddOrderModal}
+        onClose={() => setShowAddOrderModal(false)}
+        onSuccess={() => {
+          fetchOrders();
+          setShowAddOrderModal(false);
+        }}
+      />
     </AdminLayout>
   );
 }

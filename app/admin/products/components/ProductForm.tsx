@@ -21,6 +21,7 @@ interface ProductFormProps {
   onSelectOptionInputChange: (field: "label" | "additionalPrice", value: string | number) => void;
   onAddSelectOption: () => void;
   onRemoveSelectOption: (index: number) => void;
+  onToggleOptionAvailable?: (index: number) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   submitLabel: string;
@@ -46,6 +47,7 @@ export default function ProductForm({
   onSelectOptionInputChange,
   onAddSelectOption,
   onRemoveSelectOption,
+  onToggleOptionAvailable,
   onSubmit,
   onCancel,
   submitLabel,
@@ -182,10 +184,26 @@ export default function ProductForm({
             </button>
           </div>
           {selectOptions.map((option, index) => (
-            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-              <span className="text-sm">
+            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg gap-2">
+              <span className={`text-sm flex-1 ${option.isAvailable === false ? "text-gray-400 line-through" : ""}`}>
                 {option.label} (+GHS {option.additionalPrice.toFixed(2)})
               </span>
+              {onToggleOptionAvailable && (
+                <button
+                  type="button"
+                  onClick={() => onToggleOptionAvailable(index)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    option.isAvailable !== false ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                  title={option.isAvailable !== false ? "Mark as unavailable" : "Mark as available"}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      option.isAvailable !== false ? "translate-x-5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => onRemoveSelectOption(index)}

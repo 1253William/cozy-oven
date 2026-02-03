@@ -196,6 +196,25 @@ export const orderService = {
     return response.data;
   },
 
+  // Admin: Create a new order (checkout) - allows admins to checkout
+  // Tries admin endpoint first, falls back to customer endpoint if admin endpoint doesn't exist
+  adminCheckout: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {
+    try {
+      // Try admin-specific endpoint first
+      const response = await apiClient.post("/api/v1/dashboard/admin/orders/checkout", data);
+      return response.data;
+    } catch (error: any) {
+      // If admin endpoint doesn't exist (404), try customer endpoint
+      // Note: Backend may need to allow admins on customer endpoint or provide admin endpoint
+      if (error.response?.status === 404 || error.response?.status === 403) {
+        // Fallback to customer endpoint (same as AddOrderModal uses)
+        const response = await apiClient.post("/api/v1/store/customer/orders/checkout/", data);
+        return response.data;
+      }
+      throw error;
+    }
+  },
+
   // Admin: Get single order details by orderId
   getOrderById: async (orderId: string): Promise<ApiResponse> => {
     const response = await apiClient.get(`/api/v1/dashboard/admin/orders/${orderId}`);

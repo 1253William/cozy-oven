@@ -114,7 +114,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 w-full flex items-center justify-between px-4 md:px-8 py-6 backdrop-blur-lg bg-white/80 shadow-sm">
+      <nav className="fixed top-[2.5rem] left-0 right-0 z-40 w-full flex items-center justify-between px-4 md:px-8 py-6 backdrop-blur-lg bg-white/80 shadow-sm">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link href="/">

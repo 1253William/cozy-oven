@@ -28,7 +28,9 @@ export const useCustomerProducts = (options: UseCustomerProductsOptions = {}) =>
       setLoading(true);
       setError(null);
       const response = await customerProductService.getAllProducts({ page, limit });
-      setProducts(response.data);
+      // Filter to only show available products
+      const availableProducts = response.data.filter(product => product.isAvailable !== false);
+      setProducts(availableProducts);
       if (response.pagination) {
         setPagination(response.pagination);
       }

@@ -3,6 +3,7 @@ import apiClient from "./apiClient";
 export interface SelectOption {
   label: string;
   additionalPrice: number;
+  isAvailable?: boolean;
 }
 
 export interface Product {
@@ -15,6 +16,8 @@ export interface Product {
   selectOptions: SelectOption[];
   sku?: string;
   stockQuantity?: number;
+  isAvailable?: boolean;
+  productStatus?: string;
   rating?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -36,6 +39,8 @@ export interface UpdateProductData {
   productDetails?: string;
   price?: number;
   selectOptions?: SelectOption[];
+  isAvailable?: boolean;
+  productStatus?: string;
 }
 
 export interface PaginationInfo {

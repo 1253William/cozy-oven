@@ -14,6 +14,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { Product, SelectOption } from "../../services/productService";
+import ComboProductModal from "./components/ComboProductModal";
+import comboService, { ComboProduct } from "../../services/comboService";
 import useAdminProducts from "../../hooks/useAdminProducts";
 import useProductManagement from "../../hooks/useProductManagement";
 import AddProductModal from "./components/AddProductModal";
@@ -32,6 +34,7 @@ export default function ProductManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showComboModal, setShowComboModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -43,6 +46,7 @@ export default function ProductManagementPage() {
   });
   const [selectOptionInput, setSelectOptionInput] = useState({ label: "", additionalPrice: 0 });
   const [selectOptions, setSelectOptions] = useState<SelectOption[]>([]);
+  const [comboProducts, setComboProducts] = useState<ComboProduct[]>([]);
 
   // Use custom hooks
   const { products, loading, pagination, refetch } = useAdminProducts({
@@ -70,6 +74,7 @@ export default function ProductManagementPage() {
     success: actionSuccess,
     createProductWithImage,
     updateProductWithImage,
+    updateProduct,
     deleteProduct,
     clearMessages,
   } = useProductManagement();
@@ -79,6 +84,19 @@ export default function ProductManagementPage() {
       router.push("/admin/login");
     }
   }, [isAuthenticated, user, router]);
+
+  // Load combo products from localStorage for admin view
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setComboProducts(comboService.getAll());
+    }
+  }, []);
+
+  const refreshCombos = () => {
+    if (typeof window !== "undefined") {
+      setComboProducts(comboService.getAll());
+    }
+  };
 
   // Clear messages after timeout
   useEffect(() => {
@@ -110,13 +128,24 @@ export default function ProductManagementPage() {
 
   const addSelectOption = () => {
     if (selectOptionInput.label) {
-      setSelectOptions([...selectOptions, selectOptionInput]);
+      setSelectOptions([...selectOptions, { ...selectOptionInput, isAvailable: true }]);
       setSelectOptionInput({ label: "", additionalPrice: 0 });
     }
   };
 
   const removeSelectOption = (index: number) => {
     setSelectOptions(selectOptions.filter((_, i) => i !== index));
+  };
+
+  const toggleOptionAvailable = (index: number) => {
+    const updatedOptions = [...selectOptions];
+    // Toggle: if currently false, set to true; if true/undefined, set to false
+    const currentValue = updatedOptions[index].isAvailable;
+    updatedOptions[index] = {
+      ...updatedOptions[index],
+      isAvailable: currentValue === false ? true : false,
+    };
+    setSelectOptions(updatedOptions);
   };
 
   const resetForm = () => {
@@ -278,6 +307,21 @@ export default function ProductManagementPage() {
     }
   };
 
+  const handleToggleAvailable = async (product: Product) => {
+    try {
+      // Toggle: if currently true/undefined, set to false; if false, set to true
+      const newValue = product.isAvailable !== false ? false : true;
+      const newStatus = newValue ? "in stock" : "out of stock";
+      await updateProduct(product._id, { 
+        isAvailable: newValue,
+        productStatus: newStatus
+      });
+      await refetch();
+    } catch (error) {
+      console.error("Error toggling availability status:", error);
+    }
+  };
+
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     resetForm();
@@ -310,14 +354,24 @@ export default function ProductManagementPage() {
             <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
             <p className="text-gray-600 mt-1">Manage your products and categories</p>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
-            disabled={loading || actionLoading}
-          >
-            <Plus className="w-5 h-5" />
-            Add Product
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setShowComboModal(true)}
+              className="flex items-center gap-2 px-4 py-2 border border-[#2A2C22] text-[#2A2C22] rounded-lg hover:bg-[#f3f3f0] transition-colors"
+              disabled={loading || actionLoading}
+            >
+              <Plus className="w-5 h-5" />
+              Create Combo
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
+              disabled={loading || actionLoading}
+            >
+              <Plus className="w-5 h-5" />
+              Add Product
+            </button>
+          </div>
         </div>
 
         {/* Categories - Only show if there are categories with products */}
@@ -398,7 +452,7 @@ export default function ProductManagementPage() {
         {/* Products Grid */}
         {!loading && (
           <>
-            <ProductGrid products={filteredProducts} onEdit={openEditModal} onDelete={handleDelete} />
+            <ProductGrid products={filteredProducts} onEdit={openEditModal} onDelete={handleDelete} onToggleAvailable={handleToggleAvailable} />
 
             {/* Empty State */}
             {filteredProducts.length === 0 && !loading && (
@@ -430,6 +484,41 @@ export default function ProductManagementPage() {
                 </button>
               </div>
             )}
+
+            {/* Combo Products Overview */}
+            {comboProducts.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-gray-900">Combo Products</h2>
+                  <p className="text-sm text-gray-500">
+                    Configure how Flight Boxes / Gift Combos behave for customers.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {comboProducts.map((combo) => (
+                    <div
+                      key={combo.id}
+                      className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow bg-gray-50"
+                    >
+                      <h3 className="font-semibold text-gray-900 mb-1">{combo.name}</h3>
+                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                        {combo.description || "No description provided."}
+                      </p>
+                      <p className="text-sm font-medium text-gray-900 mb-1">
+                        Base rule: choose any {combo.baseSelectionCount} for ₵{" "}
+                        {combo.basePrice.toFixed(2)}
+                      </p>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Extras {combo.allowExtras ? "allowed (charged per option)" : "not allowed"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {combo.options.filter((o) => o.isActive).length} active options
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -459,6 +548,7 @@ export default function ProductManagementPage() {
         }
         onAddSelectOption={addSelectOption}
         onRemoveSelectOption={removeSelectOption}
+        onToggleOptionAvailable={toggleOptionAvailable}
       />
 
       {/* Edit Product Modal */}
@@ -487,6 +577,17 @@ export default function ProductManagementPage() {
         }
         onAddSelectOption={addSelectOption}
         onRemoveSelectOption={removeSelectOption}
+        onToggleOptionAvailable={toggleOptionAvailable}
+      />
+
+      {/* Combo Product Modal */}
+      <ComboProductModal
+        show={showComboModal}
+        onClose={() => setShowComboModal(false)}
+        onSaved={() => {
+          refreshCombos();
+        }}
+        products={products}
       />
     </AdminLayout>
   );

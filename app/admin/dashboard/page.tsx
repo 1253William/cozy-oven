@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
 import {
-  DollarSign,
   TrendingUp,
   Award,
   ArrowRight,
@@ -124,14 +123,14 @@ export default function AdminDashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Daily Sales</p>
                     <h3 className="text-2xl font-bold text-gray-900 mt-2">
-                      GHS {dashboardData.dailyStats.sales.toFixed(2)}
+                      ₵ {dashboardData.dailyStats.sales.toFixed(2)}
                     </h3>
                     <p className="text-xs text-gray-600 mt-1">
                       {dashboardData.dailyStats.orders} orders today
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-green-600" />
+                    <span className="text-2xl font-bold text-green-600">₵</span>
                   </div>
                 </div>
               </div>
@@ -142,7 +141,7 @@ export default function AdminDashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
                     <h3 className="text-2xl font-bold text-gray-900 mt-2">
-                      GHS {dashboardData.monthlyStats.sales.toFixed(2)}
+                      ₵ {dashboardData.monthlyStats.sales.toFixed(2)}
                     </h3>
                     <p className="text-xs text-gray-600 mt-1">
                       {dashboardData.monthlyStats.orders} orders this month
@@ -239,7 +238,7 @@ export default function AdminDashboardPage() {
                       <div className="bg-blue-50 rounded-lg p-4">
                         <p className="text-sm text-gray-600 mb-1">Revenue</p>
                         <p className="text-2xl font-bold text-blue-600">
-                          GHS {dashboardData.bestSellerThisMonth.revenue?.toFixed(2) || '0.00'}
+                          ₵ {dashboardData.bestSellerThisMonth.revenue?.toFixed(2) || '0.00'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">total earnings</p>
                       </div>

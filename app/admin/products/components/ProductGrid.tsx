@@ -6,9 +6,10 @@ interface ProductGridProps {
   products: Product[];
   onEdit: (product: Product) => void;
   onDelete?: (product: Product) => void;
+  onToggleAvailable?: (product: Product) => void;
 }
 
-export default function ProductGrid({ products, onEdit, onDelete }: ProductGridProps) {
+export default function ProductGrid({ products, onEdit, onDelete, onToggleAvailable }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => (
@@ -51,6 +52,26 @@ export default function ProductGrid({ products, onEdit, onDelete }: ProductGridP
             {product.sku && (
               <p className="text-xs text-gray-500 mb-3">SKU: {product.sku}</p>
             )}
+
+            {/* Availability Toggle */}
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm text-gray-600">Status:</span>
+              <button
+                onClick={() => onToggleAvailable?.(product)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  product.isAvailable !== false ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    product.isAvailable !== false ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+              <span className={`text-sm font-medium ${product.isAvailable !== false ? "text-green-600" : "text-red-600"}`}>
+                {product.isAvailable !== false ? "Available" : "Unavailable"}
+              </span>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-2">

@@ -83,7 +83,7 @@ export default function AdminLoginPage() {
                   type="email"
                   {...register("email")}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A2C22] focus:border-transparent"
-                  placeholder="admin@cozyoven.com"
+                  placeholder="admin@cozyoven.store"
                 />
               </div>
               {errors.email && (

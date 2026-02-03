@@ -24,6 +24,7 @@ interface AddProductModalProps {
   onSelectOptionInputChange: (field: "label" | "additionalPrice", value: string | number) => void;
   onAddSelectOption: () => void;
   onRemoveSelectOption: (index: number) => void;
+  onToggleOptionAvailable?: (index: number) => void;
 }
 
 export default function AddProductModal({
@@ -48,6 +49,7 @@ export default function AddProductModal({
   onSelectOptionInputChange,
   onAddSelectOption,
   onRemoveSelectOption,
+  onToggleOptionAvailable,
 }: AddProductModalProps) {
   if (!show) return null;
 
@@ -83,6 +85,7 @@ export default function AddProductModal({
           onSelectOptionInputChange={onSelectOptionInputChange}
           onAddSelectOption={onAddSelectOption}
           onRemoveSelectOption={onRemoveSelectOption}
+          onToggleOptionAvailable={onToggleOptionAvailable}
           onSubmit={onSubmit}
           onCancel={onClose}
           submitLabel="Add Product"

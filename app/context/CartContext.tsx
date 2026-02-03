@@ -12,6 +12,7 @@ export interface Product {
   description?: string;
   sizes?: string[];
   details?: string;
+  isAvailable?: boolean;
 }
 
 export interface CartItem extends Product {

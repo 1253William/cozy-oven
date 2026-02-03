@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import CartToastWrapper from "./components/CartToastWrapper";
 import PurchaseToast from "./components/PurchaseToast";
+import DeliveryBanner from "./components/DeliveryBanner";
 
 export const metadata: Metadata = {
   title: "Cozy Oven - Delicious Baked Goods",
@@ -23,6 +24,7 @@ export default function RootLayout({
           <WishlistProvider>
             <CartProvider>
               <CartToastWrapper>
+                <DeliveryBanner />
                 {children}
                 <PurchaseToast />
               </CartToastWrapper>

@@ -61,7 +61,14 @@ export default function BestSellers() {
                         />
                       </div>
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
+                      {/* Sold Out Badge */}
+                      {product.isAvailable === false && (
+                        <div className="absolute top-4 right-4 z-20 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                          Sold Out
+                        </div>
+                      )}
+
+                      <div className={`absolute inset-0 bg-gradient-to-t ${product.isAvailable === false ? "from-black/70" : "from-black/60"} via-transparent to-transparent flex flex-col justify-end p-6`}>
                         <div className="flex items-end justify-between">
                           <div>
                             <h3 className="text-white text-xl sm:text-2xl font-bold mb-2">

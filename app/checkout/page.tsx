@@ -159,6 +159,8 @@ export default function CheckoutPage() {
 
 
   const handlePlaceOrder = async () => {
+      // Allow both regular users and admins to checkout
+    // Admins are authenticated, so if not authenticated, show auth modal
     if (!isAuthenticated) {
       setAuthModalOpen(true);
       return;
@@ -197,6 +199,12 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Validate minimum order amount (40 cedis)
+    if (total < 40) {
+      setError("Minimum order amount is GHS 40.00. Please add more items to your cart.");
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -209,7 +217,12 @@ export default function CheckoutPage() {
         ...(item.selectedSize ? { size: item.selectedSize } : {}),
       }));
 
-      const checkoutResponse = await orderService.checkout({
+      // Use admin checkout endpoint if user is admin, otherwise use customer endpoint
+      const checkoutFunction = user?.role === "Admin" 
+        ? orderService.adminCheckout 
+        : orderService.checkout;
+      
+      const checkoutResponse = await checkoutFunction({
         items,
         deliveryFee: 0, // Delivery fee will be paid on delivery
         deliveryAddress:

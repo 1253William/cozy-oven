@@ -52,6 +52,7 @@ export default function Categories() {
       image: product.productThumbnail,
       description: product.productDetails,
       sizes: product.selectOptions?.map(opt => opt.label) || [],
+      isAvailable: product.isAvailable,
     };
     setQuickViewProduct(productData);
     setIsQuickViewOpen(true);
@@ -148,7 +149,14 @@ export default function Categories() {
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out group-hover:scale-110 z-0"
                     style={{ backgroundImage: `url(${product.productThumbnail})` }}
                   />
-                  <div className="absolute inset-0 bg-black/30 z-10" />
+                  <div className={`absolute inset-0 z-10 ${product.isAvailable === false ? "bg-black/60" : "bg-black/30"}`} />
+                  
+                  {/* Sold Out Badge */}
+                  {product.isAvailable === false && (
+                    <div className="absolute top-4 right-4 z-30 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      Sold Out
+                    </div>
+                  )}
 
                   <div className="relative z-20 p-8 h-full flex flex-col">
                     <div className="mb-auto">
