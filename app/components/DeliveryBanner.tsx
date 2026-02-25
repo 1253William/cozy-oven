@@ -12,7 +12,7 @@ export default function DeliveryBanner() {
     return null;
   }
 
-  const message = "Deliveries are made every Tuesdays and Wednesdays";
+  const message = "Freshly baked banana bread is delivered on Tuesdays and Thursdays";
 
   const duplicatedMessage = Array(3).fill(message).join(" • ");
 
