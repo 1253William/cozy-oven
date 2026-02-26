@@ -54,12 +54,12 @@ export default function AdminDashboardPage() {
     if (chartFilter === "daily" && dailySalesData && dailySalesData.length > 0) {
       return dailySalesData.map((point) => ({
         label: point.date ? new Date(point.date).toLocaleDateString('en-US', { weekday: 'short' }) : '',
-        value: point.sales,
+        value: point.sales ?? (point as any).totalSales ?? (point as any).revenue ?? 0,
       }));
     } else if (chartFilter === "monthly" && monthlySalesData && monthlySalesData.length > 0) {
       return monthlySalesData.map((point) => ({
         label: point.month || '',
-        value: point.sales,
+        value: point.sales ?? (point as any).totalSales ?? (point as any).revenue ?? 0,
       }));
     }
     

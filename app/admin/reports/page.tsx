@@ -235,14 +235,33 @@ export default function ReportsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Sales by Category</h2>
             
-            {/* Pie Chart Placeholder */}
+            {/* Pie Chart */}
             <div className="flex items-center justify-center h-64 mb-4">
-              <div className="relative w-48 h-48 rounded-full border-8 border-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">100%</p>
-                  <p className="text-sm text-gray-600">Total Sales</p>
+              {salesByCategory.length > 0 ? (
+                <div 
+                  className="relative w-48 h-48 rounded-full flex items-center justify-center transition-all duration-500"
+                  style={{
+                    background: `conic-gradient(${salesByCategory.map((item, index) => {
+                      const prevStats = salesByCategory.slice(0, index).reduce((acc, curr) => acc + curr.percentage, 0);
+                      return `${CATEGORY_COLORS[index % CATEGORY_COLORS.length]} ${prevStats}% ${prevStats + item.percentage}%`;
+                    }).join(", ")})`
+                  }}
+                >
+                  <div className="absolute inset-0 m-4 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                    <p className="text-2xl font-bold text-gray-900">
+                      GHS {financeSummary?.totalRevenue.toFixed(0) || "0"}
+                    </p>
+                    <p className="text-sm text-gray-600">Total Sales</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="relative w-48 h-48 rounded-full border-8 border-gray-200 flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-900">0%</p>
+                    <p className="text-sm text-gray-600">No Data</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Category List */}

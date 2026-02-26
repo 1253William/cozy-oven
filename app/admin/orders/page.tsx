@@ -517,24 +517,59 @@ export default function OrdersPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingOrderId(order.orderId);
-                          setNewStatus(order.status ?? "");
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Edit Status
-                      </button>
-                      <button
-                        onClick={() => handleDeleteOrder(order.orderId)}
-                        className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {editingOrderId === order.orderId ? (
+                      <div className="flex flex-col gap-2">
+                        <select
+                          value={newStatus}
+                          onChange={(e) => setNewStatus(e.target.value)}
+                          className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2A2C22]"
+                        >
+                          <option value="">Select status</option>
+                          <option value="pending">Pending</option>
+                          <option value="preparing">Preparing</option>
+                          <option value="on-delivery">On Delivery</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleStatusUpdate(order.orderId, newStatus)}
+                            disabled={!newStatus}
+                            className="flex-1 px-3 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingOrderId(null);
+                              setNewStatus("");
+                            }}
+                            className="flex-1 px-3 py-2 text-sm text-gray-700 border border-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingOrderId(order.orderId);
+                            setNewStatus(order.status ?? "");
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit Status
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOrder(order.orderId)}
+                          className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
