@@ -10,7 +10,7 @@ interface UseCustomerProductsOptions {
 
 export const useCustomerProducts = (options: UseCustomerProductsOptions = {}) => {
   const { page = 1, limit = 20, autoFetch = true } = options;
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +28,7 @@ export const useCustomerProducts = (options: UseCustomerProductsOptions = {}) =>
       setLoading(true);
       setError(null);
       const response = await customerProductService.getAllProducts({ page, limit });
-      // Filter to only show available products
-      const availableProducts = response.data.filter(product => product.isAvailable !== false);
-      setProducts(availableProducts);
+      setProducts(response.data);
       if (response.pagination) {
         setPagination(response.pagination);
       }

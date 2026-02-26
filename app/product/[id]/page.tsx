@@ -22,22 +22,39 @@ export default function ProductDetails() {
 
   const [quantity, setQuantity] = useState(1);
   const { product, loading } = useCustomerProduct(id as string);
+
+  // Check if this is a minis/mini/flightbox product
+  const isMiniCategory = (category?: string) => {
+    if (!category) return false;
+    const lower = category.toLowerCase();
+    return lower === "minis" || lower === "mini" || lower === "flightbox";
+  };
+  const isMinisProduct = isMiniCategory(product?.productCategory);
+  const minQuantity = isMinisProduct ? 4 : 1;
   
   // Filter to only show available options
   const availableOptions = product?.selectOptions?.filter(opt => opt.isAvailable !== false) ?? [];
   const sizes = availableOptions.map(opt => opt.label) ?? ["Regular"];
+
+  // A product is "sold out" if it has variants and ALL variants are unavailable
+  const hasVariants = (product?.selectOptions?.length ?? 0) > 0;
+  const isSoldOut = hasVariants && availableOptions.length === 0;
   
   const [selectedSize, setSelectedSize] = useState<string | null>(
     availableOptions?.[0]?.label ?? null
   );
 
-  // Update selectedSize when product loads or available options change
+  // Update selectedSize and quantity when product loads
   useEffect(() => {
     if (product && availableOptions.length > 0) {
       const firstAvailable = availableOptions[0]?.label;
       if (firstAvailable && (!selectedSize || !availableOptions.find(opt => opt.label === selectedSize))) {
         setSelectedSize(firstAvailable);
       }
+    }
+    // Set minimum quantity for minis
+    if (product && isMiniCategory(product.productCategory)) {
+      setQuantity(prev => Math.max(prev, 4));
     }
   }, [product, availableOptions]);
 
@@ -128,7 +145,7 @@ export default function ProductDetails() {
                 priority
               />
               {/* Sold Out Badge */}
-              {product.isAvailable === false && (
+              {isSoldOut && (
                 <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-10">
                   Sold Out
                 </div>
@@ -140,7 +157,7 @@ export default function ProductDetails() {
                 <h1 className="text-3xl font-bold">
                   {product.productName}
                 </h1>
-                {product.isAvailable === false && (
+                {isSoldOut && (
                   <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                     Sold Out
                   </span>
@@ -182,20 +199,26 @@ export default function ProductDetails() {
                 <QuantitySelector
                   quantity={quantity}
                   onQuantityChange={setQuantity}
+                  min={minQuantity}
                 />
+                {isMinisProduct && (
+                  <p className="text-sm text-orange-600 mt-2 font-medium">
+                    Minimum order: 4 pieces
+                  </p>
+                )}
               </div>
 
               <button
                 onClick={handleAddToCart}
-                disabled={product.isAvailable === false}
+                disabled={isSoldOut}
                 className={`flex items-center justify-center gap-3 font-bold py-4 px-8 rounded-full w-full transition-all ${
-                  product.isAvailable === false
+                  isSoldOut
                     ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                     : "bg-[#bd6325] text-white hover:bg-[#a8551f]"
                 }`}
               >
                 <ShoppingCart className="w-6 h-6" />
-                {product.isAvailable === false ? "Sold Out" : "Add to Cart"}
+                {isSoldOut ? "Sold Out" : "Add to Cart"}
               </button>
             </div>
           </div>

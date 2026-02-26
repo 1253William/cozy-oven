@@ -13,6 +13,7 @@ export interface Product {
   sizes?: string[];
   details?: string;
   isAvailable?: boolean;
+  category?: string;
 }
 
 export interface CartItem extends Product {

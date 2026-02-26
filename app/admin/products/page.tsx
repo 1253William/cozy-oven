@@ -14,8 +14,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { Product, SelectOption } from "../../services/productService";
-import ComboProductModal from "./components/ComboProductModal";
-import comboService, { ComboProduct } from "../../services/comboService";
+// import ComboProductModal from "./components/ComboProductModal";
+// import comboService, { ComboProduct } from "../../services/comboService";
 import useAdminProducts from "../../hooks/useAdminProducts";
 import useProductManagement from "../../hooks/useProductManagement";
 import AddProductModal from "./components/AddProductModal";
@@ -34,7 +34,7 @@ export default function ProductManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showComboModal, setShowComboModal] = useState(false);
+  // const [showComboModal, setShowComboModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -46,7 +46,7 @@ export default function ProductManagementPage() {
   });
   const [selectOptionInput, setSelectOptionInput] = useState({ label: "", additionalPrice: 0 });
   const [selectOptions, setSelectOptions] = useState<SelectOption[]>([]);
-  const [comboProducts, setComboProducts] = useState<ComboProduct[]>([]);
+  // const [comboProducts, setComboProducts] = useState<ComboProduct[]>([]);
 
   // Use custom hooks
   const { products, loading, pagination, refetch } = useAdminProducts({
@@ -86,17 +86,17 @@ export default function ProductManagementPage() {
   }, [isAuthenticated, user, router]);
 
   // Load combo products from localStorage for admin view
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setComboProducts(comboService.getAll());
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     setComboProducts(comboService.getAll());
+  //   }
+  // }, []);
 
-  const refreshCombos = () => {
-    if (typeof window !== "undefined") {
-      setComboProducts(comboService.getAll());
-    }
-  };
+  // const refreshCombos = () => {
+  //   if (typeof window !== "undefined") {
+  //     setComboProducts(comboService.getAll());
+  //   }
+  // };
 
   // Clear messages after timeout
   useEffect(() => {
@@ -355,14 +355,14 @@ export default function ProductManagementPage() {
             <p className="text-gray-600 mt-1">Manage your products and categories</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button
+            {/* <button
               onClick={() => setShowComboModal(true)}
               className="flex items-center gap-2 px-4 py-2 border border-[#2A2C22] text-[#2A2C22] rounded-lg hover:bg-[#f3f3f0] transition-colors"
               disabled={loading || actionLoading}
             >
               <Plus className="w-5 h-5" />
               Create Combo
-            </button>
+            </button> */}
             <button
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#2A2C22] text-white rounded-lg hover:bg-[#1a1c12] transition-colors"
@@ -485,8 +485,8 @@ export default function ProductManagementPage() {
               </div>
             )}
 
-            {/* Combo Products Overview */}
-            {comboProducts.length > 0 && (
+            {/* Combo Products Overview - Commented out until feature is complete */}
+            {/* {comboProducts.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-gray-900">Combo Products</h2>
@@ -518,7 +518,7 @@ export default function ProductManagementPage() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </>
         )}
       </div>
@@ -580,15 +580,15 @@ export default function ProductManagementPage() {
         onToggleOptionAvailable={toggleOptionAvailable}
       />
 
-      {/* Combo Product Modal */}
-      <ComboProductModal
+      {/* Combo Product Modal - Commented out until feature is complete */}
+      {/* <ComboProductModal
         show={showComboModal}
         onClose={() => setShowComboModal(false)}
         onSaved={() => {
           refreshCombos();
         }}
         products={products}
-      />
+      /> */}
     </AdminLayout>
   );
 }

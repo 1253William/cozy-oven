@@ -45,14 +45,20 @@ export default function Categories() {
   const currentProducts = effectiveActiveCategory ? getProductsByCategory(effectiveActiveCategory) : [];
 
   const handleQuickView = (product: typeof allProducts[0]) => {
+    // A product is sold out if it has variants and all are unavailable
+    const hasVariants = (product.selectOptions?.length ?? 0) > 0;
+    const availableVariants = product.selectOptions?.filter(opt => opt.isAvailable !== false) ?? [];
+    const soldOut = hasVariants && availableVariants.length === 0;
+
     const productData: Product = {
       id: product._id,
       name: product.productName,
       price: `GHS ${product.price}`,
       image: product.productThumbnail,
       description: product.productDetails,
-      sizes: product.selectOptions?.map(opt => opt.label) || [],
-      isAvailable: product.isAvailable,
+      sizes: availableVariants.map(opt => opt.label),
+      isAvailable: !soldOut,
+      category: product.productCategory,
     };
     setQuickViewProduct(productData);
     setIsQuickViewOpen(true);
@@ -149,10 +155,10 @@ export default function Categories() {
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out group-hover:scale-110 z-0"
                     style={{ backgroundImage: `url(${product.productThumbnail})` }}
                   />
-                  <div className={`absolute inset-0 z-10 ${product.isAvailable === false ? "bg-black/60" : "bg-black/30"}`} />
+                  <div className={`absolute inset-0 z-10 ${((product.selectOptions?.length ?? 0) > 0 && (product.selectOptions?.filter(opt => opt.isAvailable !== false)?.length ?? 0) === 0) ? "bg-black/60" : "bg-black/30"}`} />
                   
-                  {/* Sold Out Badge */}
-                  {product.isAvailable === false && (
+                  {/* Sold Out Badge - shown when product has variants and all are unavailable */}
+                  {(product.selectOptions?.length ?? 0) > 0 && (product.selectOptions?.filter(opt => opt.isAvailable !== false)?.length ?? 0) === 0 && (
                     <div className="absolute top-4 right-4 z-30 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                       Sold Out
                     </div>

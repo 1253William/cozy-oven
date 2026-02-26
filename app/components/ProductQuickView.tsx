@@ -18,6 +18,15 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   
+  // Check if this is a minis/mini/flightbox product
+  const isMiniCategory = (category?: string) => {
+    if (!category) return false;
+    const lower = category.toLowerCase();
+    return lower === "minis" || lower === "mini" || lower === "flightbox";
+  };
+  const isMinisProduct = isMiniCategory(product?.category);
+  const minQuantity = isMinisProduct ? 4 : 1;
+  
   // Derive the initial size from the product
   const defaultSize = useMemo(() => {
     return product?.sizes?.[0] || "Regular";
@@ -32,6 +41,12 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
       if (product?.sizes?.[0]) {
         setSelectedSize(product.sizes[0]);
       }
+      // Set minimum quantity for minis
+      if (isMinisProduct) {
+        setQuantity(prev => Math.max(prev, 4));
+      } else {
+        setQuantity(1);
+      }
     } else {
       document.body.style.overflow = "unset";
     }
@@ -40,7 +55,7 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
       document.body.style.overflow = "unset";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, isMinisProduct]);
 
   if (!product) return null;
 
@@ -51,7 +66,7 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
   };
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
+  const decrementQuantity = () => setQuantity((prev) => Math.max(minQuantity, prev - 1));
 
   return (
     <AnimatePresence>
@@ -218,6 +233,13 @@ export default function ProductQuickView({ isOpen, onClose, product }: ProductQu
                   {product.isAvailable === false ? "Sold Out" : "Add to Cart"}
                 </button>
               </div>
+
+              {/* Minimum order note for minis */}
+              {isMinisProduct && (
+                <p className="text-sm text-orange-600 font-medium mb-4">
+                  Minimum order: 4 pieces
+                </p>
+              )}
 
               {/* View Full Details Link */}
               <Link href={`/product/${product.id}`} onClick={onClose}>

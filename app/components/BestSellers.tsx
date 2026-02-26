@@ -61,14 +61,14 @@ export default function BestSellers() {
                         />
                       </div>
 
-                      {/* Sold Out Badge */}
-                      {product.isAvailable === false && (
+                      {/* Sold Out Badge - shown when product has variants and all are unavailable */}
+                      {(product.selectOptions?.length ?? 0) > 0 && (product.selectOptions?.filter(opt => opt.isAvailable !== false)?.length ?? 0) === 0 && (
                         <div className="absolute top-4 right-4 z-20 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                           Sold Out
                         </div>
                       )}
 
-                      <div className={`absolute inset-0 bg-gradient-to-t ${product.isAvailable === false ? "from-black/70" : "from-black/60"} via-transparent to-transparent flex flex-col justify-end p-6`}>
+                      <div className={`absolute inset-0 bg-gradient-to-t ${((product.selectOptions?.length ?? 0) > 0 && (product.selectOptions?.filter(opt => opt.isAvailable !== false)?.length ?? 0) === 0) ? "from-black/70" : "from-black/60"} via-transparent to-transparent flex flex-col justify-end p-6`}>
                         <div className="flex items-end justify-between">
                           <div>
                             <h3 className="text-white text-xl sm:text-2xl font-bold mb-2">
