@@ -199,11 +199,11 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Validate minimum order amount (40 cedis)
-    if (total < 40) {
-      setError("Minimum order amount is GHS 40.00. Please add more items to your cart.");
-      return;
-    }
+    // Validate minimum order amount (40 cedis) - TEMPORARILY DISABLED
+    // if (total < 40) {
+    //   setError("Minimum order amount is GHS 40.00. Please add more items to your cart.");
+    //   return;
+    // }
 
     setIsProcessing(true);
     setError(null);
