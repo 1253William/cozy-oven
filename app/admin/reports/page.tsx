@@ -9,7 +9,6 @@ import {
   TrendingUp,
   Users,
   Package,
-  DollarSign,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -168,7 +167,7 @@ export default function ReportsPage() {
                   </h3>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                  <span className="text-2xl font-bold text-green-600">₵</span>
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-2">

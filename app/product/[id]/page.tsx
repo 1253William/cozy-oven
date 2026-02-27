@@ -185,28 +185,32 @@ export default function ProductDetails() {
                 {product.productDetails}
               </p>
 
-              <div className="mb-6">
-                <label className="block font-semibold mb-2">Size</label>
-                <SizeSelector
-                  sizes={sizes}
-                  selectedSize={selectedSize}
-                  onSizeChange={setSelectedSize}
-                />
-              </div>
+              {!isSoldOut && (
+                <>
+                  <div className="mb-6">
+                    <label className="block font-semibold mb-2">Size</label>
+                    <SizeSelector
+                      sizes={sizes}
+                      selectedSize={selectedSize}
+                      onSizeChange={setSelectedSize}
+                    />
+                  </div>
 
-              <div className="mb-6">
-                <label className="block font-semibold mb-2">Quantity</label>
-                <QuantitySelector
-                  quantity={quantity}
-                  onQuantityChange={setQuantity}
-                  min={minQuantity}
-                />
-                {isMinisProduct && (
-                  <p className="text-sm text-orange-600 mt-2 font-medium">
-                    Minimum order: 4 pieces
-                  </p>
-                )}
-              </div>
+                  <div className="mb-6">
+                    <label className="block font-semibold mb-2">Quantity</label>
+                    <QuantitySelector
+                      quantity={quantity}
+                      onQuantityChange={setQuantity}
+                      min={minQuantity}
+                    />
+                    {isMinisProduct && (
+                      <p className="text-sm text-orange-600 mt-2 font-medium">
+                        Minimum order: 4 pieces
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
 
               <button
                 onClick={handleAddToCart}
