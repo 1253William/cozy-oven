@@ -11,7 +11,7 @@ const getStatusInfo = (status: string) => {
       return { label: "Order Processed", color: "bg-blue-500", progress: 25 };
     case "preparing":
       return { label: "Being Prepared", color: "bg-orange-500", progress: 50 };
-    case "on-delivery":
+    case "on_delivery":
       return { label: "On The Way", color: "bg-purple-500", progress: 75 };
     case "delivered":
       return { label: "Delivered", color: "bg-green-500", progress: 100 };

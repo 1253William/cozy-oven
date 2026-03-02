@@ -24,7 +24,7 @@ const statusOptions = [
   { value: "all", label: "All Orders" },
   { value: "pending", label: "Pending" },
   { value: "preparing", label: "Preparing" },
-  { value: "on-delivery", label: "On Delivery" },
+  { value: "on_delivery", label: "On Delivery" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -35,7 +35,7 @@ const getStatusColor = (status?: string) => {
       return "bg-yellow-100 text-yellow-700";
     case "preparing":
       return "bg-blue-100 text-blue-700";
-    case "on-delivery":
+    case "on_delivery":
       return "bg-purple-100 text-purple-700";
     case "delivered":
       return "bg-green-100 text-green-700";
@@ -52,7 +52,7 @@ const getStatusIcon = (status?: string) => {
       return <Clock className="w-4 h-4" />;
     case "preparing":
       return <Package className="w-4 h-4" />;
-    case "on-delivery":
+    case "on_delivery":
       return <Truck className="w-4 h-4" />;
     case "delivered":
       return <CheckCircle className="w-4 h-4" />;
@@ -157,7 +157,7 @@ export default function OrdersPage() {
     try {
       const response = await orderService.updateOrderStatus(
         orderId,
-        status as "pending" | "preparing" | "on-delivery" | "delivered" | "cancelled"
+        status as "pending" | "preparing" | "on_delivery" | "delivered" | "cancelled"
       );
 
       if (response?.success) {
@@ -393,7 +393,7 @@ export default function OrdersPage() {
                             <option value="">Select status</option>
                             <option value="pending">Pending</option>
                             <option value="preparing">Preparing</option>
-                            <option value="on-delivery">On Delivery</option>
+                            <option value="on_delivery">On Delivery</option>
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                           </select>
@@ -527,7 +527,7 @@ export default function OrdersPage() {
                           <option value="">Select status</option>
                           <option value="pending">Pending</option>
                           <option value="preparing">Preparing</option>
-                          <option value="on-delivery">On Delivery</option>
+                          <option value="on_delivery">On Delivery</option>
                           <option value="delivered">Delivered</option>
                           <option value="cancelled">Cancelled</option>
                         </select>
@@ -552,6 +552,13 @@ export default function OrdersPage() {
                       </div>
                     ) : (
                       <div className="flex gap-2">
+                        <button
+                          onClick={() => setViewingOrderId(order.orderId)}
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View Details
+                        </button>
                         <button
                           onClick={() => {
                             setEditingOrderId(order.orderId);
