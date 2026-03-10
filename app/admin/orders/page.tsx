@@ -24,7 +24,7 @@ const statusOptions = [
   { value: "all", label: "All Orders" },
   { value: "pending", label: "Pending" },
   { value: "preparing", label: "Preparing" },
-  { value: "on_delivery", label: "On Delivery" },
+  { value: "on-delivery", label: "On Delivery" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -35,7 +35,7 @@ const getStatusColor = (status?: string) => {
       return "bg-yellow-100 text-yellow-700";
     case "preparing":
       return "bg-blue-100 text-blue-700";
-    case "on_delivery":
+    case "on-delivery":
       return "bg-purple-100 text-purple-700";
     case "delivered":
       return "bg-green-100 text-green-700";
@@ -52,7 +52,7 @@ const getStatusIcon = (status?: string) => {
       return <Clock className="w-4 h-4" />;
     case "preparing":
       return <Package className="w-4 h-4" />;
-    case "on_delivery":
+    case "on-delivery":
       return <Truck className="w-4 h-4" />;
     case "delivered":
       return <CheckCircle className="w-4 h-4" />;
@@ -154,11 +154,14 @@ export default function OrdersPage() {
 };
 
   const handleStatusUpdate = async (orderId: string, status: string) => {
+    const allowedStatuses = ["pending", "preparing", "on-delivery", "delivered", "cancelled"] as const;
+    if (!allowedStatuses.includes(status as (typeof allowedStatuses)[number])) {
+      alert("Invalid status selected. Please choose a valid status.");
+      return;
+    }
+
     try {
-      const response = await orderService.updateOrderStatus(
-        orderId,
-        status as "pending" | "preparing" | "on_delivery" | "delivered" | "cancelled"
-      );
+      const response = await orderService.updateOrderStatus(orderId, status);
 
       if (response?.success) {
         await fetchOrders();
@@ -393,7 +396,7 @@ export default function OrdersPage() {
                             <option value="">Select status</option>
                             <option value="pending">Pending</option>
                             <option value="preparing">Preparing</option>
-                            <option value="on_delivery">On Delivery</option>
+                            <option value="on-delivery">On Delivery</option>
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                           </select>
@@ -527,7 +530,7 @@ export default function OrdersPage() {
                           <option value="">Select status</option>
                           <option value="pending">Pending</option>
                           <option value="preparing">Preparing</option>
-                          <option value="on_delivery">On Delivery</option>
+                          <option value="on-delivery">On Delivery</option>
                           <option value="delivered">Delivered</option>
                           <option value="cancelled">Cancelled</option>
                         </select>

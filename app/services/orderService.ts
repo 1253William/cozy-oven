@@ -182,7 +182,7 @@ export const orderService = {
   // Admin: Update order status
   updateOrderStatus: async (
     orderId: string,
-    status: "pending" | "preparing" | "on_delivery" | "delivered" | "cancelled"
+    status: string
   ): Promise<ApiResponse<Order>> => {
     const response = await apiClient.patch(
       `/api/v1/dashboard/admin/orders/status/${orderId}/${status}`
