@@ -19,6 +19,13 @@ export interface DailySale {
   orders: number;
 }
 
+export interface WeeklySale {
+  week: number;
+  label: string;
+  revenue: number;
+  orders: number;
+}
+
 export interface FulfillmentStats {
   delivery: { orders: number; revenue: number };
   pickup: { orders: number; revenue: number };
@@ -27,6 +34,50 @@ export interface FulfillmentStats {
 export interface StatusBreakdownItem {
   status: string;
   count: number;
+}
+
+export interface PaymentMethodBreakdown {
+  paymentMethod: string;
+  orders: number;
+  revenue: number;
+}
+
+export interface ChannelBreakdown {
+  channel: string;
+  orders: number;
+  revenue: number;
+}
+
+export interface ReviewsSummary {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  public: number;
+  order: number;
+  averageApprovedRating: number | null;
+}
+
+export interface PnLBlock {
+  grossSales: number;
+  transactionFees: number;
+  refundedAmount: number;
+  netSales: number;
+  cogs: number;
+  grossProfit: number;
+  inventoryPurchases: number;
+  operatingExpenses: number;
+  totalOpex: number;
+  netProfit: number;
+  netMarginPercent: number;
+  netMargin: string;
+  promoDiscounts?: number;
+  cogsCoverage?: {
+    totalLines: number;
+    linesWithCost: number;
+    coveragePercent: number;
+  };
+  opexBreakdown?: Array<{ category: string; amount: number }>;
 }
 
 export interface FinanceSummary {
@@ -42,6 +93,16 @@ export interface FinanceSummary {
   averageOrderValue?: number;
   comparison?: FinanceComparison;
   dailySales?: DailySale[];
+  weeklySales?: WeeklySale[];
+  byPaymentMethod?: PaymentMethodBreakdown[];
+  byChannel?: ChannelBreakdown[];
+  fees?: {
+    transactionFees: number;
+    grossSales: number;
+    netAfterFees: number;
+  };
+  pnl?: PnLBlock;
+  reviews?: ReviewsSummary;
   fulfillment?: FulfillmentStats;
   statusBreakdown?: StatusBreakdownItem[];
 }
@@ -131,8 +192,7 @@ export const reportsService = {
     month?: string,
     year?: number
   ): Promise<TopCustomersResponse> => {
-    const period =
-      month && year ? `&${periodQuery(month, year)}` : "";
+    const period = month && year ? `&${periodQuery(month, year)}` : "";
     const response = await apiClient.get(
       `/api/v1/dashboard/admin/reports/top-customers?page=${page}&limit=${limit}${period}`
     );
@@ -142,6 +202,14 @@ export const reportsService = {
   exportMonthlyReport: async (month: string, year: number): Promise<Blob> => {
     const response = await apiClient.get(
       `/api/v1/dashboard/admin/reports/export?${periodQuery(month, year)}`,
+      { responseType: "blob" }
+    );
+    return response.data;
+  },
+
+  exportMonthlyReportPdf: async (month: string, year: number): Promise<Blob> => {
+    const response = await apiClient.get(
+      `/api/v1/dashboard/admin/reports/export.pdf?${periodQuery(month, year)}`,
       { responseType: "blob" }
     );
     return response.data;
