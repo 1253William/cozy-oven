@@ -12,6 +12,7 @@ import useCustomerProducts from "../hooks/useCustomerProducts";
 import faqService, { Faq } from "../services/faqService";
 import { Product } from "../services/productService";
 import subscriberService from "../services/subscriberService";
+import reviewService, { Review } from "../services/reviewService";
 import type { HomepageSection } from "../services/cmsService";
 import { fallbackHomepageSections } from "../lib/homeData";
 
@@ -32,6 +33,7 @@ export default function HomeClient({
   });
   const resolvedProducts = products.length > 0 ? products : initialProducts;
   const [faqs, setFaqs] = useState<Faq[]>(initialFaqs);
+  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState<string | null>(null);
   const homepageSections = (
@@ -95,6 +97,19 @@ export default function HomeClient({
     if (initialFaqs.length > 0) return;
     faqService.getPublicFaqs().then(setFaqs);
   }, [initialFaqs.length]);
+
+  useEffect(() => {
+    let active = true;
+    reviewService
+      .getRecentReviews(6)
+      .then((data) => {
+        if (active) setRecentReviews(data);
+      })
+      .catch((err) => console.error("Failed to load recent reviews:", err));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -388,14 +403,33 @@ export default function HomeClient({
                     </div>
 
                     <div className="grid content-start gap-4">
-                      {testimonials.slice(0, 3).map((testimonial) => (
+                      {(recentReviews.length > 0
+                        ? recentReviews.slice(0, 3).map((review) => ({
+                            id: review.id,
+                            message: review.comment,
+                            name: review.displayName,
+                            verified: review.verified || review.source === "order",
+                          }))
+                        : testimonials.slice(0, 3).map((testimonial) => ({
+                            id: testimonial.id,
+                            message: testimonial.message,
+                            name: "",
+                            verified: false,
+                          }))
+                      ).map((item) => (
                         <article
-                          key={testimonial.id}
+                          key={item.id}
                           className="rounded-[28px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5]/80 p-6 shadow-[0_12px_40px_rgba(34,34,34,0.10)]"
                         >
                           <h3 className="text-xl font-semibold leading-snug tracking-[-0.02em] text-[#222222] sm:text-2xl">
-                            &quot;{testimonial.message}&quot;
+                            &quot;{item.message}&quot;
                           </h3>
+                          {item.name ? (
+                            <p className="mt-3 text-sm text-[#5d6043]">
+                              — {item.name}
+                              {item.verified ? " · Verified purchase" : ""}
+                            </p>
+                          ) : null}
                         </article>
                       ))}
                       <a
@@ -573,14 +607,33 @@ export default function HomeClient({
                   </div>
                 </div>
                 <div className="grid content-start gap-4">
-                  {testimonials.slice(0, 3).map((testimonial) => (
+                  {(recentReviews.length > 0
+                    ? recentReviews.slice(0, 3).map((review) => ({
+                        id: review.id,
+                        message: review.comment,
+                        name: review.displayName,
+                        verified: review.verified || review.source === "order",
+                      }))
+                    : testimonials.slice(0, 3).map((testimonial) => ({
+                        id: testimonial.id,
+                        message: testimonial.message,
+                        name: "",
+                        verified: false,
+                      }))
+                  ).map((item) => (
                     <article
-                      key={testimonial.id}
+                      key={item.id}
                       className="rounded-[28px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5]/80 p-6 shadow-[0_12px_40px_rgba(34,34,34,0.10)]"
                     >
                       <h3 className="text-xl font-semibold leading-snug tracking-[-0.02em] text-[#222222] sm:text-2xl">
-                        &quot;{testimonial.message}&quot;
+                        &quot;{item.message}&quot;
                       </h3>
+                      {item.name ? (
+                        <p className="mt-3 text-sm text-[#5d6043]">
+                          — {item.name}
+                          {item.verified ? " · Verified purchase" : ""}
+                        </p>
+                      ) : null}
                     </article>
                   ))}
                 </div>
