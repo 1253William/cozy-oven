@@ -94,6 +94,11 @@ const reviewService = {
     });
     return response.data;
   },
+
+  async deleteAdminReview(id: string) {
+    const response = await apiClient.delete(`/api/v1/dashboard/reviews/${id}`);
+    return response.data;
+  },
 };
 
 export default reviewService;
