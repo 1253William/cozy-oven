@@ -34,8 +34,10 @@ export async function fetchProductsByIds(ids: string[]): Promise<Product[]> {
     if (!res.ok) return [];
     const json = await res.json();
     const products = normalizeProductList(Array.isArray(json.data) ? json.data : []);
-    const wanted = new Set(ids.map(String));
-    return products.filter((product) => wanted.has(String(product.id)));
+    const byId = new Map(products.map((product) => [String(product.id), product]));
+    return ids
+      .map((id) => byId.get(String(id)))
+      .filter(Boolean) as Product[];
   } catch {
     return [];
   }
