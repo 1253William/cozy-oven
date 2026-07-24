@@ -7,6 +7,9 @@ interface ProductFormProps {
   productName: string;
   productCategory: string;
   price: number;
+  salePrice?: number | null;
+  saleStartsAt?: string;
+  saleEndsAt?: string;
   productDetails: string;
   imageFile: File | null;
   imagePreview: string | string[];
@@ -20,6 +23,9 @@ interface ProductFormProps {
   onProductNameChange: (value: string) => void;
   onProductCategoryChange: (value: string) => void;
   onPriceChange: (value: number) => void;
+  onSalePriceChange?: (value: number | null) => void;
+  onSaleStartsAtChange?: (value: string) => void;
+  onSaleEndsAtChange?: (value: string) => void;
   onProductDetailsChange: (value: string) => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage?: (index: number) => void;
@@ -44,6 +50,9 @@ export default function ProductForm({
   productName,
   productCategory,
   price,
+  salePrice = null,
+  saleStartsAt = "",
+  saleEndsAt = "",
   productDetails,
   imageFile,
   imagePreview,
@@ -57,6 +66,9 @@ export default function ProductForm({
   onProductNameChange,
   onProductCategoryChange,
   onPriceChange,
+  onSalePriceChange,
+  onSaleStartsAtChange,
+  onSaleEndsAtChange,
   onProductDetailsChange,
   onImageChange,
   onRemoveImage,
@@ -226,6 +238,48 @@ export default function ProductForm({
             className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
             placeholder="0.00"
             required={!isEdit}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-[#5d6043] mb-2">
+            Sale price (GHS)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={salePrice ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value;
+              onSalePriceChange?.(raw === "" ? null : parseFloat(raw) || 0);
+            }}
+            className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+            placeholder="Optional"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-[#5d6043] mb-2">
+            Sale starts
+          </label>
+          <input
+            type="datetime-local"
+            value={saleStartsAt}
+            onChange={(e) => onSaleStartsAtChange?.(e.target.value)}
+            className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-[#5d6043] mb-2">
+            Sale ends
+          </label>
+          <input
+            type="datetime-local"
+            value={saleEndsAt}
+            onChange={(e) => onSaleEndsAtChange?.(e.target.value)}
+            className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
           />
         </div>
       </div>

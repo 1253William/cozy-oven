@@ -10,6 +10,9 @@ interface AddProductModalProps {
   productName: string;
   productCategory: string;
   price: number;
+  salePrice?: number | null;
+  saleStartsAt?: string;
+  saleEndsAt?: string;
   productDetails: string;
   imageFile: File | null;
   imagePreview: string[];
@@ -24,6 +27,9 @@ interface AddProductModalProps {
   onProductNameChange: (value: string) => void;
   onProductCategoryChange: (value: string) => void;
   onPriceChange: (value: number) => void;
+  onSalePriceChange?: (value: number | null) => void;
+  onSaleStartsAtChange?: (value: string) => void;
+  onSaleEndsAtChange?: (value: string) => void;
   onProductDetailsChange: (value: string) => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectOptionInputChange: (field: "label" | "additionalPrice", value: string | number) => void;
@@ -45,6 +51,9 @@ export default function AddProductModal({
   productName,
   productCategory,
   price,
+  salePrice = null,
+  saleStartsAt = "",
+  saleEndsAt = "",
   productDetails,
   imageFile,
   imagePreview,
@@ -59,6 +68,9 @@ export default function AddProductModal({
   onProductNameChange,
   onProductCategoryChange,
   onPriceChange,
+  onSalePriceChange,
+  onSaleStartsAtChange,
+  onSaleEndsAtChange,
   onProductDetailsChange,
   onImageChange,
   onSelectOptionInputChange,
@@ -91,6 +103,9 @@ export default function AddProductModal({
           productName={productName}
           productCategory={productCategory}
           price={price}
+          salePrice={salePrice}
+          saleStartsAt={saleStartsAt}
+          saleEndsAt={saleEndsAt}
           productDetails={productDetails}
           imageFile={imageFile}
           imagePreview={imagePreview as any}
@@ -105,6 +120,9 @@ export default function AddProductModal({
           onProductNameChange={onProductNameChange}
           onProductCategoryChange={onProductCategoryChange}
           onPriceChange={onPriceChange}
+          onSalePriceChange={onSalePriceChange}
+          onSaleStartsAtChange={onSaleStartsAtChange}
+          onSaleEndsAtChange={onSaleEndsAtChange}
           onProductDetailsChange={onProductDetailsChange}
           onImageChange={onImageChange}
           onSelectOptionInputChange={onSelectOptionInputChange}

@@ -12,6 +12,7 @@ import ProductTabs from "../../components/ProductTabs";
 
 import { useCart } from "../../context/CartContext";
 import useCustomerProduct from "../../hooks/useProductDetails";
+import { resolveProductPrice } from "../../lib/productPricing";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -154,16 +155,20 @@ export default function ProductDetails() {
     }
   }, [product, availableOptions]);
 
-  // ✅ FINAL PRICE = size price (not base + size)
-  const currentPrice = (() => {
-    if (!product) return 0;
+  // ✅ FINAL PRICE = size price (not base + size); sale applies to base only
+  const priced = (() => {
+    if (!product) return { price: 0, compareAtPrice: null as number | null, onSale: false };
 
     const option = availableOptions.find(
       opt => opt.label === selectedSize
     );
 
-    return option?.additionalPrice ?? product.price;
+    if (option?.additionalPrice !== undefined) {
+      return { price: option.additionalPrice, compareAtPrice: null, onSale: false };
+    }
+    return resolveProductPrice(product.price, product);
   })();
+  const currentPrice = priced.price;
 
   if (loading) {
     return (
@@ -362,7 +367,16 @@ export default function ProductDetails() {
               </p>
 
               <p className="mb-6 text-2xl font-semibold text-[#bd6325] sm:text-3xl">
-                GHS {currentPrice.toFixed(2)}
+                {priced.compareAtPrice != null ? (
+                  <>
+                    <span className="mr-3 text-lg font-normal text-[#5d6043]/55 line-through">
+                      GHS {priced.compareAtPrice.toFixed(2)}
+                    </span>
+                    GHS {currentPrice.toFixed(2)}
+                  </>
+                ) : (
+                  <>GHS {currentPrice.toFixed(2)}</>
+                )}
               </p>
 
               <p className="mb-6 leading-8 text-[#5d6043]">

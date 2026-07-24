@@ -31,6 +31,28 @@ async function getProductUrls() {
   }
 }
 
+async function getCmsPageUrls() {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/cms/pages`, {
+      next: { revalidate: 300 },
+    });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    const pages = Array.isArray(payload?.data) ? payload.data : [];
+    return pages
+      .map((page: { slug?: string; updatedAt?: string }) => page.slug)
+      .filter(Boolean)
+      .map((slug: string) => ({
+        url: `${siteUrl}/pages/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -59,5 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [...staticRoutes, ...(await getProductUrls())];
+  const [productUrls, cmsUrls] = await Promise.all([getProductUrls(), getCmsPageUrls()]);
+  return [...staticRoutes, ...productUrls, ...cmsUrls];
 }

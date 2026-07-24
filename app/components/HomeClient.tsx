@@ -12,15 +12,19 @@ import useCustomerProducts from "../hooks/useCustomerProducts";
 import faqService, { Faq } from "../services/faqService";
 import { Product } from "../services/productService";
 import subscriberService from "../services/subscriberService";
+import type { HomepageSection } from "../services/cmsService";
+import { fallbackHomepageSections } from "../lib/homeData";
 
 type HomeClientProps = {
   initialProducts?: Product[];
   initialFaqs?: Faq[];
+  initialHomepageSections?: HomepageSection[];
 };
 
 export default function HomeClient({
   initialProducts = [],
   initialFaqs = [],
+  initialHomepageSections,
 }: HomeClientProps) {
   const { products, loading, error } = useCustomerProducts({
     limit: 100,
@@ -30,6 +34,25 @@ export default function HomeClient({
   const [faqs, setFaqs] = useState<Faq[]>(initialFaqs);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterStatus, setNewsletterStatus] = useState<string | null>(null);
+  const homepageSections = (
+    initialHomepageSections?.length
+      ? initialHomepageSections
+      : fallbackHomepageSections()
+  )
+    .filter((section) => section.enabled !== false)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const sectionByType = (type: HomepageSection["type"]) =>
+    homepageSections.find((section) => section.type === type);
+
+  const hero = sectionByType("hero");
+  const signatureSection = sectionByType("signature");
+  const productStrip = sectionByType("productStrip");
+  const giftCta = sectionByType("giftCta");
+  const faqSection = sectionByType("faq");
+  const newsletter = sectionByType("newsletter");
+  const promoBanner = sectionByType("promoBanner");
+
   const bestSellers = resolvedProducts.slice(0, 4);
   const bananaProducts = resolvedProducts.filter((product) =>
     product.productCategory?.toLowerCase().includes("banana")
@@ -52,8 +75,10 @@ export default function HomeClient({
       product.packageConfig?.groups?.some((group) => group.type === "selection")
     ) || packageProducts[0];
   const heroImage =
+    hero?.content?.imageUrl ||
+    signatureSection?.content?.imageUrl ||
     "https://res.cloudinary.com/daljxj4yl/image/upload/v1782461961/cozyoven/products_thumbnails/urzdqfzt92jqdnhx0mef.jpg";
-  const giftImage = giftPackage?.thumbnail || "/gift.png";
+  const giftImage = giftCta?.content?.imageUrl || giftPackage?.thumbnail || "/gift.png";
   const previewFaqs = faqs.slice(0, 4);
 
   useEffect(() => {
@@ -84,26 +109,48 @@ export default function HomeClient({
     <>
       <Navbar />
       <main className="editorial-shell">
+        {promoBanner?.content?.message ? (
+          <div className="bg-[#222222] px-4 py-3 text-center text-sm text-[#faf9f5]">
+            <span>{promoBanner.content.message}</span>
+            {promoBanner.content.ctaHref ? (
+              <Link
+                href={promoBanner.content.ctaHref}
+                className="ml-3 font-semibold underline underline-offset-2"
+              >
+                {promoBanner.content.ctaLabel || "Shop"}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hero ? (
         <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:min-h-[calc(100vh-100px)] lg:grid-cols-[0.95fr_1fr] lg:gap-12 lg:px-8 lg:py-20">
           <div className="flex flex-col justify-center">
             <p className="mb-4 text-sm font-medium text-[#bd6325]">
-              Tema-baked · Ghana-loved · Gift-ready
+              {hero.content.eyebrow || "Tema-baked · Ghana-loved · Gift-ready"}
             </p>
             <h1 className="prototype-heading max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-[#222222]">
-              Moist banana bread, freshly baked.
+              {hero.content.headline || "Moist banana bread, freshly baked."}
             </h1>
             <p className="mt-5 max-w-xl text-[clamp(1.15rem,2.4vw,1.65rem)] font-medium leading-snug text-[#5d6043]">
-              Homemade loaves and gift boxes for cravings, family tables, and moments worth remembering.
+              {hero.content.body ||
+                "Homemade loaves and gift boxes for cravings, family tables, and moments worth remembering."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/shop" className="editorial-button px-7 py-3.5">
-                Shop now
+              <Link
+                href={hero.content.ctaHref || "/shop"}
+                className="editorial-button px-7 py-3.5"
+              >
+                {hero.content.ctaLabel || "Shop now"}
               </Link>
               <Link
-                href={giftPackage ? `/product/${giftPackage.id}` : "/shop#package"}
+                href={
+                  hero.content.secondaryCtaHref ||
+                  (giftPackage ? `/product/${giftPackage.id}` : "/shop#package")
+                }
                 className="editorial-button-outline px-7 py-3.5"
               >
-                Send a gift box
+                {hero.content.secondaryCtaLabel || "Send a gift box"}
               </Link>
             </div>
           </div>
@@ -112,12 +159,16 @@ export default function HomeClient({
             <div className="soft-glow absolute h-[88%] w-[88%] rounded-full" />
             <article className="float-card relative w-[min(440px,88vw)] overflow-hidden rounded-[44px] border border-[rgba(34,34,34,0.1)] bg-gradient-to-b from-[#faf9f5]/95 to-[#b9aca2]/95 p-5 shadow-[0_26px_80px_rgba(34,34,34,0.16)]">
               <span className="absolute left-6 top-6 z-10 rounded-full bg-[#222222] px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#faf9f5]">
-                Best seller
+                {signatureSection?.content?.eyebrow || "Best seller"}
               </span>
               <div className="relative h-[300px] overflow-hidden rounded-[34px] sm:h-[360px]">
                 <Image
                   src={heroImage}
-                  alt={signature?.productName || "Cozy Oven banana bread"}
+                  alt={
+                    signatureSection?.content?.headline ||
+                    signature?.productName ||
+                    "Cozy Oven banana bread"
+                  }
                   fill
                   priority
                   className="scale-[1.08] object-cover drop-shadow-[0_34px_34px_rgba(34,34,34,0.3)]"
@@ -126,16 +177,22 @@ export default function HomeClient({
               </div>
               <div className="px-2 pb-2 pt-4">
                 <h2 className="text-xl font-semibold tracking-[-0.02em] text-[#222222] sm:text-2xl">
-                  {signature?.productName || "Chocolate Banana Bread"}
+                  {signatureSection?.content?.headline ||
+                    signature?.productName ||
+                    "Chocolate Banana Bread"}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#5d6043]">
-                  Soft, rich, moist and baked in small batches.
+                  {signatureSection?.content?.body ||
+                    "Soft, rich, moist and baked in small batches."}
                 </p>
                 <Link
-                  href={signature ? `/product/${signature.id}` : "/shop"}
+                  href={
+                    signatureSection?.content?.ctaHref ||
+                    (signature ? `/product/${signature.id}` : "/shop")
+                  }
                   className="mt-5 inline-flex rounded-full bg-[#bd6325] px-5 py-3 font-semibold text-[#faf9f5] transition hover:bg-[#222222]"
                 >
-                  Shop now
+                  {signatureSection?.content?.ctaLabel || "Shop now"}
                 </Link>
               </div>
             </article>
@@ -153,19 +210,25 @@ export default function HomeClient({
             </aside>
           </div>
         </section>
+        ) : null}
 
+        {productStrip ? (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
               <h2 className="prototype-heading text-3xl sm:text-4xl">
-                Customer favourites, freshly baked.
+                {productStrip.content.headline || "Customer favourites, freshly baked."}
               </h2>
               <p className="mt-3 text-[#5d6043]">
-                Shop our most loved loaves, boxes, and creamy yoghurt treats.
+                {productStrip.content.body ||
+                  "Shop our most loved loaves, boxes, and creamy yoghurt treats."}
               </p>
             </div>
-            <Link href="/shop" className="editorial-button-outline px-5 py-2.5 text-sm">
-              View all
+            <Link
+              href={productStrip.content.ctaHref || "/shop"}
+              className="editorial-button-outline px-5 py-2.5 text-sm"
+            >
+              {productStrip.content.ctaLabel || "View all"}
             </Link>
           </div>
           {loading ? (
@@ -184,15 +247,18 @@ export default function HomeClient({
             </div>
           )}
         </section>
+        ) : null}
 
+        {giftCta ? (
         <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
           <div className="relative grid overflow-hidden rounded-[36px] bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] text-[#faf9f5] shadow-[0_26px_80px_rgba(34,34,34,0.16)] md:grid-cols-[1.1fr_0.9fr]">
             <div className="relative z-10 p-7 md:p-12 lg:p-14">
               <h2 className="prototype-heading text-3xl sm:text-4xl">
-                Send a Cozy Oven gift box.
+                {giftCta.content.headline || "Send a Cozy Oven gift box."}
               </h2>
               <p className="mt-4 max-w-xl text-base leading-7 text-[#faf9f5]/82">
-                Build a warm gift for birthdays, thank-yous, office teams, and just-because surprises.
+                {giftCta.content.body ||
+                  "Build a warm gift for birthdays, thank-yous, office teams, and just-because surprises."}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {["Birthday", "Thank you", "Office treat", "Get well soon"].map((occasion) => (
@@ -205,10 +271,14 @@ export default function HomeClient({
                 ))}
               </div>
               <Link
-                href={giftPackage ? `/product/${giftPackage.id}` : "/shop#package"}
+                href={
+                  giftCta.content.ctaHref ||
+                  (giftPackage ? `/product/${giftPackage.id}` : "/shop#package")
+                }
                 className="mt-8 inline-flex rounded-full bg-[#faf9f5] px-7 py-3.5 font-semibold text-[#222222] shadow-[0_16px_30px_rgba(34,34,34,0.18)] transition hover:-translate-y-0.5"
               >
-                {giftPackage ? "Build a gift box" : "Shop packages"}
+                {giftCta.content.ctaLabel ||
+                  (giftPackage ? "Build a gift box" : "Shop packages")}
               </Link>
             </div>
             <div className="relative min-h-[280px] md:min-h-full">
@@ -222,6 +292,7 @@ export default function HomeClient({
             </div>
           </div>
         </section>
+        ) : null}
 
         {(yogurtProducts.length > 0 || resolvedProducts.length > 0) && (
           <section className="border-y border-[rgba(34,34,34,0.1)] bg-[#faf9f5]/60">
@@ -324,11 +395,11 @@ export default function HomeClient({
           </div>
         </section>
 
-        {previewFaqs.length > 0 && (
+        {faqSection && previewFaqs.length > 0 && (
           <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
             <div className="mb-6 max-w-2xl">
               <h2 className="prototype-heading text-3xl sm:text-4xl">
-                Delivery, freshness and gifting.
+                {faqSection.content.headline || "Delivery, freshness and gifting."}
               </h2>
             </div>
             <div className="grid max-w-3xl gap-3">
@@ -348,10 +419,12 @@ export default function HomeClient({
           </section>
         )}
 
+        {newsletter ? (
         <section className="bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] px-4 py-16 text-[#faf9f5] sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-4xl flex-col gap-6 text-center">
             <h2 className="prototype-heading text-3xl sm:text-4xl">
-              New flavours, fresh bakes and special offers.
+              {newsletter.content.headline ||
+                "New flavours, fresh bakes and special offers."}
             </h2>
             <form
               onSubmit={handleNewsletter}
@@ -370,7 +443,7 @@ export default function HomeClient({
                 className="min-h-12 flex-1 rounded-full border border-[#faf9f5]/15 bg-[#faf9f5]/10 px-5 text-[#faf9f5] outline-none placeholder:text-[#b9aca2]/70 focus:border-[#b9aca2]"
               />
               <button type="submit" className="editorial-button min-h-12 px-8">
-                Subscribe
+                {newsletter.content.ctaLabel || "Subscribe"}
               </button>
             </form>
             {newsletterStatus && (
@@ -380,6 +453,7 @@ export default function HomeClient({
             )}
           </div>
         </section>
+        ) : null}
       </main>
       <Footer />
     </>
