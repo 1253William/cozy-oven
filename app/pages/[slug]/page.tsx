@@ -9,6 +9,7 @@ import {
   fetchOnSaleProducts,
   resolveSectionProducts,
 } from "../../lib/cmsPageData";
+import { splitLeadingPromo } from "../../lib/cmsSectionOrder";
 import type { Product } from "../../services/productService";
 
 type PageProps = {
@@ -66,17 +67,19 @@ export default async function CmsStorefrontPage({ params }: PageProps) {
   if (!page) notFound();
 
   const sections = page.sections || [];
-  const needsProducts = sections.some((section) => section.type === "productStrip");
+  const { leadingPromo, rest } = splitLeadingPromo(sections);
+  const bodySections = leadingPromo ? rest : sections;
+  const needsProducts = bodySections.some((section) => section.type === "productStrip");
 
   const allProducts = needsProducts ? await fetchCustomerProducts() : [];
-  const saleProducts = sections.some(
+  const saleProducts = bodySections.some(
     (section) => section.type === "productStrip" && section.content?.showOnSaleProducts
   )
     ? await fetchOnSaleProducts()
     : [];
 
   const productsBySectionId: Record<string, Product[]> = {};
-  for (const section of sections) {
+  for (const section of bodySections) {
     if (section.type !== "productStrip") continue;
     productsBySectionId[section.id] = resolveSectionProducts(section, {
       allProducts,
@@ -86,10 +89,15 @@ export default async function CmsStorefrontPage({ params }: PageProps) {
 
   return (
     <>
+      {/* Clears the fixed delivery banner so chrome below isn’t covered */}
+      <div className="h-9 shrink-0" aria-hidden />
+      {leadingPromo ? (
+        <CmsPageSectionsRenderer sections={[leadingPromo]} />
+      ) : null}
       <Navbar />
       <main className="editorial-shell">
         <CmsPageSectionsRenderer
-          sections={sections}
+          sections={bodySections}
           productsBySectionId={productsBySectionId}
         />
       </main>

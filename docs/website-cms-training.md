@@ -133,7 +133,8 @@ Pages are built from **sections** (same idea as the homepage), and you can **add
 | **Feature grid** | Dark band with a list of points |
 | **Values chips** | Round labels in a row |
 | **Product strip** | Hand-picked products, category filter, and/or on-sale products |
-| **Gift box / Featured / Promo / FAQs / Newsletter** | Same styles as the homepage |
+| **Promo section** | Mid-height dark promo band (larger than the home promo strip) |
+| **Gift box / Featured / FAQs / Newsletter** | Same styles as the homepage |
 | **Closing note** | Signed thank-you / closing message |
 
 ### Draft vs Published

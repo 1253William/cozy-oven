@@ -65,23 +65,32 @@ export default function CmsPageSectionsRenderer({
         const c = section.content || {};
         const products = productsBySectionId[section.id] || [];
 
-        if (section.type === "promoBanner" && c.message) {
+        if (section.type === "promoBanner" && (c.message || c.headline)) {
           return (
-            <div
+            <section
               key={section.id}
-              className="bg-[#222222] px-4 py-3 text-center text-sm text-[#faf9f5]"
+              className="bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] px-4 py-8 text-[#faf9f5] sm:px-6 sm:py-10 lg:px-8"
             >
-              <span>{c.message}</span>
-              {c.ctaHref ? (
-                <CtaLink
-                  preview={preview}
-                  href={c.ctaHref}
-                  className="ml-3 font-semibold underline underline-offset-2"
-                >
-                  {c.ctaLabel || "Shop"}
-                </CtaLink>
-              ) : null}
-            </div>
+              <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center sm:gap-5">
+                <p className="max-w-2xl text-lg font-medium leading-snug sm:text-xl sm:leading-8">
+                  {c.message || c.headline}
+                </p>
+                {c.body ? (
+                  <p className="max-w-xl text-sm leading-6 text-[#b9aca2] sm:text-base sm:leading-7">
+                    {c.body}
+                  </p>
+                ) : null}
+                {c.ctaLabel && c.ctaHref ? (
+                  <CtaLink
+                    preview={preview}
+                    href={c.ctaHref}
+                    className="editorial-button-outline mt-1 border-[#faf9f5] px-6 py-2.5 text-[#faf9f5]"
+                  >
+                    {c.ctaLabel}
+                  </CtaLink>
+                ) : null}
+              </div>
+            </section>
           );
         }
 

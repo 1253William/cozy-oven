@@ -56,7 +56,7 @@ const FIELD_LABELS: Partial<Record<keyof CmsPageSectionContent, string>> = {
   productId: "Product ID",
   productIds: "Products",
   categoryFilter: "Category filter",
-  message: "Message",
+  message: "Promo text",
   startsAt: "Starts",
   endsAt: "Ends",
   items: "Items (one per line)",

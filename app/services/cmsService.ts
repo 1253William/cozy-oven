@@ -157,7 +157,7 @@ export const SECTION_LABELS: Record<HomepageSectionType, string> = {
 };
 
 export const PAGE_SECTION_LABELS: Record<CmsPageSectionType, string> = {
-  promoBanner: "Promo bar",
+  promoBanner: "Promo section",
   hero: "Hero",
   signature: "Featured product",
   giftCta: "Gift box",
@@ -181,7 +181,7 @@ export const PAGE_SECTION_FIELD_MAP: Record<
   CmsPageSectionType,
   Array<keyof CmsPageSectionContent>
 > = {
-  promoBanner: ["message", "ctaLabel", "ctaHref", "startsAt", "endsAt"],
+  promoBanner: ["message", "body", "ctaLabel", "ctaHref", "startsAt", "endsAt"],
   hero: [
     "eyebrow",
     "headline",
@@ -226,7 +226,12 @@ export const createBlankPageSection = (
     case "promoBanner":
       return {
         ...base,
-        content: { message: "Limited-time offer", ctaLabel: "Shop", ctaHref: "/shop" },
+        content: {
+          message: "Limited-time offer — don’t miss it",
+          body: "A short line under the promo, if you want one.",
+          ctaLabel: "Shop now",
+          ctaHref: "/shop",
+        },
       };
     case "hero":
       return {
