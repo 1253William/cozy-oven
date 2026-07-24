@@ -1,6 +1,34 @@
 import apiClient from "./apiClient";
 
-// Reports interfaces
+export interface FinanceComparison {
+  previousMonth: string;
+  previousYear: number;
+  previousRevenue: number;
+  previousExpenses: number;
+  previousProfit: number;
+  previousOrderCount: number;
+  revenueChangePercent: number | null;
+  expensesChangePercent: number | null;
+  profitChangePercent: number | null;
+  ordersChangePercent: number | null;
+}
+
+export interface DailySale {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface FulfillmentStats {
+  delivery: { orders: number; revenue: number };
+  pickup: { orders: number; revenue: number };
+}
+
+export interface StatusBreakdownItem {
+  status: string;
+  count: number;
+}
+
 export interface FinanceSummary {
   month: string;
   year: number;
@@ -8,6 +36,14 @@ export interface FinanceSummary {
   totalExpenses: number;
   profit: number;
   profitMargin: string;
+  profitMarginPercent?: number;
+  profitMarginExplanation?: string;
+  orderCount?: number;
+  averageOrderValue?: number;
+  comparison?: FinanceComparison;
+  dailySales?: DailySale[];
+  fulfillment?: FulfillmentStats;
+  statusBreakdown?: StatusBreakdownItem[];
 }
 
 export interface SalesByCategory {
@@ -61,31 +97,52 @@ export interface TopCustomersResponse {
   data: TopCustomer[];
 }
 
+const periodQuery = (month: string, year: number) =>
+  `month=${encodeURIComponent(month)}&year=${encodeURIComponent(String(year))}`;
+
 export const reportsService = {
-  // GET /api/v1/dashboard/admin/reports/finance-summary - Get finance summary for a month
   getFinanceSummary: async (month: string, year: number): Promise<FinanceSummaryResponse> => {
     const response = await apiClient.get(
-      `/api/v1/dashboard/admin/reports/finance-summary?month=${month}&year=${year}`
+      `/api/v1/dashboard/admin/reports/finance-summary?${periodQuery(month, year)}`
     );
     return response.data;
   },
 
-  // GET /api/v1/dashboard/admin/reports/sales-by-category - Get sales by category
-  getSalesByCategory: async (): Promise<SalesByCategoryResponse> => {
-    const response = await apiClient.get("/api/v1/dashboard/admin/reports/sales-by-category");
-    return response.data;
-  },
-
-  // GET /api/v1/dashboard/admin/reports/top-selling-products - Get top selling products
-  getTopSellingProducts: async (): Promise<TopSellingProductsResponse> => {
-    const response = await apiClient.get("/api/v1/dashboard/admin/reports/top-selling-products");
-    return response.data;
-  },
-
-  // GET /api/v1/dashboard/admin/reports/top-customers - Get top customers with pagination
-  getTopCustomers: async (page: number = 1, limit: number = 5): Promise<TopCustomersResponse> => {
+  getSalesByCategory: async (month: string, year: number): Promise<SalesByCategoryResponse> => {
     const response = await apiClient.get(
-      `/api/v1/dashboard/admin/reports/top-customers?page=${page}&limit=${limit}`
+      `/api/v1/dashboard/admin/reports/sales-by-category?${periodQuery(month, year)}`
+    );
+    return response.data;
+  },
+
+  getTopSellingProducts: async (
+    month: string,
+    year: number
+  ): Promise<TopSellingProductsResponse> => {
+    const response = await apiClient.get(
+      `/api/v1/dashboard/admin/reports/top-selling-products?${periodQuery(month, year)}`
+    );
+    return response.data;
+  },
+
+  getTopCustomers: async (
+    page: number = 1,
+    limit: number = 5,
+    month?: string,
+    year?: number
+  ): Promise<TopCustomersResponse> => {
+    const period =
+      month && year ? `&${periodQuery(month, year)}` : "";
+    const response = await apiClient.get(
+      `/api/v1/dashboard/admin/reports/top-customers?page=${page}&limit=${limit}${period}`
+    );
+    return response.data;
+  },
+
+  exportMonthlyReport: async (month: string, year: number): Promise<Blob> => {
+    const response = await apiClient.get(
+      `/api/v1/dashboard/admin/reports/export?${periodQuery(month, year)}`,
+      { responseType: "blob" }
     );
     return response.data;
   },

@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
 import {
   Download,
   TrendingUp,
-  Users,
-  Package,
+  TrendingDown,
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Truck,
+  Store,
 } from "lucide-react";
 import reportsService, {
   type FinanceSummary,
@@ -20,10 +21,9 @@ import reportsService, {
   type TopCustomer,
 } from "../../services/reportsService";
 
-// Color palette for category charts
 const CATEGORY_COLORS = [
   "#5d6043",
-  "#4CAF50",
+  "#bd6325",
   "#2196F3",
   "#FF9800",
   "#9C27B0",
@@ -31,25 +31,54 @@ const CATEGORY_COLORS = [
   "#00BCD4",
 ];
 
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+function ChangeBadge({ value }: { value: number | null | undefined }) {
+  if (value === null || value === undefined) {
+    return <span className="text-xs text-[#5d6043]">vs last month: —</span>;
+  }
+  const up = value >= 0;
+  const Icon = up ? TrendingUp : TrendingDown;
+  return (
+    <span
+      className={`mt-2 inline-flex items-center gap-1 text-xs font-medium ${
+        up ? "text-green-700" : "text-red-700"
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {up ? "+" : ""}
+      {value}% vs last month
+    </span>
+  );
+}
+
 export default function ReportsPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  
-  // Finance Summary State
+  const [exporting, setExporting] = useState(false);
+
   const [financeSummary, setFinanceSummary] = useState<FinanceSummary | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState(() => {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return months[new Date().getMonth()];
-  });
+  const [selectedMonth, setSelectedMonth] = useState(() => MONTHS[new Date().getMonth()]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  
-  // Sales Data State
+
   const [salesByCategory, setSalesByCategory] = useState<SalesByCategory[]>([]);
   const [topProducts, setTopProducts] = useState<TopSellingProduct[]>([]);
   const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([]);
-  
-  // Pagination State
+
   const [customersPage, setCustomersPage] = useState(1);
   const [customersMeta, setCustomersMeta] = useState({
     page: 1,
@@ -65,6 +94,10 @@ export default function ReportsPage() {
   }, [isAuthenticated, user, router]);
 
   useEffect(() => {
+    setCustomersPage(1);
+  }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
     if (isAuthenticated && user?.role === "Admin") {
       fetchAllReports();
     }
@@ -74,26 +107,16 @@ export default function ReportsPage() {
   const fetchAllReports = async () => {
     setLoading(true);
     try {
-      // Fetch all reports in parallel
       const [financeRes, categoryRes, productsRes, customersRes] = await Promise.all([
         reportsService.getFinanceSummary(selectedMonth, selectedYear),
-        reportsService.getSalesByCategory(),
-        reportsService.getTopSellingProducts(),
-        reportsService.getTopCustomers(customersPage, 5),
+        reportsService.getSalesByCategory(selectedMonth, selectedYear),
+        reportsService.getTopSellingProducts(selectedMonth, selectedYear),
+        reportsService.getTopCustomers(customersPage, 5, selectedMonth, selectedYear),
       ]);
 
-      if (financeRes.success) {
-        setFinanceSummary(financeRes.data);
-      }
-
-      if (categoryRes.success) {
-        setSalesByCategory(categoryRes.data);
-      }
-
-      if (productsRes.success) {
-        setTopProducts(productsRes.data);
-      }
-
+      if (financeRes.success) setFinanceSummary(financeRes.data);
+      if (categoryRes.success) setSalesByCategory(categoryRes.data);
+      if (productsRes.success) setTopProducts(productsRes.data);
       if (customersRes.success) {
         setTopCustomers(customersRes.data);
         setCustomersMeta(customersRes.meta);
@@ -105,6 +128,36 @@ export default function ReportsPage() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      const blob = await reportsService.exportMonthlyReport(selectedMonth, selectedYear);
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `cozy-oven-report-${selectedMonth}-${selectedYear}.csv`
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting report:", error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const dailySales = financeSummary?.dailySales || [];
+  const maxDailyRevenue = useMemo(
+    () => Math.max(...dailySales.map((d) => d.revenue), 1),
+    [dailySales]
+  );
+
+  const fulfillment = financeSummary?.fulfillment;
+  const statusBreakdown = financeSummary?.statusBreakdown || [];
+
   if (!isAuthenticated || user?.role !== "Admin") {
     return null;
   }
@@ -112,343 +165,399 @@ export default function ReportsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#222222]">Reports & Analytics</h1>
-            <p className="text-[#5d6043] mt-1">Detailed insights into your business</p>
+            <p className="mt-1 text-[#5d6043]">
+              Period insights for {selectedMonth} {selectedYear}
+            </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors">
-            <Download className="w-5 h-5" />
-            Export Report
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting || loading}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition-colors hover:bg-[#222222] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+            {exporting ? "Exporting..." : "Export CSV"}
           </button>
         </div>
 
-        {/* Date Range Filter */}
-        <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
-            <span className="text-sm font-medium text-[#5d6043]">Finance Period:</span>
+        <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-4 shadow-sm">
+          <div className="flex flex-col items-start gap-3 md:flex-row md:items-center">
+            <span className="text-sm font-medium text-[#5d6043]">Report period:</span>
             <div className="flex gap-2">
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+                className="rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
               >
-                {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month) => (
-                  <option key={month} value={month}>{month}</option>
+                {MONTHS.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
                 ))}
               </select>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+                className="rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
               >
-                {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
+                {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(
+                  (year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  )
+                )}
               </select>
             </div>
           </div>
         </div>
 
-        {/* Summary Cards */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-5 border border-[#b9aca2]/40">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Total Revenue</p>
-                  <h3 className="text-2xl font-bold text-[#222222] mt-2">
-                    GHS {financeSummary?.totalRevenue.toFixed(2) || "0.00"}
-                  </h3>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-green-600">₵</span>
-                </div>
+          <>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                <p className="text-sm font-medium text-[#5d6043]">Total Revenue</p>
+                <h3 className="mt-2 text-2xl font-bold text-[#222222]">
+                  GHS {financeSummary?.totalRevenue.toFixed(2) || "0.00"}
+                </h3>
+                <ChangeBadge value={financeSummary?.comparison?.revenueChangePercent} />
               </div>
-              <p className="text-xs text-[#5d6043] mt-2">
-                {selectedMonth} {selectedYear}
-              </p>
+
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                <p className="text-sm font-medium text-[#5d6043]">Inventory Expenses</p>
+                <h3 className="mt-2 text-2xl font-bold text-[#222222]">
+                  GHS {financeSummary?.totalExpenses.toFixed(2) || "0.00"}
+                </h3>
+                <ChangeBadge value={financeSummary?.comparison?.expensesChangePercent} />
+              </div>
+
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                <p className="text-sm font-medium text-[#5d6043]">Profit</p>
+                <h3 className="mt-2 text-2xl font-bold text-[#222222]">
+                  GHS {financeSummary?.profit.toFixed(2) || "0.00"}
+                </h3>
+                <ChangeBadge value={financeSummary?.comparison?.profitChangePercent} />
+              </div>
+
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                <p className="text-sm font-medium text-[#5d6043]">Profit Margin</p>
+                <h3 className="mt-2 text-2xl font-bold text-[#222222]">
+                  {financeSummary?.profitMargin || "0%"}
+                </h3>
+                <p className="mt-2 text-xs text-[#5d6043]">
+                  {financeSummary?.orderCount || 0} paid orders · AOV GHS{" "}
+                  {(financeSummary?.averageOrderValue || 0).toFixed(2)}
+                </p>
+              </div>
             </div>
 
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-5 border border-[#b9aca2]/40">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Total Expenses</p>
-                  <h3 className="text-2xl font-bold text-[#222222] mt-2">
-                    GHS {financeSummary?.totalExpenses.toFixed(2) || "0.00"}
-                  </h3>
-                </div>
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <Package className="w-6 h-6 text-red-600" />
-                </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-6 shadow-sm lg:col-span-2">
+                <h2 className="mb-4 text-xl font-bold text-[#222222]">Daily Sales</h2>
+                {dailySales.length === 0 ? (
+                  <p className="py-10 text-center text-[#5d6043]">No paid sales this month</p>
+                ) : (
+                  <div className="flex h-48 items-end gap-1 overflow-x-auto pb-2">
+                    {dailySales.map((day) => {
+                      const height = Math.max(8, (day.revenue / maxDailyRevenue) * 100);
+                      const label = day.date.slice(8);
+                      return (
+                        <div
+                          key={day.date}
+                          className="group flex min-w-[28px] flex-1 flex-col items-center justify-end"
+                          title={`${day.date}: GHS ${day.revenue.toFixed(2)} · ${day.orders} orders`}
+                        >
+                          <div
+                            className="w-full rounded-t bg-[#5d6043] transition group-hover:bg-[#bd6325]"
+                            style={{ height: `${height}%` }}
+                          />
+                          <span className="mt-1 text-[10px] text-[#5d6043]">{label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              <p className="text-xs text-[#5d6043] mt-2">
-                {selectedMonth} {selectedYear}
-              </p>
-            </div>
 
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-5 border border-[#b9aca2]/40">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Profit</p>
-                  <h3 className="text-2xl font-bold text-[#222222] mt-2">
-                    GHS {financeSummary?.profit.toFixed(2) || "0.00"}
-                  </h3>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-              <p className="text-xs text-[#5d6043] mt-2">
-                {selectedMonth} {selectedYear}
-              </p>
-            </div>
-
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-5 border border-[#b9aca2]/40">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Profit Margin</p>
-                  <h3 className="text-2xl font-bold text-[#222222] mt-2">
-                    {financeSummary?.profitMargin || "0%"}
-                  </h3>
-                </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <Users className="w-6 h-6 text-yellow-600" />
-                </div>
-              </div>
-              <p className="text-xs text-[#5d6043] mt-2">
-                {selectedMonth} {selectedYear}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sales by Category - Pie Chart */}
-          <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 p-6">
-            <h2 className="text-xl font-bold text-[#222222] mb-6">Sales by Category</h2>
-            
-            {/* Pie Chart */}
-            <div className="flex items-center justify-center h-64 mb-4">
-              {salesByCategory.length > 0 ? (
-                <div 
-                  className="relative w-48 h-48 rounded-full flex items-center justify-center transition-all duration-500"
-                  style={{
-                    background: `conic-gradient(${salesByCategory.map((item, index) => {
-                      const prevStats = salesByCategory.slice(0, index).reduce((acc, curr) => acc + curr.percentage, 0);
-                      return `${CATEGORY_COLORS[index % CATEGORY_COLORS.length]} ${prevStats}% ${prevStats + item.percentage}%`;
-                    }).join(", ")})`
-                  }}
-                >
-                  <div className="absolute inset-0 m-4 bg-[#faf9f5] rounded-full flex flex-col items-center justify-center shadow-inner">
-                    <p className="text-2xl font-bold text-[#222222]">
-                      GHS {financeSummary?.totalRevenue.toFixed(0) || "0"}
-                    </p>
-                    <p className="text-sm text-[#5d6043]">Total Sales</p>
+              <div className="space-y-6">
+                <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                  <h2 className="mb-4 text-lg font-bold text-[#222222]">Delivery vs Pickup</h2>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between rounded-lg border border-[rgba(34,34,34,0.08)] px-3 py-3">
+                      <div className="flex items-center gap-2 text-sm text-[#5d6043]">
+                        <Truck className="h-4 w-4" />
+                        Delivery
+                      </div>
+                      <div className="text-right text-sm">
+                        <p className="font-semibold text-[#222222]">
+                          {fulfillment?.delivery.orders || 0} orders
+                        </p>
+                        <p className="text-xs text-[#5d6043]">
+                          GHS {(fulfillment?.delivery.revenue || 0).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border border-[rgba(34,34,34,0.08)] px-3 py-3">
+                      <div className="flex items-center gap-2 text-sm text-[#5d6043]">
+                        <Store className="h-4 w-4" />
+                        Pickup
+                      </div>
+                      <div className="text-right text-sm">
+                        <p className="font-semibold text-[#222222]">
+                          {fulfillment?.pickup.orders || 0} orders
+                        </p>
+                        <p className="text-xs text-[#5d6043]">
+                          GHS {(fulfillment?.pickup.revenue || 0).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
+                <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
+                  <h2 className="mb-4 text-lg font-bold text-[#222222]">Order Status</h2>
+                  {statusBreakdown.length === 0 ? (
+                    <p className="text-sm text-[#5d6043]">No orders this month</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {statusBreakdown.map((item) => (
+                        <div
+                          key={item.status}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span className="capitalize text-[#5d6043]">
+                            {(item.status || "unknown").replace("-", " ")}
+                          </span>
+                          <span className="font-semibold text-[#222222]">{item.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-6 shadow-sm">
+                <h2 className="mb-6 text-xl font-bold text-[#222222]">Sales by Category</h2>
+                <div className="mb-4 flex h-64 items-center justify-center">
+                  {salesByCategory.length > 0 ? (
+                    <div
+                      className="relative flex h-48 w-48 items-center justify-center rounded-full transition-all duration-500"
+                      style={{
+                        background: `conic-gradient(${salesByCategory
+                          .map((item, index) => {
+                            const prevStats = salesByCategory
+                              .slice(0, index)
+                              .reduce((acc, curr) => acc + curr.percentage, 0);
+                            return `${CATEGORY_COLORS[index % CATEGORY_COLORS.length]} ${prevStats}% ${prevStats + item.percentage}%`;
+                          })
+                          .join(", ")})`,
+                      }}
+                    >
+                      <div className="absolute inset-0 m-4 flex flex-col items-center justify-center rounded-full bg-[#faf9f5] shadow-inner">
+                        <p className="text-2xl font-bold text-[#222222]">
+                          GHS {financeSummary?.totalRevenue.toFixed(0) || "0"}
+                        </p>
+                        <p className="text-sm text-[#5d6043]">Period sales</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative flex h-48 w-48 items-center justify-center rounded-full border-8 border-[#b9aca2]/60">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-[#222222]">0%</p>
+                        <p className="text-sm text-[#5d6043]">No Data</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {salesByCategory.length === 0 ? (
+                  <p className="py-8 text-center text-[#5d6043]">No sales data for this period</p>
+                ) : (
+                  <div className="space-y-3">
+                    {salesByCategory.map((item, index) => (
+                      <div key={item.category} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="h-4 w-4 rounded-full"
+                            style={{
+                              backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+                            }}
+                          />
+                          <span className="text-sm text-[#5d6043]">{item.category}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-[#222222]">
+                            GHS {item.revenue.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-[#5d6043]">{item.percentage.toFixed(1)}%</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-6 shadow-sm">
+                <h2 className="mb-6 text-xl font-bold text-[#222222]">Top Selling Products</h2>
+                {topProducts.length === 0 ? (
+                  <p className="py-8 text-center text-[#5d6043]">No product data for this period</p>
+                ) : (
+                  <div className="space-y-4">
+                    {topProducts.map((product, index) => (
+                      <div
+                        key={String(product._id) + product.name}
+                        className="flex items-center justify-between border-b border-[#b9aca2]/40 pb-4 last:border-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-[#b9aca2]">#{index + 1}</span>
+                          <div>
+                            <p className="text-sm font-semibold text-[#222222]">{product.name}</p>
+                            <p className="text-xs text-[#5d6043]">{product.unitsSold} units sold</p>
+                          </div>
+                        </div>
+                        <p className="text-sm font-bold text-[#5d6043]">
+                          GHS {product.revenue.toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-6 shadow-sm">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-[#222222]">Top Customers</h2>
+                {customersMeta.totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCustomersPage((prev) => Math.max(1, prev - 1))}
+                      disabled={customersPage === 1 || loading}
+                      className="rounded-lg border border-[#b9aca2] p-2 hover:bg-[#faf9f5] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <span className="text-sm text-[#5d6043]">
+                      Page {customersPage} of {customersMeta.totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCustomersPage((prev) => Math.min(customersMeta.totalPages, prev + 1))
+                      }
+                      disabled={customersPage === customersMeta.totalPages || loading}
+                      className="rounded-lg border border-[#b9aca2] p-2 hover:bg-[#faf9f5] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {topCustomers.length === 0 ? (
+                <p className="py-12 text-center text-[#5d6043]">No customer data for this period</p>
               ) : (
-                <div className="relative w-48 h-48 rounded-full border-8 border-[#b9aca2]/60 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-[#222222]">0%</p>
-                    <p className="text-sm text-[#5d6043]">No Data</p>
+                <>
+                  <div className="hidden overflow-x-auto md:block">
+                    <table className="w-full">
+                      <thead className="border-b border-[#b9aca2]/60 bg-[#faf9f5]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5d6043]">
+                            Rank
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5d6043]">
+                            Customer
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5d6043]">
+                            Contact
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5d6043]">
+                            Orders
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5d6043]">
+                            Spent
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#b9aca2]/60">
+                        {topCustomers.map((customer) => (
+                          <tr key={`${customer.userId}-${customer.rank}`} className="hover:bg-[#faf9f5]">
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <span className="text-lg font-bold text-[#b9aca2]">#{customer.rank}</span>
+                            </td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <div className="flex items-center">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5d6043] font-semibold text-[#faf9f5]">
+                                  {customer.fullName?.charAt(0) || "?"}
+                                </div>
+                                <span className="ml-3 text-sm font-semibold text-[#222222]">
+                                  {customer.fullName}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <span className="text-sm text-[#5d6043]">{customer.email || "—"}</span>
+                            </td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <span className="text-sm text-[#222222]">{customer.totalOrders}</span>
+                            </td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <span className="text-sm font-semibold text-[#5d6043]">
+                                GHS {customer.totalSpent.toFixed(2)}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                </div>
+
+                  <div className="space-y-3 md:hidden">
+                    {topCustomers.map((customer) => (
+                      <div
+                        key={`${customer.userId}-${customer.rank}-m`}
+                        className="rounded-lg border border-[#b9aca2]/60 p-4"
+                      >
+                        <div className="mb-3 flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5d6043] font-semibold text-[#faf9f5]">
+                            {customer.fullName?.charAt(0) || "?"}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-[#222222]">{customer.fullName}</h3>
+                            <p className="text-xs text-[#5d6043]">{customer.email || "—"}</p>
+                            <p className="text-xs text-[#5d6043]">Rank #{customer.rank}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="mb-1 text-xs text-[#5d6043]">Orders</p>
+                            <p className="text-sm font-semibold text-[#222222]">{customer.totalOrders}</p>
+                          </div>
+                          <div>
+                            <p className="mb-1 text-xs text-[#5d6043]">Spent</p>
+                            <p className="text-sm font-semibold text-[#5d6043]">
+                              GHS {customer.totalSpent.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
-
-            {/* Category List */}
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 text-[#5d6043] animate-spin" />
-              </div>
-            ) : salesByCategory.length === 0 ? (
-              <p className="text-center text-[#5d6043] py-8">No sales data available</p>
-            ) : (
-              <div className="space-y-3">
-                {salesByCategory.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{
-                          backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
-                        }}
-                      />
-                      <span className="text-sm text-[#5d6043]">{item.category}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-[#222222]">
-                        GHS {item.revenue.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-[#5d6043]">{item.percentage.toFixed(1)}%</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Top Products */}
-          <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 p-6">
-            <h2 className="text-xl font-bold text-[#222222] mb-6">Top Selling Products</h2>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 text-[#5d6043] animate-spin" />
-              </div>
-            ) : topProducts.length === 0 ? (
-              <p className="text-center text-[#5d6043] py-8">No product data available</p>
-            ) : (
-              <div className="space-y-4">
-                {topProducts.map((product, index) => (
-                  <div key={product._id} className="flex items-center justify-between pb-4 border-b border-[#b9aca2]/40 last:border-0">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-[#b9aca2]">#{index + 1}</span>
-                        <div>
-                          <p className="text-sm font-semibold text-[#222222]">{product.name}</p>
-                          <p className="text-xs text-[#5d6043]">{product.unitsSold} units sold</p>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm font-bold text-[#5d6043]">
-                      GHS {product.revenue.toFixed(2)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Top Customers */}
-        <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-[#222222]">Top Customers</h2>
-            {customersMeta.totalPages > 1 && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCustomersPage(prev => Math.max(1, prev - 1))}
-                  disabled={customersPage === 1 || loading}
-                  className="p-2 rounded-lg border border-[#b9aca2] hover:bg-[#faf9f5] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-sm text-[#5d6043]">
-                  Page {customersPage} of {customersMeta.totalPages}
-                </span>
-                <button
-                  onClick={() => setCustomersPage(prev => Math.min(customersMeta.totalPages, prev + 1))}
-                  disabled={customersPage === customersMeta.totalPages || loading}
-                  className="p-2 rounded-lg border border-[#b9aca2] hover:bg-[#faf9f5] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-          </div>
-          
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
-            </div>
-          ) : topCustomers.length === 0 ? (
-            <p className="text-center text-[#5d6043] py-12">No customer data available</p>
-          ) : (
-            <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-[#faf9f5] border-b border-[#b9aca2]/60">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                        Rank
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                        Customer Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                        Total Orders
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                        Total Spent
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#b9aca2]/60">
-                    {topCustomers.map((customer) => (
-                      <tr key={customer.userId} className="hover:bg-[#faf9f5]">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-lg font-bold text-[#b9aca2]">#{customer.rank}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-[#5d6043] rounded-full flex items-center justify-center text-[#faf9f5] font-semibold">
-                              {customer.fullName?.charAt(0) || "?"}
-                            </div>
-                            <span className="ml-3 text-sm font-semibold text-[#222222]">
-                              {customer.fullName}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-[#5d6043]">{customer.email}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-[#222222]">{customer.totalOrders}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-semibold text-[#5d6043]">
-                            GHS {customer.totalSpent.toFixed(2)}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              {/* Mobile Card View */}
-              <div className="md:hidden space-y-3">
-                {topCustomers.map((customer) => (
-                  <div key={customer.userId} className="border border-[#b9aca2]/60 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#5d6043] rounded-full flex items-center justify-center text-[#faf9f5] font-semibold">
-                          {customer.fullName?.charAt(0) || "?"}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#222222]">{customer.fullName}</h3>
-                          <p className="text-xs text-[#5d6043]">{customer.email}</p>
-                          <p className="text-xs text-[#5d6043]">Rank #{customer.rank}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-xs text-[#5d6043] mb-1">Total Orders</p>
-                        <p className="text-sm font-semibold text-[#222222]">{customer.totalOrders}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#5d6043] mb-1">Total Spent</p>
-                        <p className="text-sm font-semibold text-[#5d6043]">GHS {customer.totalSpent.toFixed(2)}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </AdminLayout>
   );
