@@ -14,6 +14,7 @@ import AdminLayout from "../../components/AdminLayout";
 import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
 import CmsProductPicker from "../CmsProductPicker";
+import CmsDraftPreviewModal from "../CmsDraftPreviewModal";
 import cmsService, {
   CMS_PAGE_SECTION_TYPES,
   CmsPage,
@@ -97,6 +98,9 @@ export default function AdminWebsitePagesPage() {
   const [showCatalog, setShowCatalog] = useState(false);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [draftContent, setDraftContent] = useState<CmsPageSectionContent>({});
+  const [draftPreview, setDraftPreview] = useState<
+    null | { mode: "page" } | { mode: "section"; sectionId: string }
+  >(null);
 
   const sorted = useMemo(
     () =>
@@ -113,6 +117,27 @@ export default function AdminWebsitePagesPage() {
 
   const editingSection =
     formSections.find((section) => section.id === editingSectionId) || null;
+
+  /** Current form sections with in-progress edit draft applied. */
+  const sectionsForPreview = useMemo(() => {
+    if (!editingSectionId) return formSections;
+    return formSections.map((section) =>
+      section.id === editingSectionId
+        ? {
+            ...section,
+            content: {
+              ...draftContent,
+              items: Array.isArray(draftContent.items)
+                ? draftContent.items.map((item) => String(item).trim()).filter(Boolean)
+                : draftContent.items,
+              productIds: Array.isArray(draftContent.productIds)
+                ? draftContent.productIds.map((id) => String(id).trim()).filter(Boolean)
+                : draftContent.productIds,
+            },
+          }
+        : section
+    );
+  }, [formSections, editingSectionId, draftContent]);
 
   const load = async () => {
     try {
@@ -620,17 +645,27 @@ export default function AdminWebsitePagesPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[#faf9f5] p-6">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="text-xl font-bold text-[#222222]">
                 {editingId ? "Edit page" : "New page"}
               </h2>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="rounded-lg p-2 hover:bg-[#eeeae0]"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setDraftPreview({ mode: "page" })}
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
+                >
+                  <Eye className="h-4 w-4" />
+                  Preview page
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="rounded-lg p-2 hover:bg-[#eeeae0]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleSave} className="space-y-5">
@@ -734,14 +769,24 @@ export default function AdminWebsitePagesPage() {
               <div className="space-y-3 border-t border-[#b9aca2]/50 pt-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h3 className="font-semibold text-[#222222]">Sections</h3>
-                  <button
-                    type="button"
-                    onClick={() => setShowCatalog((prev) => !prev)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add section
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDraftPreview({ mode: "page" })}
+                      className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Preview page
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCatalog((prev) => !prev)}
+                      className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add section
+                    </button>
+                  </div>
                 </div>
 
                 {showCatalog ? (
@@ -799,9 +844,21 @@ export default function AdminWebsitePagesPage() {
                           </button>
                           <button
                             type="button"
+                            onClick={() =>
+                              setDraftPreview({ mode: "section", sectionId: section.id })
+                            }
+                            className="rounded-lg border border-[#b9aca2] px-2 py-2 text-xs font-medium text-[#5d6043]"
+                            aria-label="Preview section"
+                            title="Preview section"
+                          >
+                            Preview
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => toggleSection(section.id)}
                             className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043]"
                             aria-label="Toggle"
+                            title={section.enabled ? "Hide on page" : "Show on page"}
                           >
                             {section.enabled ? (
                               <Eye className="h-4 w-4" />
@@ -846,6 +903,19 @@ export default function AdminWebsitePagesPage() {
                             </button>
                             <button
                               type="button"
+                              onClick={() =>
+                                setDraftPreview({
+                                  mode: "section",
+                                  sectionId: section.id,
+                                })
+                              }
+                              className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Preview
+                            </button>
+                            <button
+                              type="button"
                               onClick={saveSectionEdit}
                               className="rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
                             >
@@ -868,6 +938,14 @@ export default function AdminWebsitePagesPage() {
                   Cancel
                 </button>
                 <button
+                  type="button"
+                  onClick={() => setDraftPreview({ mode: "page" })}
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm text-[#5d6043]"
+                >
+                  <Eye className="h-4 w-4" />
+                  Preview
+                </button>
+                <button
                   type="submit"
                   disabled={saving}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm text-[#faf9f5] disabled:opacity-60"
@@ -879,6 +957,22 @@ export default function AdminWebsitePagesPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {draftPreview && (
+        <CmsDraftPreviewModal
+          title={form.title.trim() || (editingId ? "Page preview" : "New page preview")}
+          subtitle={
+            editingId
+              ? "Live draft preview (includes unsaved edits)"
+              : "New page preview — save when you’re happy with it"
+          }
+          sections={sectionsForPreview}
+          sectionId={
+            draftPreview.mode === "section" ? draftPreview.sectionId : null
+          }
+          onClose={() => setDraftPreview(null)}
+        />
       )}
 
       {historyPage && (
