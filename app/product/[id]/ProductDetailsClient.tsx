@@ -539,7 +539,7 @@ export default function ProductDetails() {
           </div>
 
           <div className="mt-16">
-            <ProductTabs details={product.productDetails} />
+            <ProductTabs details={product.productDetails} productId={String(product.id || id)} />
           </div>
 
         </div>

@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import CartToastWrapper from "./components/CartToastWrapper";
 import PurchaseToast from "./components/PurchaseToast";
+import ReviewPromptModal from "./components/ReviewPromptModal";
 import DeliveryBanner from "./components/DeliveryBanner";
 import StorefrontMotion from "./components/StorefrontMotion";
 import ApiWarmupBanner from "./components/ApiWarmupBanner";
@@ -73,6 +74,7 @@ export default function RootLayout({
                 <StorefrontMotion />
                 {children}
                 <PurchaseToast />
+                <ReviewPromptModal />
               </CartToastWrapper>
             </CartProvider>
           </WishlistProvider>

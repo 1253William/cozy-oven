@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Mail,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import Image from "next/image";
@@ -35,6 +36,7 @@ const menuItems = [
   { name: "Subscribers", icon: Mail, href: "/admin/subscribers" },
   { name: "Email Marketing", icon: Mail, href: "/admin/email-marketing" },
   { name: "FAQs", icon: Mail, href: "/admin/faqs" },
+  { name: "Reviews", icon: Star, href: "/admin/reviews" },
   { name: "Notifications", icon: Bell, href: "/admin/notifications" },
   { name: "Admin Profile", icon: UserCircle, href: "/admin/profile" },
   { name: "Reports", icon: BarChart3, href: "/admin/reports" },
