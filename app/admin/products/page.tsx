@@ -39,6 +39,7 @@ export default function ProductManagementPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [originalExistingImages, setOriginalExistingImages] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState({
     productName: "",
     productCategory: "",
@@ -282,6 +283,7 @@ export default function ProductManagementPage() {
     setImageFiles([]);
     setImagePreviews([]);
     setExistingImages([]);
+    setOriginalExistingImages([]);
     setSelectOptionInput({ label: "", additionalPrice: 0 });
   };
 
@@ -370,6 +372,7 @@ export default function ProductManagementPage() {
           options: [],
         }) ||
         imageFiles.length > 0 ||
+        JSON.stringify(existingImages) !== JSON.stringify(originalExistingImages) ||
         JSON.stringify(selectOptions) !== JSON.stringify(selectedProduct.selectOptions);
       
       if (!hasChanges) {
@@ -407,11 +410,18 @@ export default function ProductManagementPage() {
         formData.append("packageConfig", JSON.stringify(packageConfig));
       }
       
-      // Only send new image files as 'thumbnail' — these ADD to existing images
-      if (imageFiles.length > 0) {
-        imageFiles.forEach(file => {
-          formData.append("thumbnail", file);
-        });
+      const imagesChanged =
+        imageFiles.length > 0 ||
+        JSON.stringify(existingImages) !== JSON.stringify(originalExistingImages);
+
+      // Keep existing gallery URLs + append any newly uploaded files
+      if (imagesChanged) {
+        formData.append("keepImages", JSON.stringify(existingImages));
+        if (imageFiles.length > 0) {
+          imageFiles.forEach(file => {
+            formData.append("thumbnail", file);
+          });
+        }
       }
 
       console.log("handleEditProduct: Updating product", selectedProduct.id);
@@ -452,6 +462,7 @@ export default function ProductManagementPage() {
       ? product.images
       : [product.thumbnail];
     setExistingImages(serverImages);
+    setOriginalExistingImages(serverImages);
     // Clear new file uploads
     setImageFiles([]);
     setImagePreviews([]);
