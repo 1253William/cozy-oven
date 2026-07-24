@@ -147,7 +147,7 @@ export interface CmsPageVersion {
 }
 
 export const SECTION_LABELS: Record<HomepageSectionType, string> = {
-  promoBanner: "Promo bar",
+  promoBanner: "Promo section",
   hero: "Hero",
   signature: "Featured product",
   giftCta: "Gift box",

@@ -6,7 +6,7 @@ A simple guide for updating the website yourself — no coding needed.
 
 ## What you can do now
 
-1. **Edit the homepage** (headlines, buttons, promo bar, which sections show)
+1. **Edit the homepage** (headlines, buttons, promo section, which sections show)
 2. **Create special pages** (Mother’s Day, sales, campaigns)
 3. **Put products on sale** (sale price + optional start/end dates)
 
@@ -28,7 +28,7 @@ You’ll see a list of homepage “blocks” (sections), like cards in a stack.
 
 | Block | What it controls |
 |---|---|
-| **Promo bar** | Thin black message at the very top (optional) |
+| **Promo section** | Mid-height promo band above the navigation (optional) |
 | **Hero** | Big opening message + main buttons |
 | **Featured product** | The product card in the hero area |
 | **Favourites** | The product row (“customer favourites”) |
@@ -40,7 +40,7 @@ You’ll see a list of homepage “blocks” (sections), like cards in a stack.
 
 - Click the **eye** icon on a card
 - Hidden blocks won’t appear on the live site
-- Tip: turn **Promo bar** off when you’re not running a promo
+- Tip: turn **Promo section** off when you’re not running a promo
 
 ### Change the order
 
@@ -65,14 +65,14 @@ You’ll see a list of homepage “blocks” (sections), like cards in a stack.
 - You can **Remove** an image with the red X, then upload a new one
 - After uploading on the homepage, still click the main **Save** button so the change sticks
 
-### Promo bar dates
+### Promo section dates
 
-On the promo bar, you can set:
+On the promo section, you can set:
 
 - **Starts** — when it should begin showing
 - **Ends** — when it should stop
 
-Leave them empty if you want it on whenever the promo bar is visible.
+Leave them empty if you want it on whenever the promo section is visible.
 
 ### Favourites category (optional)
 
@@ -217,7 +217,7 @@ You don’t need a special page just to discount one product.
 
 ### “I want a top banner for this weekend only”
 
-1. Website → Home → Promo bar → Edit  
+1. Website → Home → Promo section → Edit  
 2. Write the message + optional button link  
 3. Set Starts / Ends  
 4. Make sure the eye is **on**  
@@ -255,7 +255,7 @@ You don’t need a special page just to discount one product.
 ## Good habits
 
 - Always click **Save** after homepage changes
-- Keep promo bar **off** when there’s no promo (cleaner homepage)
+- Keep promo section **off** when there’s no promo (cleaner homepage)
 - Use **Draft** while you’re still writing a page
 - **Preview** before you publish
 - Use **History** instead of rewriting from scratch if something looks wrong
