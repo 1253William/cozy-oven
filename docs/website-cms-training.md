@@ -100,6 +100,8 @@ Use this for things like:
 - A weekend sale page
 - A special gift campaign
 
+Pages are built from **sections** (same idea as the homepage), and you can **add** sections from a list.
+
 ### Create a page
 
 1. Go to **Website → Pages**
@@ -110,17 +112,29 @@ Use this for things like:
 |---|---|
 | **Title** | Name of the page (for you + the site) |
 | **Slug** | The web address piece — fills in automatically from the title (you can still edit it) |
-| **Template** | Layout style: **Simple**, **Seasonal**, or **Promo** |
+| **Starter preset** | Seeds a starting set of sections: **Simple**, **Seasonal**, or **Promo** (you can change sections after) |
 | **Status** | **Draft** (only you) or **Published** (live) |
-| **Headline / Body** | Main text |
-| **Image** | Upload a photo (same as product images) |
-| **Button / Button link** | Optional call-to-action |
-| **Products on this page** | Search and tap products to add (tap again or the chip X to remove) |
-| **Show on-sale products** | If you didn’t pick products, show ones currently on sale |
 | **SEO title / description** | What Google / link previews can use |
 | **Publish at / Unpublish at** | Optional schedule |
 
-4. Click **Save**
+4. Under **Sections**, click **Add section** to pick a block (Hero, Story + image, Product strip, Values chips, Closing note, etc.)
+5. Use **↑ / ↓**, the eye icon, **Edit**, or trash on each section
+6. Click **Save**
+
+**Tip:** Changing the starter preset replaces the current sections — only do that when you want a fresh start.
+
+### Section types you can add
+
+| Section | Typical use |
+|---|---|
+| **Hero** | Big opening with buttons + image |
+| **Text intro** | Centered headline + paragraphs (About-style) |
+| **Story + image** | Photo beside text (image left or right) |
+| **Feature grid** | Dark band with a list of points |
+| **Values chips** | Round labels in a row |
+| **Product strip** | Hand-picked products, category filter, and/or on-sale products |
+| **Gift box / Featured / Promo / FAQs / Newsletter** | Same styles as the homepage |
+| **Closing note** | Signed thank-you / closing message |
 
 ### Draft vs Published
 

@@ -1,17 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Edit2, Eye, Loader2, Plus, Trash2, X } from "lucide-react";
+import {
+  Edit2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import AdminLayout from "../../components/AdminLayout";
 import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
 import CmsProductPicker from "../CmsProductPicker";
 import cmsService, {
+  CMS_PAGE_SECTION_TYPES,
   CmsPage,
   CmsPageInput,
+  CmsPageSection,
+  CmsPageSectionContent,
+  CmsPageSectionType,
   CmsPageTemplate,
   CmsPageVersion,
+  PAGE_SECTION_FIELD_MAP,
+  PAGE_SECTION_LABELS,
   PAGE_TEMPLATE_LABELS,
+  createBlankPageSection,
+  presetPageSections,
 } from "../../../services/cmsService";
 
 const emptyForm = (): CmsPageInput => ({
@@ -21,18 +37,31 @@ const emptyForm = (): CmsPageInput => ({
   status: "draft",
   seoTitle: "",
   seoDescription: "",
-  content: {
-    headline: "",
-    body: "",
-    imageUrl: "",
-    ctaLabel: "",
-    ctaHref: "",
-    productIds: [],
-    showOnSaleProducts: false,
-  },
+  content: {},
+  sections: presetPageSections("simple"),
   publishAt: "",
   unpublishAt: "",
 });
+
+const FIELD_LABELS: Partial<Record<keyof CmsPageSectionContent, string>> = {
+  eyebrow: "Eyebrow",
+  headline: "Headline",
+  body: "Text",
+  ctaLabel: "Button / name",
+  ctaHref: "Button link",
+  secondaryCtaLabel: "Subtitle / 2nd label",
+  secondaryCtaHref: "2nd link",
+  imageUrl: "Image",
+  productId: "Product ID",
+  productIds: "Products",
+  categoryFilter: "Category filter",
+  message: "Message",
+  startsAt: "Starts",
+  endsAt: "Ends",
+  items: "Items (one per line)",
+  imagePosition: "Image side",
+  showOnSaleProducts: "Show on-sale products",
+};
 
 const normalizeSlug = (value: string) =>
   String(value || "")
@@ -65,6 +94,9 @@ export default function AdminWebsitePagesPage() {
   const [versions, setVersions] = useState<CmsPageVersion[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [draftContent, setDraftContent] = useState<CmsPageSectionContent>({});
 
   const sorted = useMemo(
     () =>
@@ -73,6 +105,14 @@ export default function AdminWebsitePagesPage() {
       ),
     [pages]
   );
+
+  const formSections = useMemo(
+    () => [...(form.sections || [])].sort((a, b) => a.sortOrder - b.sortOrder),
+    [form.sections]
+  );
+
+  const editingSection =
+    formSections.find((section) => section.id === editingSectionId) || null;
 
   const load = async () => {
     try {
@@ -97,6 +137,8 @@ export default function AdminWebsitePagesPage() {
     setForm(emptyForm());
     setSlugTouched(false);
     setShowForm(true);
+    setShowCatalog(false);
+    setEditingSectionId(null);
     setError("");
     setSuccess("");
   };
@@ -111,19 +153,17 @@ export default function AdminWebsitePagesPage() {
       status: page.status,
       seoTitle: page.seoTitle || "",
       seoDescription: page.seoDescription || "",
-      content: {
-        headline: page.content?.headline || "",
-        body: page.content?.body || "",
-        imageUrl: page.content?.imageUrl || "",
-        ctaLabel: page.content?.ctaLabel || "",
-        ctaHref: page.content?.ctaHref || "",
-        productIds: page.content?.productIds || [],
-        showOnSaleProducts: page.content?.showOnSaleProducts === true,
-      },
+      content: page.content || {},
+      sections:
+        Array.isArray(page.sections) && page.sections.length > 0
+          ? page.sections
+          : presetPageSections(page.template),
       publishAt: toDateInputValue(page.publishAt),
       unpublishAt: toDateInputValue(page.unpublishAt),
     });
     setShowForm(true);
+    setShowCatalog(false);
+    setEditingSectionId(null);
     setError("");
     setSuccess("");
   };
@@ -141,24 +181,114 @@ export default function AdminWebsitePagesPage() {
     setForm((prev) => ({ ...prev, slug: normalizeSlug(slug) }));
   };
 
+  const applyPreset = (template: CmsPageTemplate) => {
+    setForm((prev) => ({
+      ...prev,
+      template,
+      sections: presetPageSections(template),
+    }));
+    setEditingSectionId(null);
+    setShowCatalog(false);
+  };
+
+  const renumber = (list: CmsPageSection[]) =>
+    list.map((section, index) => ({ ...section, sortOrder: index }));
+
+  const setSections = (list: CmsPageSection[]) => {
+    setForm((prev) => ({ ...prev, sections: renumber(list) }));
+  };
+
+  const moveSection = (id: string, direction: -1 | 1) => {
+    const list = [...formSections];
+    const index = list.findIndex((section) => section.id === id);
+    const next = index + direction;
+    if (index < 0 || next < 0 || next >= list.length) return;
+    const swap = list[index];
+    list[index] = list[next];
+    list[next] = swap;
+    setSections(list);
+  };
+
+  const toggleSection = (id: string) => {
+    setSections(
+      formSections.map((section) =>
+        section.id === id ? { ...section, enabled: !section.enabled } : section
+      )
+    );
+  };
+
+  const removeSection = (id: string) => {
+    if (!window.confirm("Remove this section?")) return;
+    setSections(formSections.filter((section) => section.id !== id));
+    if (editingSectionId === id) {
+      setEditingSectionId(null);
+      setDraftContent({});
+    }
+  };
+
+  const addSection = (type: CmsPageSectionType) => {
+    const next = [...formSections, createBlankPageSection(type, formSections.length)];
+    setSections(next);
+    setShowCatalog(false);
+    const added = next[next.length - 1];
+    setEditingSectionId(added.id);
+    setDraftContent({ ...(added.content || {}) });
+  };
+
+  const openSectionEdit = (section: CmsPageSection) => {
+    setEditingSectionId(section.id);
+    setDraftContent({ ...(section.content || {}) });
+  };
+
+  const saveSectionEdit = () => {
+    if (!editingSectionId) return;
+    setSections(
+      formSections.map((section) =>
+        section.id === editingSectionId
+          ? { ...section, content: { ...draftContent } }
+          : section
+      )
+    );
+    setEditingSectionId(null);
+    setDraftContent({});
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setSaving(true);
       setError("");
-      const productIds = Array.isArray(form.content.productIds)
-        ? form.content.productIds.map((id) => String(id).trim()).filter(Boolean)
-        : [];
+
+      const withDraft = editingSectionId
+        ? formSections.map((section) =>
+            section.id === editingSectionId
+              ? { ...section, content: { ...draftContent } }
+              : section
+          )
+        : formSections;
+
+      const sections = renumber(
+        withDraft.map((section) => ({
+          ...section,
+          content: {
+            ...section.content,
+            productIds: Array.isArray(section.content.productIds)
+              ? section.content.productIds.map((id) => String(id).trim()).filter(Boolean)
+              : section.content.productIds,
+            items: Array.isArray(section.content.items)
+              ? section.content.items.map((item) => String(item).trim()).filter(Boolean)
+              : section.content.items,
+          },
+        }))
+      );
 
       const payload: CmsPageInput = {
         ...form,
         slug: form.slug || normalizeSlug(form.title) || undefined,
         publishAt: form.publishAt || null,
         unpublishAt: form.unpublishAt || null,
-        content: {
-          ...form.content,
-          productIds,
-        },
+        content: form.content || {},
+        sections,
       };
 
       if (editingId) {
@@ -224,7 +354,11 @@ export default function AdminWebsitePagesPage() {
   const handleRestore = async (version: CmsPageVersion) => {
     if (!historyPage) return;
     const when = new Date(version.savedAt).toLocaleString();
-    if (!window.confirm(`Restore this version from ${when}? Your current page will be saved in history first.`)) {
+    if (
+      !window.confirm(
+        `Restore this version from ${when}? Your current page will be saved in history first.`
+      )
+    ) {
       return;
     }
     try {
@@ -242,11 +376,135 @@ export default function AdminWebsitePagesPage() {
     }
   };
 
-  const setContent = (key: keyof CmsPage["content"], value: string | boolean | string[]) => {
-    setForm((prev) => ({
-      ...prev,
-      content: { ...prev.content, [key]: value },
-    }));
+  const renderSectionField = (field: keyof CmsPageSectionContent) => {
+    if (field === "imageUrl") {
+      return (
+        <CmsImageField
+          key={field}
+          value={draftContent.imageUrl || ""}
+          onChange={(url) => setDraftContent((prev) => ({ ...prev, imageUrl: url }))}
+        />
+      );
+    }
+    if (field === "productIds") {
+      return (
+        <CmsProductPicker
+          key={field}
+          selectedIds={draftContent.productIds || []}
+          onChange={(ids) => setDraftContent((prev) => ({ ...prev, productIds: ids }))}
+        />
+      );
+    }
+    if (field === "showOnSaleProducts") {
+      return (
+        <label key={field} className="flex items-center gap-2 text-sm text-[#5d6043]">
+          <input
+            type="checkbox"
+            checked={draftContent.showOnSaleProducts === true}
+            onChange={(e) =>
+              setDraftContent((prev) => ({
+                ...prev,
+                showOnSaleProducts: e.target.checked,
+              }))
+            }
+          />
+          {FIELD_LABELS[field]}
+        </label>
+      );
+    }
+    if (field === "imagePosition") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <select
+            value={draftContent.imagePosition || "left"}
+            onChange={(e) =>
+              setDraftContent((prev) => ({
+                ...prev,
+                imagePosition: e.target.value === "right" ? "right" : "left",
+              }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          >
+            <option value="left">Image left</option>
+            <option value="right">Image right</option>
+          </select>
+        </label>
+      );
+    }
+    if (field === "items") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <textarea
+            rows={5}
+            value={(draftContent.items || []).join("\n")}
+            onChange={(e) =>
+              setDraftContent((prev) => ({
+                ...prev,
+                items: e.target.value.split("\n"),
+              }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          />
+        </label>
+      );
+    }
+    if (field === "body") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <textarea
+            rows={4}
+            value={draftContent.body || ""}
+            onChange={(e) =>
+              setDraftContent((prev) => ({ ...prev, body: e.target.value }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          />
+        </label>
+      );
+    }
+    if (field === "startsAt" || field === "endsAt") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <input
+            type="datetime-local"
+            value={toDateInputValue(draftContent[field])}
+            onChange={(e) =>
+              setDraftContent((prev) => ({
+                ...prev,
+                [field]: e.target.value || null,
+              }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          />
+        </label>
+      );
+    }
+    return (
+      <label key={field} className="block text-sm">
+        <span className="mb-1 block font-semibold text-[#5d6043]">
+          {FIELD_LABELS[field] || field}
+        </span>
+        <input
+          value={String(draftContent[field] ?? "")}
+          onChange={(e) =>
+            setDraftContent((prev) => ({ ...prev, [field]: e.target.value }))
+          }
+          className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+        />
+      </label>
+    );
   };
 
   return (
@@ -308,7 +566,8 @@ export default function AdminWebsitePagesPage() {
                       {page.status}
                     </span>
                     <span className="rounded-full bg-[#eeeae0] px-2 py-0.5 text-xs text-[#5d6043]">
-                      {PAGE_TEMPLATE_LABELS[page.template]}
+                      {PAGE_TEMPLATE_LABELS[page.template]} ·{" "}
+                      {(page.sections || []).length} sections
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[#5d6043]">{pagePublicPath(page.slug)}</p>
@@ -360,7 +619,7 @@ export default function AdminWebsitePagesPage() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-[#faf9f5] p-6">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[#faf9f5] p-6">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-[#222222]">
                 {editingId ? "Edit page" : "New page"}
@@ -374,7 +633,7 @@ export default function AdminWebsitePagesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
+            <form onSubmit={handleSave} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm">
                   <span className="mb-1 block font-semibold text-[#5d6043]">Title</span>
@@ -398,12 +657,12 @@ export default function AdminWebsitePagesPage() {
                   </span>
                 </label>
                 <label className="block text-sm">
-                  <span className="mb-1 block font-semibold text-[#5d6043]">Template</span>
+                  <span className="mb-1 block font-semibold text-[#5d6043]">
+                    Starter preset
+                  </span>
                   <select
                     value={form.template}
-                    onChange={(e) =>
-                      setForm({ ...form, template: e.target.value as CmsPageTemplate })
-                    }
+                    onChange={(e) => applyPreset(e.target.value as CmsPageTemplate)}
                     className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
                   >
                     {(Object.keys(PAGE_TEMPLATE_LABELS) as CmsPageTemplate[]).map((key) => (
@@ -412,6 +671,9 @@ export default function AdminWebsitePagesPage() {
                       </option>
                     ))}
                   </select>
+                  <span className="mt-1 block text-xs text-[#5d6043]">
+                    Changing preset replaces the current sections.
+                  </span>
                 </label>
                 <label className="block text-sm">
                   <span className="mb-1 block font-semibold text-[#5d6043]">Status</span>
@@ -429,56 +691,6 @@ export default function AdminWebsitePagesPage() {
                     <option value="published">Published</option>
                   </select>
                 </label>
-              </div>
-
-              <label className="block text-sm">
-                <span className="mb-1 block font-semibold text-[#5d6043]">Headline</span>
-                <input
-                  value={form.content.headline || ""}
-                  onChange={(e) => setContent("headline", e.target.value)}
-                  className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
-                />
-              </label>
-
-              <label className="block text-sm">
-                <span className="mb-1 block font-semibold text-[#5d6043]">Body</span>
-                <textarea
-                  rows={5}
-                  value={form.content.body || ""}
-                  onChange={(e) => setContent("body", e.target.value)}
-                  className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
-                />
-              </label>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <CmsImageField
-                    value={form.content.imageUrl || ""}
-                    onChange={(url) => setContent("imageUrl", url)}
-                  />
-                </div>
-
-                <CmsProductPicker
-                  selectedIds={form.content.productIds || []}
-                  onChange={(ids) => setContent("productIds", ids)}
-                />
-
-                <label className="block text-sm">
-                  <span className="mb-1 block font-semibold text-[#5d6043]">Button</span>
-                  <input
-                    value={form.content.ctaLabel || ""}
-                    onChange={(e) => setContent("ctaLabel", e.target.value)}
-                    className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1 block font-semibold text-[#5d6043]">Button link</span>
-                  <input
-                    value={form.content.ctaHref || ""}
-                    onChange={(e) => setContent("ctaHref", e.target.value)}
-                    className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
-                  />
-                </label>
                 <label className="block text-sm">
                   <span className="mb-1 block font-semibold text-[#5d6043]">SEO title</span>
                   <input
@@ -488,7 +700,9 @@ export default function AdminWebsitePagesPage() {
                   />
                 </label>
                 <label className="block text-sm">
-                  <span className="mb-1 block font-semibold text-[#5d6043]">SEO description</span>
+                  <span className="mb-1 block font-semibold text-[#5d6043]">
+                    SEO description
+                  </span>
                   <input
                     value={form.seoDescription || ""}
                     onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
@@ -505,7 +719,9 @@ export default function AdminWebsitePagesPage() {
                   />
                 </label>
                 <label className="block text-sm">
-                  <span className="mb-1 block font-semibold text-[#5d6043]">Unpublish at</span>
+                  <span className="mb-1 block font-semibold text-[#5d6043]">
+                    Unpublish at
+                  </span>
                   <input
                     type="datetime-local"
                     value={form.unpublishAt || ""}
@@ -515,14 +731,133 @@ export default function AdminWebsitePagesPage() {
                 </label>
               </div>
 
-              <label className="flex items-center gap-2 text-sm text-[#5d6043]">
-                <input
-                  type="checkbox"
-                  checked={form.content.showOnSaleProducts === true}
-                  onChange={(e) => setContent("showOnSaleProducts", e.target.checked)}
-                />
-                Also show on-sale products if none picked above
-              </label>
+              <div className="space-y-3 border-t border-[#b9aca2]/50 pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-semibold text-[#222222]">Sections</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowCatalog((prev) => !prev)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add section
+                  </button>
+                </div>
+
+                {showCatalog ? (
+                  <div className="grid gap-2 rounded-xl border border-[#b9aca2]/60 bg-white p-3 sm:grid-cols-2">
+                    {CMS_PAGE_SECTION_TYPES.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => addSection(type)}
+                        className="rounded-lg border border-[#b9aca2]/50 px-3 py-2 text-left text-sm text-[#5d6043] hover:bg-[#eeeae0]"
+                      >
+                        {PAGE_SECTION_LABELS[type]}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+
+                {formSections.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-[#b9aca2] px-4 py-8 text-center text-sm text-[#5d6043]">
+                    No sections yet. Add one from the catalog.
+                  </p>
+                ) : (
+                  formSections.map((section, index) => (
+                    <article
+                      key={section.id}
+                      className="rounded-xl border border-[#b9aca2]/50 bg-white p-3"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h4 className="font-semibold text-[#222222]">
+                            {PAGE_SECTION_LABELS[section.type]}
+                          </h4>
+                          <p className="text-xs text-[#5d6043]">
+                            {section.enabled ? "On" : "Off"} · {section.type}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveSection(section.id, -1)}
+                            disabled={index === 0}
+                            className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043] disabled:opacity-40"
+                            aria-label="Move up"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveSection(section.id, 1)}
+                            disabled={index === formSections.length - 1}
+                            className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043] disabled:opacity-40"
+                            aria-label="Move down"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleSection(section.id)}
+                            className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043]"
+                            aria-label="Toggle"
+                          >
+                            {section.enabled ? (
+                              <Eye className="h-4 w-4" />
+                            ) : (
+                              <EyeOff className="h-4 w-4" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openSectionEdit(section)}
+                            className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043]"
+                            aria-label="Edit"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeSection(section.id)}
+                            className="rounded-lg border border-red-200 p-2 text-red-700"
+                            aria-label="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {editingSection?.id === section.id ? (
+                        <div className="mt-4 space-y-3 border-t border-[#b9aca2]/40 pt-4">
+                          {PAGE_SECTION_FIELD_MAP[section.type].map((field) =>
+                            renderSectionField(field)
+                          )}
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingSectionId(null);
+                                setDraftContent({});
+                              }}
+                              className="rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={saveSectionEdit}
+                              className="rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
+                            >
+                              Done
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+                    </article>
+                  ))
+                )}
+              </div>
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -587,6 +922,9 @@ export default function AdminWebsitePagesPage() {
                       <p className="truncate text-xs text-[#5d6043]">
                         {version.snapshot.title} · {version.snapshot.status}
                         {version.label ? ` · ${version.label}` : ""}
+                        {Array.isArray(version.snapshot.sections)
+                          ? ` · ${version.snapshot.sections.length} sections`
+                          : ""}
                       </p>
                     </div>
                     <button
