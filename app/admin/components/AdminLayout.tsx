@@ -31,6 +31,7 @@ const menuItems = [
   { name: "Inventory", icon: Package, href: "/admin/inventory" },
   { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
   { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
+  { name: "Website", icon: LayoutDashboard, href: "/admin/website" },
   { name: "Subscribers", icon: Mail, href: "/admin/subscribers" },
   { name: "Email Marketing", icon: Mail, href: "/admin/email-marketing" },
   { name: "FAQs", icon: Mail, href: "/admin/faqs" },
@@ -110,7 +111,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <li key={item.name}>
@@ -184,7 +186,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <li key={item.name}>

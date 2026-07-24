@@ -35,6 +35,9 @@ export interface Product {
   id: string;
   productName: string;
   price: number;
+  salePrice?: number | null;
+  saleStartsAt?: string | null;
+  saleEndsAt?: string | null;
   productCategory: string;
   thumbnail: string;
   productDetails: string;
@@ -56,6 +59,9 @@ export interface Product {
 export interface CreateProductData {
   productName: string;
   price: number;
+  salePrice?: number | null;
+  saleStartsAt?: string | null;
+  saleEndsAt?: string | null;
   productCategory: string;
   productThumbnail: string;
   productDetails: string;
@@ -69,6 +75,9 @@ export interface UpdateProductData {
   productCategory?: string;
   productDetails?: string;
   price?: number;
+  salePrice?: number | null;
+  saleStartsAt?: string | null;
+  saleEndsAt?: string | null;
   selectOptions?: SelectOption[];
   isAvailable?: boolean;
   productStatus?: string;

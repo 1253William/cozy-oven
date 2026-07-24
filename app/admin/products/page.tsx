@@ -22,6 +22,14 @@ import AddProductModal from "./components/AddProductModal";
 import EditProductModal from "./components/EditProductModal";
 import ProductGrid from "./components/ProductGrid";
 
+const toDateTimeLocalValue = (value?: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 export default function ProductManagementPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -44,6 +52,9 @@ export default function ProductManagementPage() {
     productName: "",
     productCategory: "",
     price: 0,
+    salePrice: null as number | null,
+    saleStartsAt: "",
+    saleEndsAt: "",
     productDetails: "",
   });
   const [productType, setProductType] = useState<"standard" | "package">("standard");
@@ -270,6 +281,9 @@ export default function ProductManagementPage() {
       productName: "",
       productCategory: "",
       price: 0,
+      salePrice: null,
+      saleStartsAt: "",
+      saleEndsAt: "",
       productDetails: "",
     });
     setProductType("standard");
@@ -329,6 +343,9 @@ export default function ProductManagementPage() {
       formData.append("productCategory", newProduct.productCategory);
       formData.append("productDetails", newProduct.productDetails.trim());
       formData.append("price", newProduct.price.toString());
+      formData.append("salePrice", newProduct.salePrice == null ? "" : String(newProduct.salePrice));
+      formData.append("saleStartsAt", newProduct.saleStartsAt || "");
+      formData.append("saleEndsAt", newProduct.saleEndsAt || "");
       formData.append("productType", nextProductType);
       formData.append("selectOptions", JSON.stringify(selectOptions));
       if (nextProductType === "package") {
@@ -402,6 +419,9 @@ export default function ProductManagementPage() {
       formData.append("productCategory", newProduct.productCategory);
       formData.append("productDetails", newProduct.productDetails.trim());
       formData.append("price", newProduct.price.toString());
+      formData.append("salePrice", newProduct.salePrice == null ? "" : String(newProduct.salePrice));
+      formData.append("saleStartsAt", newProduct.saleStartsAt || "");
+      formData.append("saleEndsAt", newProduct.saleEndsAt || "");
       formData.append("productType", nextProductType);
       
       // selectOptions MUST be a JSON string
@@ -447,6 +467,9 @@ export default function ProductManagementPage() {
           ? PACKAGE_CATEGORY_LABEL
           : product.productCategory,
       price: product.price,
+      salePrice: product.salePrice ?? null,
+      saleStartsAt: toDateTimeLocalValue(product.saleStartsAt),
+      saleEndsAt: toDateTimeLocalValue(product.saleEndsAt),
       productDetails: product.productDetails,
     });
     setSelectOptions(product.selectOptions || []);
@@ -703,6 +726,9 @@ export default function ProductManagementPage() {
         productName={newProduct.productName}
         productCategory={newProduct.productCategory}
         price={newProduct.price}
+        salePrice={newProduct.salePrice}
+        saleStartsAt={newProduct.saleStartsAt}
+        saleEndsAt={newProduct.saleEndsAt}
         productDetails={newProduct.productDetails}
         imageFile={imageFiles.length > 0 ? imageFiles[0] : null}
         imagePreview={imagePreviews as any}
@@ -716,6 +742,9 @@ export default function ProductManagementPage() {
         onProductNameChange={(value) => setNewProduct({ ...newProduct, productName: value })}
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
         onPriceChange={(value) => setNewProduct({ ...newProduct, price: value })}
+        onSalePriceChange={(value) => setNewProduct({ ...newProduct, salePrice: value })}
+        onSaleStartsAtChange={(value) => setNewProduct({ ...newProduct, saleStartsAt: value })}
+        onSaleEndsAtChange={(value) => setNewProduct({ ...newProduct, saleEndsAt: value })}
         onProductDetailsChange={(value) => setNewProduct({ ...newProduct, productDetails: value })}
         onImageChange={handleImageChange}
         onRemoveImage={removeImage}
@@ -742,6 +771,9 @@ export default function ProductManagementPage() {
         productName={newProduct.productName}
         productCategory={newProduct.productCategory}
         price={newProduct.price}
+        salePrice={newProduct.salePrice}
+        saleStartsAt={newProduct.saleStartsAt}
+        saleEndsAt={newProduct.saleEndsAt}
         productDetails={newProduct.productDetails}
         imageFile={imageFiles.length > 0 ? imageFiles[0] : null}
         imagePreview={[...existingImages, ...imagePreviews]}
@@ -756,6 +788,9 @@ export default function ProductManagementPage() {
         onProductNameChange={(value) => setNewProduct({ ...newProduct, productName: value })}
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
         onPriceChange={(value) => setNewProduct({ ...newProduct, price: value })}
+        onSalePriceChange={(value) => setNewProduct({ ...newProduct, salePrice: value })}
+        onSaleStartsAtChange={(value) => setNewProduct({ ...newProduct, saleStartsAt: value })}
+        onSaleEndsAtChange={(value) => setNewProduct({ ...newProduct, saleEndsAt: value })}
         onProductDetailsChange={(value) => setNewProduct({ ...newProduct, productDetails: value })}
         onImageChange={handleImageChange}
         onRemoveImage={removeImage}

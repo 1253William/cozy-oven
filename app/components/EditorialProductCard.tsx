@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart, type PackageSelection } from "../context/CartContext";
 import type { PackageGroup, Product as StoreProduct } from "../services/productService";
+import { resolveProductPrice } from "../lib/productPricing";
 
 type EditorialProductCardProps = {
   product: StoreProduct;
@@ -19,7 +20,12 @@ const displayPrice = (product: StoreProduct, selectedLabel?: string) => {
   const selected = selectedLabel
     ? options.find((item) => item.label === selectedLabel)
     : options[0];
-  return selected?.additionalPrice ?? product.price;
+  const base = selected?.additionalPrice ?? product.price;
+  // Variant prices are absolute; sale applies to base product price only when no variant.
+  if (selected?.additionalPrice !== undefined) {
+    return { price: base, compareAtPrice: null as number | null, onSale: false };
+  }
+  return resolveProductPrice(product.price, product);
 };
 
 const soldOut = (product: StoreProduct) => {
@@ -82,7 +88,8 @@ export default function EditorialProductCard({ product, compact = false }: Edito
     needsSizePick ? undefined : options[0]?.label
   );
   const [sizeHint, setSizeHint] = useState(false);
-  const price = displayPrice(product, selectedSize);
+  const priced = displayPrice(product, selectedSize);
+  const price = priced.price;
 
   const handleAddToCart = () => {
     if (unavailable) return;
@@ -173,7 +180,18 @@ export default function EditorialProductCard({ product, compact = false }: Edito
           </p>
         )}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-semibold text-[#5d6043]">GHS {price.toFixed(2)}</p>
+          <p className="font-semibold text-[#5d6043]">
+            {priced.compareAtPrice != null ? (
+              <>
+                <span className="mr-2 text-sm font-normal text-[#5d6043]/55 line-through">
+                  GHS {priced.compareAtPrice.toFixed(2)}
+                </span>
+                GHS {price.toFixed(2)}
+              </>
+            ) : (
+              <>GHS {price.toFixed(2)}</>
+            )}
+          </p>
           {needsBuild ? (
             <Link href={`/product/${product.id}`} className="editorial-button-outline px-4 py-2 text-sm">
               Build box
