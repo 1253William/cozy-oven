@@ -264,24 +264,34 @@ export default function ReportsPage() {
                 {dailySales.length === 0 ? (
                   <p className="py-10 text-center text-[#5d6043]">No paid sales this month</p>
                 ) : (
-                  <div className="flex h-48 items-end gap-1 overflow-x-auto pb-2">
-                    {dailySales.map((day) => {
-                      const height = Math.max(8, (day.revenue / maxDailyRevenue) * 100);
-                      const label = day.date.slice(8);
-                      return (
-                        <div
-                          key={day.date}
-                          className="group flex min-w-[28px] flex-1 flex-col items-center justify-end"
-                          title={`${day.date}: GHS ${day.revenue.toFixed(2)} · ${day.orders} orders`}
-                        >
+                  <div className="overflow-x-auto">
+                    <div className="flex min-h-[200px] items-end gap-2 pb-1">
+                      {dailySales.map((day) => {
+                        const barHeight = Math.max(
+                          8,
+                          Math.round((day.revenue / maxDailyRevenue) * 160)
+                        );
+                        const label = day.date.slice(8);
+                        return (
                           <div
-                            className="w-full rounded-t bg-[#5d6043] transition group-hover:bg-[#bd6325]"
-                            style={{ height: `${height}%` }}
-                          />
-                          <span className="mt-1 text-[10px] text-[#5d6043]">{label}</span>
-                        </div>
-                      );
-                    })}
+                            key={day.date}
+                            className="group flex min-w-[32px] flex-1 flex-col items-center"
+                            title={`${day.date}: GHS ${day.revenue.toFixed(2)} · ${day.orders} orders`}
+                          >
+                            <p className="mb-1 text-[10px] font-medium text-[#5d6043] opacity-0 transition group-hover:opacity-100">
+                              {Math.round(day.revenue)}
+                            </p>
+                            <div
+                              className="w-full rounded-t-md bg-[#5d6043] transition group-hover:bg-[#bd6325]"
+                              style={{ height: `${barHeight}px` }}
+                            />
+                            <span className="mt-2 text-[11px] font-medium text-[#5d6043]">
+                              {label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
