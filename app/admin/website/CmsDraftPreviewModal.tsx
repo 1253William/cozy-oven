@@ -8,6 +8,7 @@ import { PAGE_SECTION_LABELS } from "../../services/cmsService";
 import productService, { Product } from "../../services/productService";
 import { isSaleActive } from "../../lib/productPricing";
 import { resolveSectionProducts } from "../../lib/cmsSectionProducts";
+import { splitLeadingPromo } from "../../lib/cmsSectionOrder";
 
 type CmsDraftPreviewModalProps = {
   title: string;
@@ -30,16 +31,26 @@ export default function CmsDraftPreviewModal({
     Record<string, Product[]>
   >({});
 
-  const previewSections = useMemo(() => {
-    if (!sectionId) return sections;
-    const match = sections.find((section) => section.id === sectionId);
-    if (!match) return [];
-    return [{ ...match, enabled: true }];
+  const { leadingPromo, bodySections, singleSection } = useMemo(() => {
+    if (sectionId) {
+      const match = sections.find((section) => section.id === sectionId);
+      return {
+        leadingPromo: null as CmsPageSection | null,
+        bodySections: match ? [{ ...match, enabled: true }] : [],
+        singleSection: true,
+      };
+    }
+    const split = splitLeadingPromo(sections);
+    return {
+      leadingPromo: split.leadingPromo,
+      bodySections: split.leadingPromo ? split.rest : sections,
+      singleSection: false,
+    };
   }, [sections, sectionId]);
 
   const sectionLabel =
-    sectionId && previewSections[0]
-      ? PAGE_SECTION_LABELS[previewSections[0].type]
+    sectionId && bodySections[0]
+      ? PAGE_SECTION_LABELS[bodySections[0].type]
       : null;
 
   useEffect(() => {
@@ -47,7 +58,7 @@ export default function CmsDraftPreviewModal({
     (async () => {
       try {
         setLoading(true);
-        const needsProducts = previewSections.some(
+        const needsProducts = bodySections.some(
           (section) => section.type === "productStrip"
         );
         if (!needsProducts) {
@@ -63,7 +74,7 @@ export default function CmsDraftPreviewModal({
           (product) => product.isAvailable !== false && isSaleActive(product)
         );
         const map: Record<string, Product[]> = {};
-        for (const section of previewSections) {
+        for (const section of bodySections) {
           if (section.type !== "productStrip") continue;
           map[section.id] = resolveSectionProducts(section, {
             allProducts: list,
@@ -81,12 +92,11 @@ export default function CmsDraftPreviewModal({
     return () => {
       active = false;
     };
-    // Re-run when the preview target or product-related fields change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sectionId,
     JSON.stringify(
-      previewSections.map((section) => ({
+      bodySections.map((section) => ({
         id: section.id,
         type: section.type,
         productIds: section.content?.productIds,
@@ -123,14 +133,36 @@ export default function CmsDraftPreviewModal({
             <div className="flex justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
             </div>
-          ) : (
+          ) : singleSection ? (
             <div className="editorial-shell bg-[#faf9f5]">
               <CmsPageSectionsRenderer
-                sections={previewSections}
+                sections={bodySections}
                 productsBySectionId={productsBySectionId}
                 preview
-                includeDisabled={Boolean(sectionId)}
+                includeDisabled
               />
+            </div>
+          ) : (
+            <div className="editorial-shell bg-[#faf9f5]">
+              {leadingPromo ? (
+                <>
+                  <CmsPageSectionsRenderer sections={[leadingPromo]} preview />
+                  <div className="border-b border-[#b9aca2]/40 bg-[#eeeae0]/60 px-4 py-3 text-center text-xs font-medium text-[#5d6043]">
+                    Navigation sits below the promo on the live site
+                  </div>
+                  <CmsPageSectionsRenderer
+                    sections={bodySections}
+                    productsBySectionId={productsBySectionId}
+                    preview
+                  />
+                </>
+              ) : (
+                <CmsPageSectionsRenderer
+                  sections={bodySections}
+                  productsBySectionId={productsBySectionId}
+                  preview
+                />
+              )}
             </div>
           )}
         </div>
