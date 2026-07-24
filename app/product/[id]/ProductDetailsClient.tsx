@@ -155,7 +155,7 @@ export default function ProductDetails() {
     }
   }, [product, availableOptions]);
 
-  // ✅ FINAL PRICE = size price (not base + size); sale applies to base only
+  // Size price is absolute; sale window still applies on top of the chosen unit price.
   const priced = (() => {
     if (!product) return { price: 0, compareAtPrice: null as number | null, onSale: false };
 
@@ -163,10 +163,8 @@ export default function ProductDetails() {
       opt => opt.label === selectedSize
     );
 
-    if (option?.additionalPrice !== undefined) {
-      return { price: option.additionalPrice, compareAtPrice: null, onSale: false };
-    }
-    return resolveProductPrice(product.price, product);
+    const base = option?.additionalPrice ?? product.price;
+    return resolveProductPrice(base, product);
   })();
   const currentPrice = priced.price;
 

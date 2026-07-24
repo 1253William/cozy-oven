@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
 import WebsiteTabs from "./WebsiteTabs";
+import CmsImageField from "./CmsImageField";
 import cmsService, {
   HomepageSection,
   HomepageSectionContent,
@@ -45,7 +46,7 @@ const FIELD_LABELS: Partial<Record<keyof HomepageSectionContent, string>> = {
   ctaHref: "Button link",
   secondaryCtaLabel: "2nd button",
   secondaryCtaHref: "2nd link",
-  imageUrl: "Image URL",
+  imageUrl: "Image",
   productId: "Product ID",
   categoryFilter: "Category",
   message: "Message",
@@ -301,6 +302,19 @@ export default function AdminWebsiteHomePage() {
                         className="mt-1 w-full rounded-lg border border-[#b9aca2] px-3 py-2 text-[#222222]"
                       />
                     </label>
+                  );
+                }
+
+                if (field === "imageUrl") {
+                  return (
+                    <CmsImageField
+                      key={field}
+                      label={label}
+                      value={typeof value === "string" ? value : ""}
+                      onChange={(url) =>
+                        setDraftContent((prev) => ({ ...prev, imageUrl: url }))
+                      }
+                    />
                   );
                 }
 

@@ -21,11 +21,7 @@ const displayPrice = (product: StoreProduct, selectedLabel?: string) => {
     ? options.find((item) => item.label === selectedLabel)
     : options[0];
   const base = selected?.additionalPrice ?? product.price;
-  // Variant prices are absolute; sale applies to base product price only when no variant.
-  if (selected?.additionalPrice !== undefined) {
-    return { price: base, compareAtPrice: null as number | null, onSale: false };
-  }
-  return resolveProductPrice(product.price, product);
+  return resolveProductPrice(base, product);
 };
 
 const soldOut = (product: StoreProduct) => {
