@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "../context/CartContext";
-import type { Product as StoreProduct } from "../services/productService";
+import { useCart, type PackageSelection } from "../context/CartContext";
+import type { PackageGroup, Product as StoreProduct } from "../services/productService";
 
 type EditorialProductCardProps = {
   product: StoreProduct;
@@ -28,9 +28,53 @@ const soldOut = (product: StoreProduct) => {
   return product.isAvailable === false || (hasVariants && available.length === 0);
 };
 
+const packageGroups = (product: StoreProduct): PackageGroup[] => {
+  const groups = product.packageConfig?.groups;
+  if (groups && groups.length > 0) return groups;
+
+  const legacyOptions = product.packageConfig?.options || [];
+  if (legacyOptions.length > 0) {
+    return [
+      {
+        id: "default",
+        label: product.packageConfig?.selectionLabel || "Choose your options",
+        type: "selection",
+        requiredSelectionCount: product.packageConfig?.requiredSelectionCount || 1,
+        allowRepeats: true,
+        options: legacyOptions,
+        sortOrder: 0,
+      },
+    ];
+  }
+
+  return [];
+};
+
+/** True when the customer must pick options before buying. */
+const isCustomizablePackage = (product: StoreProduct) => {
+  if (product.productType !== "package") return false;
+  return packageGroups(product).some((group) => group.type === "selection");
+};
+
+const fixedPackageSelections = (product: StoreProduct): PackageSelection[] =>
+  packageGroups(product)
+    .filter((group) => group.type === "fixed")
+    .flatMap((group) =>
+      (group.options || [])
+        .filter((option) => option.isAvailable !== false)
+        .map((option) => ({
+          label: option.label,
+          quantity: option.quantity || 1,
+          groupLabel: group.label,
+          groupId: group.id || group.label,
+          type: "fixed" as const,
+        }))
+    );
+
 export default function EditorialProductCard({ product, compact = false }: EditorialProductCardProps) {
   const { addToCart } = useCart();
   const isPackage = product.productType === "package";
+  const needsBuild = isCustomizablePackage(product);
   const unavailable = soldOut(product);
   const options = availableOptions(product);
   const needsSizePick = options.length > 1;
@@ -41,12 +85,16 @@ export default function EditorialProductCard({ product, compact = false }: Edito
   const price = displayPrice(product, selectedSize);
 
   const handleAddToCart = () => {
-    if (isPackage || unavailable) return;
+    if (unavailable) return;
+    // Customizable packages must be configured on the product page
+    if (needsBuild) return;
 
     if (needsSizePick && !selectedSize) {
       setSizeHint(true);
       return;
     }
+
+    const selections = isPackage ? fixedPackageSelections(product) : undefined;
 
     addToCart(
       {
@@ -59,7 +107,8 @@ export default function EditorialProductCard({ product, compact = false }: Edito
         sizes: options.map((item) => item.label),
       },
       1,
-      selectedSize
+      selectedSize,
+      selections?.length ? selections : undefined
     );
     setSizeHint(false);
   };
@@ -125,7 +174,7 @@ export default function EditorialProductCard({ product, compact = false }: Edito
         )}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-semibold text-[#5d6043]">GHS {price.toFixed(2)}</p>
-          {isPackage ? (
+          {needsBuild ? (
             <Link href={`/product/${product.id}`} className="editorial-button-outline px-4 py-2 text-sm">
               Build box
             </Link>
