@@ -53,6 +53,9 @@ export default function HomeClient({
   const giftCta = sectionByType("giftCta");
   const faqSection = sectionByType("faq");
   const newsletter = sectionByType("newsletter");
+  const promoBanner = sectionByType("promoBanner");
+  const promoMessage = String(promoBanner?.content?.message || "").trim();
+  const showPromo = Boolean(promoBanner && promoMessage);
 
   const categoryFilter = productStrip?.content?.categoryFilter?.trim() || "";
   const signatureProductId = signatureSection?.content?.productId?.trim() || "";
@@ -132,26 +135,35 @@ export default function HomeClient({
 
   return (
     <>
+      {/* Clears the fixed delivery banner so chrome below isn’t covered */}
+      <div className="h-9 shrink-0" aria-hidden />
+      {showPromo ? (
+        <section className="bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] px-4 py-8 text-[#faf9f5] sm:px-6 sm:py-10 lg:px-8">
+          <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center sm:gap-5">
+            <p className="max-w-2xl text-lg font-medium leading-snug sm:text-xl sm:leading-8">
+              {promoMessage}
+            </p>
+            {promoBanner?.content?.body ? (
+              <p className="max-w-xl text-sm leading-6 text-[#b9aca2] sm:text-base sm:leading-7">
+                {promoBanner.content.body}
+              </p>
+            ) : null}
+            {promoBanner?.content?.ctaHref ? (
+              <Link
+                href={promoBanner.content.ctaHref}
+                className="editorial-button-outline mt-1 border-[#faf9f5] px-6 py-2.5 text-[#faf9f5]"
+              >
+                {promoBanner.content.ctaLabel || "Shop"}
+              </Link>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
       <Navbar />
       <main className="editorial-shell">
         {homepageSections.map((section) => {
-          if (section.type === "promoBanner" && section.content?.message) {
-            return (
-              <div
-                key={section.id}
-                className="bg-[#222222] px-4 py-3 text-center text-sm text-[#faf9f5]"
-              >
-                <span>{section.content.message}</span>
-                {section.content.ctaHref ? (
-                  <Link
-                    href={section.content.ctaHref}
-                    className="ml-3 font-semibold underline underline-offset-2"
-                  >
-                    {section.content.ctaLabel || "Shop"}
-                  </Link>
-                ) : null}
-              </div>
-            );
+          if (section.type === "promoBanner") {
+            return null;
           }
 
           if (section.type === "hero" && hero) {

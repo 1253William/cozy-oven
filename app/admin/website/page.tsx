@@ -20,7 +20,7 @@ import cmsService, {
 } from "../../services/cmsService";
 
 const FIELD_MAP: Record<HomepageSectionType, Array<keyof HomepageSectionContent>> = {
-  promoBanner: ["message", "ctaLabel", "ctaHref", "startsAt", "endsAt"],
+  promoBanner: ["message", "body", "ctaLabel", "ctaHref", "startsAt", "endsAt"],
   hero: [
     "eyebrow",
     "headline",
