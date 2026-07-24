@@ -2,6 +2,8 @@ import { normalizeProductList, Product } from "../services/productService";
 import type { CmsPage } from "../services/cmsService";
 import { isSaleActive } from "./productPricing";
 
+export { resolveSectionProducts } from "./cmsSectionProducts";
+
 const getApiBase = () =>
   (
     process.env.API_BASE_URL ||
@@ -24,38 +26,31 @@ export async function fetchCmsPageBySlug(slug: string): Promise<CmsPage | null> 
   }
 }
 
-export async function fetchProductsByIds(ids: string[]): Promise<Product[]> {
-  if (!ids.length) return [];
+export async function fetchCustomerProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(
-      `${getApiBase()}/api/v1/store/customer/products?page=1&limit=100`,
-      { next: { revalidate: 120 } }
-    );
+    const res = await fetch(`${getApiBase()}/api/v1/store/customer/products?page=1&limit=100`, {
+      next: { revalidate: 120 },
+    });
     if (!res.ok) return [];
     const json = await res.json();
-    const products = normalizeProductList(Array.isArray(json.data) ? json.data : []);
-    const byId = new Map(products.map((product) => [String(product.id), product]));
-    return ids
-      .map((id) => byId.get(String(id)))
-      .filter(Boolean) as Product[];
+    return normalizeProductList(Array.isArray(json.data) ? json.data : []);
   } catch {
     return [];
   }
 }
 
+export async function fetchProductsByIds(ids: string[]): Promise<Product[]> {
+  if (!ids.length) return [];
+  const products = await fetchCustomerProducts();
+  const byId = new Map(products.map((product) => [String(product.id), product]));
+  return ids
+    .map((id) => byId.get(String(id)))
+    .filter(Boolean) as Product[];
+}
+
 export async function fetchOnSaleProducts(): Promise<Product[]> {
-  try {
-    const res = await fetch(
-      `${getApiBase()}/api/v1/store/customer/products?page=1&limit=100`,
-      { next: { revalidate: 120 } }
-    );
-    if (!res.ok) return [];
-    const json = await res.json();
-    const products = normalizeProductList(Array.isArray(json.data) ? json.data : []);
-    return products.filter(
-      (product) => product.isAvailable !== false && isSaleActive(product)
-    );
-  } catch {
-    return [];
-  }
+  const products = await fetchCustomerProducts();
+  return products.filter(
+    (product) => product.isAvailable !== false && isSaleActive(product)
+  );
 }
