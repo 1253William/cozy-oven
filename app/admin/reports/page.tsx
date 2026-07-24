@@ -12,7 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Truck,
-  Store,
+  ShoppingBag,
 } from "lucide-react";
 import reportsService, {
   type FinanceSummary,
@@ -306,7 +306,7 @@ export default function ReportsPage() {
                     </div>
                     <div className="flex items-center justify-between rounded-lg border border-[rgba(34,34,34,0.08)] px-3 py-3">
                       <div className="flex items-center gap-2 text-sm text-[#5d6043]">
-                        <Store className="h-4 w-4" />
+                        <ShoppingBag className="h-4 w-4" />
                         Pickup
                       </div>
                       <div className="text-right text-sm">
