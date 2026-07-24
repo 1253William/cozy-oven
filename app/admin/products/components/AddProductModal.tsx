@@ -11,6 +11,7 @@ interface AddProductModalProps {
   productCategory: string;
   price: number;
   salePrice?: number | null;
+  unitCost?: number | null;
   saleStartsAt?: string;
   saleEndsAt?: string;
   productDetails: string;
@@ -28,6 +29,7 @@ interface AddProductModalProps {
   onProductCategoryChange: (value: string) => void;
   onPriceChange: (value: number) => void;
   onSalePriceChange?: (value: number | null) => void;
+  onUnitCostChange?: (value: number | null) => void;
   onSaleStartsAtChange?: (value: string) => void;
   onSaleEndsAtChange?: (value: string) => void;
   onProductDetailsChange: (value: string) => void;
@@ -52,6 +54,7 @@ export default function AddProductModal({
   productCategory,
   price,
   salePrice = null,
+  unitCost = null,
   saleStartsAt = "",
   saleEndsAt = "",
   productDetails,
@@ -69,6 +72,7 @@ export default function AddProductModal({
   onProductCategoryChange,
   onPriceChange,
   onSalePriceChange,
+  onUnitCostChange,
   onSaleStartsAtChange,
   onSaleEndsAtChange,
   onProductDetailsChange,
@@ -90,10 +94,7 @@ export default function AddProductModal({
       <div className="bg-[#faf9f5] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#faf9f5] z-10 pb-4">
           <h2 className="text-2xl font-bold text-[#222222]">Add New Product</h2>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[#b9aca2]"
-          >
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#b9aca2]">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -104,6 +105,7 @@ export default function AddProductModal({
           productCategory={productCategory}
           price={price}
           salePrice={salePrice}
+          unitCost={unitCost}
           saleStartsAt={saleStartsAt}
           saleEndsAt={saleEndsAt}
           productDetails={productDetails}
@@ -121,6 +123,7 @@ export default function AddProductModal({
           onProductCategoryChange={onProductCategoryChange}
           onPriceChange={onPriceChange}
           onSalePriceChange={onSalePriceChange}
+          onUnitCostChange={onUnitCostChange}
           onSaleStartsAtChange={onSaleStartsAtChange}
           onSaleEndsAtChange={onSaleEndsAtChange}
           onProductDetailsChange={onProductDetailsChange}

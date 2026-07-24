@@ -7,6 +7,7 @@ interface ProductFormProps {
   productName: string;
   productCategory: string;
   price: number;
+  unitCost?: number | null;
   salePrice?: number | null;
   saleStartsAt?: string;
   saleEndsAt?: string;
@@ -23,6 +24,7 @@ interface ProductFormProps {
   onProductNameChange: (value: string) => void;
   onProductCategoryChange: (value: string) => void;
   onPriceChange: (value: number) => void;
+  onUnitCostChange?: (value: number | null) => void;
   onSalePriceChange?: (value: number | null) => void;
   onSaleStartsAtChange?: (value: string) => void;
   onSaleEndsAtChange?: (value: string) => void;
@@ -50,6 +52,7 @@ export default function ProductForm({
   productName,
   productCategory,
   price,
+  unitCost = null,
   salePrice = null,
   saleStartsAt = "",
   saleEndsAt = "",
@@ -66,6 +69,7 @@ export default function ProductForm({
   onProductNameChange,
   onProductCategoryChange,
   onPriceChange,
+  onUnitCostChange,
   onSalePriceChange,
   onSaleStartsAtChange,
   onSaleEndsAtChange,
@@ -238,6 +242,24 @@ export default function ProductForm({
             className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
             placeholder="0.00"
             required={!isEdit}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-[#5d6043] mb-2">
+            Unit cost / COGS (GHS)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={unitCost ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value;
+              onUnitCostChange?.(raw === "" ? null : parseFloat(raw) || 0);
+            }}
+            className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+            placeholder="What it costs to make"
           />
         </div>
 

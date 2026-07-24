@@ -35,6 +35,7 @@ export interface Product {
   id: string;
   productName: string;
   price: number;
+  unitCost?: number | null;
   salePrice?: number | null;
   saleStartsAt?: string | null;
   saleEndsAt?: string | null;
