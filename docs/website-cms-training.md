@@ -148,10 +148,16 @@ You can switch back to Draft anytime to take it offline.
 On each page card:
 
 - **Copy link** — copies the public page URL (share after it’s published)
-- **Preview** — opens a preview (works for drafts too)
+- **Preview** — opens a preview of the saved page (works for drafts too)
 - **History** — see recent saves and restore an older version if something went wrong
 - **Edit** — opens the form
 - Trash icon — deletes the page (ask yourself once before confirming)
+
+While editing (including a **new** unsaved page):
+
+- **Preview page** — shows the whole page with your current edits (no need to save first)
+- **Preview** on a section — shows just that block
+- While editing a section’s fields, use **Preview** to check it before clicking Done
 
 ### Undo with History
 

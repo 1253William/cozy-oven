@@ -10,6 +10,8 @@ type CmsPageSectionsRendererProps = {
   productsBySectionId?: Record<string, Product[]>;
   /** When true, CTAs render as non-navigating spans (admin preview). */
   preview?: boolean;
+  /** When true, include disabled sections (useful for section-level preview). */
+  includeDisabled?: boolean;
 };
 
 const splitParagraphs = (body?: string) =>
@@ -43,9 +45,10 @@ export default function CmsPageSectionsRenderer({
   sections,
   productsBySectionId = {},
   preview = false,
+  includeDisabled = false,
 }: CmsPageSectionsRendererProps) {
   const sorted = [...(sections || [])]
-    .filter((section) => section.enabled !== false)
+    .filter((section) => includeDisabled || section.enabled !== false)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 
   if (sorted.length === 0) {
