@@ -12,10 +12,14 @@ A simple guide for updating the website yourself — no coding needed.
 4. **Site settings** (delivery banner, footer, social links, campaign nav links)
 5. **Reuse uploaded images** from the media library
 6. **Put products on sale** (sale price + optional start/end dates)
+7. **Review monthly business performance** (sales, orders, products, customers, expenses, and exports)
 
 Everything lives in **Admin**. Log in the same way you always do.
 
 Website tabs: **Home · About · Pages · Site**
+
+The wider Admin area also includes **Reports**, **Orders**, **Products**, **Inventory**,
+**Expenses**, **Customers**, **Reviews**, **Subscribers**, and **Notifications**.
 
 ---
 
@@ -288,6 +292,94 @@ You don’t need a special page just to discount one product.
 
 ---
 
+## Part 6 — Monthly reports (Admin → Reports)
+
+Reports are for reviewing how the bakery performed and what needs attention next.
+They are live: the numbers are recalculated from current orders, expenses,
+inventory purchases, products, customers, and reviews whenever you load a month.
+
+### Open a report
+
+1. Go to **Admin → Reports**
+2. Choose the **month** and **year** at the top of the page
+3. Wait for the report cards and tables to refresh
+
+The report currently includes:
+
+| Area | What to look at |
+|---|---|
+| **Finance summary** | Gross sales, expenses, profit, margin, paid orders, and average order value |
+| **Month comparison** | Change from the previous month; the newer report contract also includes the same month last year |
+| **Sales by category** | Which product categories generated the most revenue |
+| **Top-selling products** | Products ranked by units and revenue |
+| **Top customers** | Customers ranked by orders and total spend, including guests where available |
+| **Sales trend** | Daily and weekly movement through the selected month |
+| **Sales channels** | Storefront, offline, and invoice sales |
+| **Payment methods** | Paystack, cash, mobile money, and other recorded methods |
+| **Fulfillment** | Delivery versus pickup orders |
+| **Order statuses** | The operational state of paid orders |
+| **Expenses** | Operating expenses and inventory purchases by category |
+| **Reviews** | Total, approved, pending, rejected, and average approved rating |
+| **Inventory quality** | Whether sold items have unit-cost data available for COGS calculations |
+
+### How to read the report
+
+Start with the headline numbers:
+
+1. **Sales** tells you how much was sold.
+2. **Paid orders** tells you how many completed paid transactions contributed to that sales number.
+3. **Average order value** shows the typical basket size.
+4. **Expenses and profit** show whether sales translated into a healthy result.
+5. Compare the selected month with the previous month before looking for causes.
+
+Then review operations:
+
+1. Check the sales trend for unusually quiet or busy weeks.
+2. Check top products and categories to understand demand.
+3. Check delivery/pickup and order statuses for fulfillment pressure.
+4. Check expenses and inventory purchases for unexpected cost increases.
+5. Check COGS/data-quality warnings before relying heavily on profit or margin.
+6. Check customers and reviews for follow-up opportunities.
+
+### Export a report
+
+- **Export CSV** downloads a spreadsheet-friendly report for filtering, sharing, or further analysis.
+- **Export PDF** downloads a presentation-friendly report for monthly meetings or records.
+- Both exports use the same report calculations as the dashboard.
+
+Use the selected month and year before clicking either export button. If the
+download appears to show the wrong period, return to Reports, select the period
+again, and retry.
+
+### Monthly review routine
+
+At the beginning of each review:
+
+1. Confirm that all orders for the month have the correct payment and order status.
+2. Confirm that inventory purchases for the month have been recorded.
+3. Confirm that operating expenses have been entered under the right category.
+4. Open **Reports** and select the month.
+5. Note the sales, profit, margin, order count, and average order value.
+6. Identify the strongest and weakest products.
+7. Review fulfillment, customer, review, and data-quality warnings.
+8. Export the CSV or PDF if the report needs to be shared.
+
+Reports remain live, so correcting an order, expense, inventory record, or
+product cost can change the report the next time it is loaded.
+
+### Reports and the newer API view
+
+The backend also provides a unified live report for the newer admin interface:
+
+`GET /api/v1/dashboard/admin/reports/monthly?month=July&year=2026`
+
+It groups the same information into summary, sales, operations, inventory,
+customers, marketing/reviews, expenses, comparisons, and data-quality sections.
+The existing Reports page and older report endpoints remain available while the
+newer interface adopts this unified response.
+
+---
+
 ## Quick recipes
 
 ### “I want a top banner for this weekend only”
@@ -326,6 +418,22 @@ You don’t need a special page just to discount one product.
 1. On a page (or About), add **Hours & location**  
 2. Add **WhatsApp band** — button link is already filled; change text if you want  
 3. Save / Publish
+
+### “I want to understand how last month performed”
+
+1. Admin → **Reports**
+2. Select the month and year
+3. Read the finance summary and month comparison first
+4. Check products, fulfillment, customers, expenses, and reviews
+5. Export CSV or PDF if you need to share the review
+
+### “The report profit looks incomplete”
+
+1. Check the report’s **COGS coverage** or data-quality warning
+2. Open **Products** and confirm products have correct unit costs
+3. Open **Inventory** and confirm purchases are recorded for the selected month
+4. Open **Expenses** and confirm operating costs have the correct date/category
+5. Reload the report after correcting the source records
 
 ### “I accidentally ruined the homepage — undo”
 
