@@ -18,6 +18,7 @@ export default function CmsPagePreviewPage() {
   const [productsBySectionId, setProductsBySectionId] = useState<Record<string, Product[]>>(
     {}
   );
+  const [productsCatalog, setProductsCatalog] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -34,6 +35,7 @@ export default function CmsPagePreviewPage() {
 
         const all = await productService.getProducts({ page: 1, limit: 100 });
         const list = all.data || [];
+        setProductsCatalog(list);
         const sale = list.filter(
           (product: Product) => product.isAvailable !== false && isSaleActive(product)
         );
@@ -87,6 +89,7 @@ export default function CmsPagePreviewPage() {
           <CmsPageSectionsRenderer
             sections={page.sections || []}
             productsBySectionId={productsBySectionId}
+            products={productsCatalog}
             preview
           />
         </div>

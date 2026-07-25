@@ -15,6 +15,9 @@ import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
 import CmsProductPicker from "../CmsProductPicker";
 import CmsDraftPreviewModal from "../CmsDraftPreviewModal";
+import PublishChecklistModal, {
+  type PublishChecklistItem,
+} from "../PublishChecklistModal";
 import cmsService, {
   CMS_PAGE_SECTION_TYPES,
   CmsPage,
@@ -52,16 +55,17 @@ const FIELD_LABELS: Partial<Record<keyof CmsPageSectionContent, string>> = {
   ctaHref: "Button link",
   secondaryCtaLabel: "Subtitle / 2nd label",
   secondaryCtaHref: "2nd link",
-  imageUrl: "Image",
-  productId: "Product ID",
+  imageUrl: "Thumbnail / icon",
+  productId: "Product thumbnail",
   productIds: "Products",
   categoryFilter: "Category filter",
-  message: "Promo text",
+  message: "Promo text (keep short)",
   startsAt: "Starts",
   endsAt: "Ends",
   items: "Items (one per line)",
   imagePosition: "Image side",
   showOnSaleProducts: "Show on-sale products",
+  tone: "Style",
 };
 
 const normalizeSlug = (value: string) =>
@@ -96,6 +100,7 @@ export default function AdminWebsitePagesPage() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [showCatalog, setShowCatalog] = useState(false);
+  const [showPublishChecklist, setShowPublishChecklist] = useState(false);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [draftContent, setDraftContent] = useState<CmsPageSectionContent>({});
   const [draftPreview, setDraftPreview] = useState<
@@ -278,44 +283,98 @@ export default function AdminWebsitePagesPage() {
     setDraftContent({});
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const buildSavePayload = (): CmsPageInput => {
+    const withDraft = editingSectionId
+      ? formSections.map((section) =>
+          section.id === editingSectionId
+            ? { ...section, content: { ...draftContent } }
+            : section
+        )
+      : formSections;
+
+    const sections = renumber(
+      withDraft.map((section) => ({
+        ...section,
+        content: {
+          ...section.content,
+          productIds: Array.isArray(section.content.productIds)
+            ? section.content.productIds.map((id) => String(id).trim()).filter(Boolean)
+            : section.content.productIds,
+          items: Array.isArray(section.content.items)
+            ? section.content.items.map((item) => String(item).trim()).filter(Boolean)
+            : section.content.items,
+        },
+      }))
+    );
+
+    return {
+      ...form,
+      slug: form.slug || normalizeSlug(form.title) || undefined,
+      publishAt: form.publishAt || null,
+      unpublishAt: form.unpublishAt || null,
+      content: form.content || {},
+      sections,
+    };
+  };
+
+  const getPagePublishChecklist = (payload: CmsPageInput): PublishChecklistItem[] => {
+    const slug = String(payload.slug || "").trim();
+    const title = String(payload.title || "").trim();
+    const sections = payload.sections || [];
+    const promo = sections.find((section) => section.type === "promoBanner");
+    const promoOn = promo?.enabled !== false;
+    const promoMessage = String(
+      promo?.content?.message || promo?.content?.headline || ""
+    ).trim();
+    const promoNeedsCta = promoOn && Boolean(promoMessage);
+    const promoHasCta = Boolean(
+      String(promo?.content?.ctaLabel || "").trim() &&
+        String(promo?.content?.ctaHref || "").trim()
+    );
+
+    return [
+      {
+        id: "title",
+        label: "Title is filled",
+        ok: Boolean(title),
+      },
+      {
+        id: "slug",
+        label: "Slug / link looks good",
+        ok: Boolean(slug),
+        hint: slug ? pagePublicPath(slug) : "Fill the title so a slug can be created.",
+      },
+      {
+        id: "seo",
+        label: String(payload.seoTitle || "").trim()
+          ? `SEO title: ${String(payload.seoTitle).trim()}`
+          : "SEO title / description (optional)",
+        ok: true,
+        hint:
+          String(payload.seoDescription || "").trim() ||
+          "Optional — helps Google and link previews.",
+      },
+      {
+        id: "promo-message",
+        label: promoOn
+          ? "Promo message is filled (or turn promo off)"
+          : "Promo is off / not used",
+        ok: !promoOn || Boolean(promoMessage),
+      },
+      {
+        id: "promo-cta",
+        label: promoNeedsCta
+          ? "Promo has a button label + link"
+          : "Promo button (optional)",
+        ok: !promoNeedsCta || promoHasCta,
+      },
+    ];
+  };
+
+  const persistPage = async (payload: CmsPageInput) => {
     try {
       setSaving(true);
       setError("");
-
-      const withDraft = editingSectionId
-        ? formSections.map((section) =>
-            section.id === editingSectionId
-              ? { ...section, content: { ...draftContent } }
-              : section
-          )
-        : formSections;
-
-      const sections = renumber(
-        withDraft.map((section) => ({
-          ...section,
-          content: {
-            ...section.content,
-            productIds: Array.isArray(section.content.productIds)
-              ? section.content.productIds.map((id) => String(id).trim()).filter(Boolean)
-              : section.content.productIds,
-            items: Array.isArray(section.content.items)
-              ? section.content.items.map((item) => String(item).trim()).filter(Boolean)
-              : section.content.items,
-          },
-        }))
-      );
-
-      const payload: CmsPageInput = {
-        ...form,
-        slug: form.slug || normalizeSlug(form.title) || undefined,
-        publishAt: form.publishAt || null,
-        unpublishAt: form.unpublishAt || null,
-        content: form.content || {},
-        sections,
-      };
-
       if (editingId) {
         await cmsService.updateAdminPage(editingId, payload);
         setSuccess("Saved");
@@ -323,6 +382,7 @@ export default function AdminWebsitePagesPage() {
         await cmsService.createAdminPage(payload);
         setSuccess("Created");
       }
+      setShowPublishChecklist(false);
       setShowForm(false);
       await load();
     } catch (err: any) {
@@ -331,6 +391,20 @@ export default function AdminWebsitePagesPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = buildSavePayload();
+    if (payload.status === "published") {
+      setShowPublishChecklist(true);
+      return;
+    }
+    await persistPage(payload);
+  };
+
+  const confirmPublishSave = async () => {
+    await persistPage(buildSavePayload());
   };
 
   const handleDelete = async (page: CmsPage) => {
@@ -418,6 +492,39 @@ export default function AdminWebsitePagesPage() {
           selectedIds={draftContent.productIds || []}
           onChange={(ids) => setDraftContent((prev) => ({ ...prev, productIds: ids }))}
         />
+      );
+    }
+    if (field === "productId") {
+      return (
+        <CmsProductPicker
+          key={field}
+          label="Product thumbnail (optional)"
+          maxSelections={1}
+          selectedIds={draftContent.productId ? [String(draftContent.productId)] : []}
+          onChange={(ids) =>
+            setDraftContent((prev) => ({ ...prev, productId: ids[0] || "" }))
+          }
+        />
+      );
+    }
+    if (field === "tone") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <select
+            value={draftContent.tone || "sale"}
+            onChange={(e) =>
+              setDraftContent((prev) => ({ ...prev, tone: e.target.value }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          >
+            <option value="sale">Sale (terracotta)</option>
+            <option value="seasonal">Seasonal (olive)</option>
+            <option value="announcement">Announcement (cream)</option>
+          </select>
+        </label>
       );
     }
     if (field === "showOnSaleProducts") {
@@ -974,6 +1081,17 @@ export default function AdminWebsitePagesPage() {
           onClose={() => setDraftPreview(null)}
         />
       )}
+
+      {showPublishChecklist ? (
+        <PublishChecklistModal
+          title="Publish this page?"
+          confirmLabel={editingId ? "Save & publish" : "Create & publish"}
+          items={getPagePublishChecklist(buildSavePayload())}
+          busy={saving}
+          onCancel={() => setShowPublishChecklist(false)}
+          onConfirm={confirmPublishSave}
+        />
+      ) : null}
 
       {historyPage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

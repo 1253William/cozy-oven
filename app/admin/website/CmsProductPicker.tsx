@@ -8,9 +8,16 @@ import productService, { Product } from "../../services/productService";
 type CmsProductPickerProps = {
   selectedIds: string[];
   onChange: (ids: string[]) => void;
+  label?: string;
+  maxSelections?: number;
 };
 
-export default function CmsProductPicker({ selectedIds, onChange }: CmsProductPickerProps) {
+export default function CmsProductPicker({
+  selectedIds,
+  onChange,
+  label = "Products on this page",
+  maxSelections,
+}: CmsProductPickerProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -60,6 +67,11 @@ export default function CmsProductPicker({ selectedIds, onChange }: CmsProductPi
       onChange(selectedIds.filter((item) => item !== key));
       return;
     }
+    if (maxSelections === 1) {
+      onChange([key]);
+      return;
+    }
+    if (maxSelections && selectedIds.length >= maxSelections) return;
     onChange([...selectedIds, key]);
   };
 
@@ -69,7 +81,7 @@ export default function CmsProductPicker({ selectedIds, onChange }: CmsProductPi
 
   return (
     <div className="space-y-3 sm:col-span-2">
-      <span className="block text-sm font-semibold text-[#5d6043]">Products on this page</span>
+      <span className="block text-sm font-semibold text-[#5d6043]">{label}</span>
 
       {selectedProducts.length > 0 ? (
         <div className="flex flex-wrap gap-2">

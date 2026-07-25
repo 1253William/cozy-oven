@@ -15,6 +15,7 @@ import subscriberService from "../services/subscriberService";
 import reviewService, { Review } from "../services/reviewService";
 import type { HomepageSection } from "../services/cmsService";
 import { fallbackHomepageSections } from "../lib/homeData";
+import PromoSection from "./cms/PromoSection";
 
 type HomeClientProps = {
   initialProducts?: Product[];
@@ -47,25 +48,23 @@ export default function HomeClient({
   const sectionByType = (type: HomepageSection["type"]) =>
     homepageSections.find((section) => section.type === type);
 
-  const hero = sectionByType("hero");
   const signatureSection = sectionByType("signature");
-  const productStrip = sectionByType("productStrip");
   const giftCta = sectionByType("giftCta");
-  const faqSection = sectionByType("faq");
-  const newsletter = sectionByType("newsletter");
   const promoBanner = sectionByType("promoBanner");
   const promoMessage = String(promoBanner?.content?.message || "").trim();
   const showPromo = Boolean(promoBanner && promoMessage);
+  const firstGiftCtaId = giftCta?.id;
 
-  const categoryFilter = productStrip?.content?.categoryFilter?.trim() || "";
   const signatureProductId = signatureSection?.content?.productId?.trim() || "";
 
-  const filteredForStrip = categoryFilter
-    ? resolvedProducts.filter((product) =>
-        product.productCategory?.toLowerCase().includes(categoryFilter.toLowerCase())
-      )
-    : resolvedProducts;
-  const bestSellers = (filteredForStrip.length ? filteredForStrip : resolvedProducts).slice(0, 4);
+  const productsForStrip = (categoryFilter: string) => {
+    const filtered = categoryFilter
+      ? resolvedProducts.filter((product) =>
+          product.productCategory?.toLowerCase().includes(categoryFilter.toLowerCase())
+        )
+      : resolvedProducts;
+    return (filtered.length ? filtered : resolvedProducts).slice(0, 4);
+  };
   const bananaProducts = resolvedProducts.filter((product) =>
     product.productCategory?.toLowerCase().includes("banana")
   );
@@ -89,11 +88,10 @@ export default function HomeClient({
     packageProducts.find((product) =>
       product.packageConfig?.groups?.some((group) => group.type === "selection")
     ) || packageProducts[0];
-  const heroImage =
-    hero?.content?.imageUrl ||
+  const defaultHeroImage =
     signatureSection?.content?.imageUrl ||
     "https://res.cloudinary.com/daljxj4yl/image/upload/v1782461961/cozyoven/products_thumbnails/urzdqfzt92jqdnhx0mef.jpg";
-  const giftImage = giftCta?.content?.imageUrl || giftPackage?.thumbnail || "/gift.png";
+  const defaultGiftImage = giftPackage?.thumbnail || "/gift.png";
   const previewFaqs = faqs.slice(0, 4);
 
   useEffect(() => {
@@ -138,26 +136,23 @@ export default function HomeClient({
       {/* Clears the fixed delivery banner so chrome below isn’t covered */}
       <div className="h-9 shrink-0" aria-hidden />
       {showPromo ? (
-        <section className="bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] px-4 py-8 text-[#faf9f5] sm:px-6 sm:py-10 lg:px-8">
-          <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center sm:gap-5">
-            <p className="max-w-2xl text-lg font-medium leading-snug sm:text-xl sm:leading-8">
-              {promoMessage}
-            </p>
-            {promoBanner?.content?.body ? (
-              <p className="max-w-xl text-sm leading-6 text-[#b9aca2] sm:text-base sm:leading-7">
-                {promoBanner.content.body}
-              </p>
-            ) : null}
-            {promoBanner?.content?.ctaHref ? (
-              <Link
-                href={promoBanner.content.ctaHref}
-                className="editorial-button-outline mt-1 border-[#faf9f5] px-6 py-2.5 text-[#faf9f5]"
-              >
-                {promoBanner.content.ctaLabel || "Shop"}
-              </Link>
-            ) : null}
-          </div>
-        </section>
+        <PromoSection
+          message={promoMessage}
+          body={promoBanner?.content?.body}
+          ctaLabel={promoBanner?.content?.ctaLabel || "Shop"}
+          ctaHref={promoBanner?.content?.ctaHref || "/shop"}
+          endsAt={promoBanner?.content?.endsAt}
+          tone={promoBanner?.content?.tone}
+          imageUrl={promoBanner?.content?.imageUrl}
+          productThumbnailUrl={
+            promoBanner?.content?.productId
+              ? resolvedProducts.find(
+                  (product) => String(product.id) === String(promoBanner.content?.productId)
+                )?.thumbnail
+              : undefined
+          }
+          storageKey={`home-promo:${promoBanner?.id || "default"}:${promoMessage.slice(0, 40)}`}
+        />
       ) : null}
       <Navbar />
       <main className="editorial-shell">
@@ -166,36 +161,38 @@ export default function HomeClient({
             return null;
           }
 
-          if (section.type === "hero" && hero) {
+          if (section.type === "hero") {
+            const c = section.content || {};
+            const heroImage = c.imageUrl || defaultHeroImage;
             return (
               <Fragment key={section.id}>
                 <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:min-h-[calc(100vh-100px)] lg:grid-cols-[0.95fr_1fr] lg:gap-12 lg:px-8 lg:py-20">
                   <div className="flex flex-col justify-center">
                     <p className="mb-4 text-sm font-medium text-[#bd6325]">
-                      {hero.content.eyebrow || "Tema-baked · Ghana-loved · Gift-ready"}
+                      {c.eyebrow || "Tema-baked · Ghana-loved · Gift-ready"}
                     </p>
                     <h1 className="prototype-heading max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] text-[#222222]">
-                      {hero.content.headline || "Moist banana bread, freshly baked."}
+                      {c.headline || "Moist banana bread, freshly baked."}
                     </h1>
                     <p className="mt-5 max-w-xl text-[clamp(1.15rem,2.4vw,1.65rem)] font-medium leading-snug text-[#5d6043]">
-                      {hero.content.body ||
+                      {c.body ||
                         "Homemade loaves and gift boxes for cravings, family tables, and moments worth remembering."}
                     </p>
                     <div className="mt-8 flex flex-wrap gap-3">
                       <Link
-                        href={hero.content.ctaHref || "/shop"}
+                        href={c.ctaHref || "/shop"}
                         className="editorial-button px-7 py-3.5"
                       >
-                        {hero.content.ctaLabel || "Shop now"}
+                        {c.ctaLabel || "Shop now"}
                       </Link>
                       <Link
                         href={
-                          hero.content.secondaryCtaHref ||
+                          c.secondaryCtaHref ||
                           (giftPackage ? `/product/${giftPackage.id}` : "/shop#package")
                         }
                         className="editorial-button-outline px-7 py-3.5"
                       >
-                        {hero.content.secondaryCtaLabel || "Send a gift box"}
+                        {c.secondaryCtaLabel || "Send a gift box"}
                       </Link>
                     </div>
                   </div>
@@ -263,7 +260,9 @@ export default function HomeClient({
             return null;
           }
 
-          if (section.type === "productStrip" && productStrip) {
+          if (section.type === "productStrip") {
+            const c = section.content || {};
+            const stripProducts = productsForStrip(c.categoryFilter?.trim() || "");
             return (
               <section
                 key={section.id}
@@ -272,18 +271,18 @@ export default function HomeClient({
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                   <div className="max-w-2xl">
                     <h2 className="prototype-heading text-3xl sm:text-4xl">
-                      {productStrip.content.headline || "Customer favourites, freshly baked."}
+                      {c.headline || "Customer favourites, freshly baked."}
                     </h2>
                     <p className="mt-3 text-[#5d6043]">
-                      {productStrip.content.body ||
+                      {c.body ||
                         "Shop our most loved loaves, boxes, and creamy yoghurt treats."}
                     </p>
                   </div>
                   <Link
-                    href={productStrip.content.ctaHref || "/shop"}
+                    href={c.ctaHref || "/shop"}
                     className="editorial-button-outline px-5 py-2.5 text-sm"
                   >
-                    {productStrip.content.ctaLabel || "View all"}
+                    {c.ctaLabel || "View all"}
                   </Link>
                 </div>
                 {loading ? (
@@ -292,13 +291,13 @@ export default function HomeClient({
                   </div>
                 ) : error ? (
                   <div className="editorial-card p-10 text-center text-[#bd6325]">{error}</div>
-                ) : bestSellers.length === 0 ? (
+                ) : stripProducts.length === 0 ? (
                   <div className="editorial-card p-10 text-center text-[#5d6043]">
                     No products are available right now.
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-                    {bestSellers.map((product) => (
+                    {stripProducts.map((product) => (
                       <EditorialProductCard key={product.id} product={product} compact />
                     ))}
                   </div>
@@ -307,17 +306,20 @@ export default function HomeClient({
             );
           }
 
-          if (section.type === "giftCta" && giftCta) {
+          if (section.type === "giftCta") {
+            const c = section.content || {};
+            const giftImage = c.imageUrl || defaultGiftImage;
+            const showExtras = section.id === firstGiftCtaId;
             return (
               <Fragment key={section.id}>
                 <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
                   <div className="relative grid overflow-hidden rounded-[36px] bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] text-[#faf9f5] shadow-[0_26px_80px_rgba(34,34,34,0.16)] md:grid-cols-[1.1fr_0.9fr]">
                     <div className="relative z-10 p-7 md:p-12 lg:p-14">
                       <h2 className="prototype-heading text-3xl sm:text-4xl">
-                        {giftCta.content.headline || "Send a Cozy Oven gift box."}
+                        {c.headline || "Send a Cozy Oven gift box."}
                       </h2>
                       <p className="mt-4 max-w-xl text-base leading-7 text-[#faf9f5]/82">
-                        {giftCta.content.body ||
+                        {c.body ||
                           "Build a warm gift for birthdays, thank-yous, office teams, and just-because surprises."}
                       </p>
                       <div className="mt-6 flex flex-wrap gap-2">
@@ -334,12 +336,12 @@ export default function HomeClient({
                       </div>
                       <Link
                         href={
-                          giftCta.content.ctaHref ||
+                          c.ctaHref ||
                           (giftPackage ? `/product/${giftPackage.id}` : "/shop#package")
                         }
                         className="mt-8 inline-flex rounded-full bg-[#faf9f5] px-7 py-3.5 font-semibold text-[#222222] shadow-[0_16px_30px_rgba(34,34,34,0.18)] transition hover:-translate-y-0.5"
                       >
-                        {giftCta.content.ctaLabel ||
+                        {c.ctaLabel ||
                           (giftPackage ? "Build a gift box" : "Shop packages")}
                       </Link>
                     </div>
@@ -355,7 +357,7 @@ export default function HomeClient({
                   </div>
                 </section>
 
-                {(yogurtProducts.length > 0 || resolvedProducts.length > 0) && (
+                {showExtras && (yogurtProducts.length > 0 || resolvedProducts.length > 0) ? (
                   <section className="border-y border-[rgba(34,34,34,0.1)] bg-[#faf9f5]/60">
                     <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:px-8">
                       <div>
@@ -377,8 +379,10 @@ export default function HomeClient({
                       </div>
                     </div>
                   </section>
-                )}
+                ) : null}
 
+                {showExtras ? (
+                  <>
                 <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
                   <div className="mb-8 max-w-2xl">
                     <h2 className="prototype-heading text-3xl sm:text-4xl">
@@ -479,11 +483,14 @@ export default function HomeClient({
                     </div>
                   </div>
                 </section>
+                  </>
+                ) : null}
               </Fragment>
             );
           }
 
-          if (section.type === "faq" && faqSection && previewFaqs.length > 0) {
+          if (section.type === "faq" && previewFaqs.length > 0) {
+            const c = section.content || {};
             return (
               <section
                 key={section.id}
@@ -491,7 +498,7 @@ export default function HomeClient({
               >
                 <div className="mb-6 max-w-2xl">
                   <h2 className="prototype-heading text-3xl sm:text-4xl">
-                    {faqSection.content.headline || "Delivery, freshness and gifting."}
+                    {c.headline || "Delivery, freshness and gifting."}
                   </h2>
                 </div>
                 <div className="grid max-w-3xl gap-3">
@@ -514,7 +521,8 @@ export default function HomeClient({
             );
           }
 
-          if (section.type === "newsletter" && newsletter) {
+          if (section.type === "newsletter") {
+            const c = section.content || {};
             return (
               <section
                 key={section.id}
@@ -522,18 +530,18 @@ export default function HomeClient({
               >
                 <div className="mx-auto flex max-w-4xl flex-col gap-6 text-center">
                   <h2 className="prototype-heading text-3xl sm:text-4xl">
-                    {newsletter.content.headline ||
+                    {c.headline ||
                       "New flavours, fresh bakes and special offers."}
                   </h2>
                   <form
                     onSubmit={handleNewsletter}
                     className="mx-auto flex w-full max-w-2xl flex-col gap-3 sm:flex-row"
                   >
-                    <label htmlFor="home-newsletter-email" className="sr-only">
+                    <label htmlFor={`home-newsletter-email-${section.id}`} className="sr-only">
                       Email address
                     </label>
                     <input
-                      id="home-newsletter-email"
+                      id={`home-newsletter-email-${section.id}`}
                       type="email"
                       placeholder="Enter your email address"
                       value={newsletterEmail}
@@ -542,7 +550,7 @@ export default function HomeClient({
                       className="min-h-12 flex-1 rounded-full border border-[#faf9f5]/15 bg-[#faf9f5]/10 px-5 text-[#faf9f5] outline-none placeholder:text-[#b9aca2]/70 focus:border-[#b9aca2]"
                     />
                     <button type="submit" className="editorial-button min-h-12 px-8">
-                      {newsletter.content.ctaLabel || "Subscribe"}
+                      {c.ctaLabel || "Subscribe"}
                     </button>
                   </form>
                   {newsletterStatus && (
@@ -648,6 +656,15 @@ export default function HomeClient({
                       ) : null}
                     </article>
                   ))}
+                  <a
+                    href="https://api.whatsapp.com/message/QAOMJAY7KI7WP1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-[#2F855A] px-6 py-3.5 font-semibold text-[#faf9f5] shadow-[0_16px_30px_rgba(34,34,34,0.18)] transition hover:-translate-y-0.5"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Reach out on WhatsApp
+                  </a>
                 </div>
               </div>
             </section>

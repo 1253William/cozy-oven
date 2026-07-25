@@ -4,10 +4,13 @@ import Link from "next/link";
 import EditorialProductCard from "../EditorialProductCard";
 import type { CmsPageSection } from "../../services/cmsService";
 import type { Product } from "../../services/productService";
+import PromoSection from "./PromoSection";
 
 type CmsPageSectionsRendererProps = {
   sections: CmsPageSection[];
   productsBySectionId?: Record<string, Product[]>;
+  /** Optional catalog for resolving promo product thumbnails */
+  products?: Product[];
   /** When true, CTAs render as non-navigating spans (admin preview). */
   preview?: boolean;
   /** When true, include disabled sections (useful for section-level preview). */
@@ -44,6 +47,7 @@ function CtaLink({
 export default function CmsPageSectionsRenderer({
   sections,
   productsBySectionId = {},
+  products = [],
   preview = false,
   includeDisabled = false,
 }: CmsPageSectionsRendererProps) {
@@ -63,34 +67,28 @@ export default function CmsPageSectionsRenderer({
     <>
       {sorted.map((section) => {
         const c = section.content || {};
-        const products = productsBySectionId[section.id] || [];
+        const productsForStrip = productsBySectionId[section.id] || [];
 
         if (section.type === "promoBanner" && (c.message || c.headline)) {
+          const productThumb = c.productId
+            ? products.find((product) => String(product.id) === String(c.productId))
+                ?.thumbnail
+            : undefined;
           return (
-            <section
+            <PromoSection
               key={section.id}
-              className="bg-gradient-to-br from-[#222222] via-[#5d6043] to-[#73765a] px-4 py-8 text-[#faf9f5] sm:px-6 sm:py-10 lg:px-8"
-            >
-              <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center sm:gap-5">
-                <p className="max-w-2xl text-lg font-medium leading-snug sm:text-xl sm:leading-8">
-                  {c.message || c.headline}
-                </p>
-                {c.body ? (
-                  <p className="max-w-xl text-sm leading-6 text-[#b9aca2] sm:text-base sm:leading-7">
-                    {c.body}
-                  </p>
-                ) : null}
-                {c.ctaLabel && c.ctaHref ? (
-                  <CtaLink
-                    preview={preview}
-                    href={c.ctaHref}
-                    className="editorial-button-outline mt-1 border-[#faf9f5] px-6 py-2.5 text-[#faf9f5]"
-                  >
-                    {c.ctaLabel}
-                  </CtaLink>
-                ) : null}
-              </div>
-            </section>
+              message={String(c.message || c.headline || "")}
+              body={c.body}
+              ctaLabel={c.ctaLabel || "Shop"}
+              ctaHref={c.ctaHref || "/shop"}
+              endsAt={c.endsAt}
+              tone={c.tone}
+              imageUrl={c.imageUrl}
+              productThumbnailUrl={productThumb}
+              dismissible={!preview}
+              preview={preview}
+              storageKey={`page-promo:${section.id}:${String(c.message || "").slice(0, 40)}`}
+            />
           );
         }
 
@@ -250,9 +248,9 @@ export default function CmsPageSectionsRenderer({
                   </CtaLink>
                 ) : null}
               </div>
-              {products.length > 0 ? (
+              {productsForStrip.length > 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {products.map((product) => (
+                  {productsForStrip.map((product) => (
                     <EditorialProductCard key={product.id} product={product} compact />
                   ))}
                 </div>

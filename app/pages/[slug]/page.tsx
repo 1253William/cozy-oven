@@ -69,7 +69,11 @@ export default async function CmsStorefrontPage({ params }: PageProps) {
   const sections = page.sections || [];
   const { leadingPromo, rest } = splitLeadingPromo(sections);
   const bodySections = leadingPromo ? rest : sections;
-  const needsProducts = bodySections.some((section) => section.type === "productStrip");
+  const needsProducts =
+    bodySections.some((section) => section.type === "productStrip") ||
+    sections.some(
+      (section) => section.type === "promoBanner" && Boolean(section.content?.productId)
+    );
 
   const allProducts = needsProducts ? await fetchCustomerProducts() : [];
   const saleProducts = bodySections.some(
@@ -92,13 +96,14 @@ export default async function CmsStorefrontPage({ params }: PageProps) {
       {/* Clears the fixed delivery banner so chrome below isn’t covered */}
       <div className="h-9 shrink-0" aria-hidden />
       {leadingPromo ? (
-        <CmsPageSectionsRenderer sections={[leadingPromo]} />
+        <CmsPageSectionsRenderer sections={[leadingPromo]} products={allProducts} />
       ) : null}
       <Navbar />
       <main className="editorial-shell">
         <CmsPageSectionsRenderer
           sections={bodySections}
           productsBySectionId={productsBySectionId}
+          products={allProducts}
         />
       </main>
       <Footer />

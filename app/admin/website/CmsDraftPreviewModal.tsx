@@ -30,6 +30,7 @@ export default function CmsDraftPreviewModal({
   const [productsBySectionId, setProductsBySectionId] = useState<
     Record<string, Product[]>
   >({});
+  const [productsCatalog, setProductsCatalog] = useState<Product[]>([]);
 
   const { leadingPromo, bodySections, singleSection } = useMemo(() => {
     if (sectionId) {
@@ -53,17 +54,25 @@ export default function CmsDraftPreviewModal({
       ? PAGE_SECTION_LABELS[bodySections[0].type]
       : null;
 
+  const previewSource = useMemo(
+    () => (singleSection ? bodySections : [...(leadingPromo ? [leadingPromo] : []), ...bodySections]),
+    [singleSection, leadingPromo, bodySections]
+  );
+
   useEffect(() => {
     let active = true;
     (async () => {
       try {
         setLoading(true);
-        const needsProducts = bodySections.some(
-          (section) => section.type === "productStrip"
+        const needsProducts = previewSource.some(
+          (section) =>
+            section.type === "productStrip" ||
+            (section.type === "promoBanner" && section.content?.productId)
         );
         if (!needsProducts) {
           if (active) {
             setProductsBySectionId({});
+            setProductsCatalog([]);
             setLoading(false);
           }
           return;
@@ -74,17 +83,23 @@ export default function CmsDraftPreviewModal({
           (product) => product.isAvailable !== false && isSaleActive(product)
         );
         const map: Record<string, Product[]> = {};
-        for (const section of bodySections) {
+        for (const section of previewSource) {
           if (section.type !== "productStrip") continue;
           map[section.id] = resolveSectionProducts(section, {
             allProducts: list,
             saleProducts: sale,
           });
         }
-        if (active) setProductsBySectionId(map);
+        if (active) {
+          setProductsCatalog(list);
+          setProductsBySectionId(map);
+        }
       } catch (err) {
         console.error(err);
-        if (active) setProductsBySectionId({});
+        if (active) {
+          setProductsBySectionId({});
+          setProductsCatalog([]);
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -96,9 +111,10 @@ export default function CmsDraftPreviewModal({
   }, [
     sectionId,
     JSON.stringify(
-      bodySections.map((section) => ({
+      previewSource.map((section) => ({
         id: section.id,
         type: section.type,
+        productId: section.content?.productId,
         productIds: section.content?.productIds,
         categoryFilter: section.content?.categoryFilter,
         showOnSaleProducts: section.content?.showOnSaleProducts,
@@ -138,6 +154,7 @@ export default function CmsDraftPreviewModal({
               <CmsPageSectionsRenderer
                 sections={bodySections}
                 productsBySectionId={productsBySectionId}
+                products={productsCatalog}
                 preview
                 includeDisabled
               />
@@ -146,13 +163,18 @@ export default function CmsDraftPreviewModal({
             <div className="editorial-shell bg-[#faf9f5]">
               {leadingPromo ? (
                 <>
-                  <CmsPageSectionsRenderer sections={[leadingPromo]} preview />
+                  <CmsPageSectionsRenderer
+                    sections={[leadingPromo]}
+                    products={productsCatalog}
+                    preview
+                  />
                   <div className="border-b border-[#b9aca2]/40 bg-[#eeeae0]/60 px-4 py-3 text-center text-xs font-medium text-[#5d6043]">
                     Navigation sits below the promo on the live site
                   </div>
                   <CmsPageSectionsRenderer
                     sections={bodySections}
                     productsBySectionId={productsBySectionId}
+                    products={productsCatalog}
                     preview
                   />
                 </>
@@ -160,6 +182,7 @@ export default function CmsDraftPreviewModal({
                 <CmsPageSectionsRenderer
                   sections={bodySections}
                   productsBySectionId={productsBySectionId}
+                  products={productsCatalog}
                   preview
                 />
               )}
