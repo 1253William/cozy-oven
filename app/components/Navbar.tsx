@@ -13,8 +13,9 @@ import { customerProductService } from "../services/customerProductService";
 import { Product } from "../services/productService";
 import AuthModal from "./AuthModal";
 import CartDrawer from "./CartDrawer";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
-const navLinks = [
+const baseNavLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "About", href: "/about" },
@@ -36,6 +37,7 @@ export default function Navbar() {
 
   const { getCartCount, isCartOpen, openCart, closeCart } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
+  const siteSettings = useSiteSettings();
 
   useEffect(() => {
     setIsMounted(true);
@@ -85,10 +87,23 @@ export default function Navbar() {
   }, [searchQuery]);
 
   const cartCount = isMounted ? getCartCount() : 0;
+  const campaignLinks = (siteSettings.campaignNavLinks || []).map((link) => ({
+    label: link.label,
+    href: link.href,
+  }));
+  const withCampaigns = [
+    ...baseNavLinks.slice(0, 2),
+    ...campaignLinks,
+    ...baseNavLinks.slice(2),
+  ];
   const visibleNavLinks =
     isMounted && isAuthenticated
-      ? [...navLinks.slice(0, 2), { label: "Orders", href: "/account/orders" }, ...navLinks.slice(2)]
-      : navLinks;
+      ? [
+          ...withCampaigns.slice(0, 2 + campaignLinks.length),
+          { label: "Orders", href: "/account/orders" },
+          ...withCampaigns.slice(2 + campaignLinks.length),
+        ]
+      : withCampaigns;
 
   const handleCartClick = () => {
     openCart();

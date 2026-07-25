@@ -3,27 +3,28 @@
 import { usePathname } from "next/navigation";
 import { Truck } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function DeliveryBanner() {
   const pathname = usePathname();
-  
-  // Don't show on admin pages
+  const settings = useSiteSettings();
+
   if (pathname?.startsWith("/admin")) {
     return null;
   }
 
-  const message = "Freshly baked banana bread is delivered on Tuesdays and Thursdays";
+  const enabled = settings.deliveryBanner?.enabled !== false;
+  const message = String(settings.deliveryBanner?.message || "").trim();
+  if (!enabled || !message) return null;
 
   const duplicatedMessage = Array(3).fill(message).join(" • ");
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-[#bd6325] text-[#faf9f5] py-2 overflow-hidden z-50 w-full">
+    <div className="fixed top-0 left-0 right-0 z-50 w-full overflow-hidden bg-[#bd6325] py-2 text-[#faf9f5]">
       <div className="flex items-center gap-7 whitespace-nowrap">
         <motion.div
           className="flex items-center gap-7"
-          animate={{
-            x: [0, -1000],
-          }}
+          animate={{ x: [0, -1000] }}
           transition={{
             x: {
               repeat: Infinity,
@@ -33,11 +34,10 @@ export default function DeliveryBanner() {
             },
           }}
         >
-          <Truck className="w-4 h-4 shrink-0" />
+          <Truck className="h-4 w-4 shrink-0" />
           <span className="text-sm font-medium">{duplicatedMessage}</span>
         </motion.div>
       </div>
     </div>
   );
 }
-
