@@ -178,7 +178,7 @@ Pages are built from **sections**, and you can **add** sections from a list.
 | **SEO title / description** | What Google / link previews can use |
 | **Publish at / Unpublish at** | Optional schedule |
 
-4. Under **Sections**, click **Add section** to pick a block
+4. Under **Sections**, click **Add section** — browse the list and check the **demo preview** (sample photos/copy) before you click **Add this section**
 5. Use **↑ / ↓**, the eye icon, **Edit**, or trash on each section
 6. Click **Save**
 

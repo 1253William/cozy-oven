@@ -18,6 +18,7 @@ import CmsProductPicker from "../CmsProductPicker";
 import CmsCardsField, { cardsVariantForSectionType } from "../CmsCardsField";
 import CmsGalleryField from "../CmsGalleryField";
 import CmsDraftPreviewModal from "../CmsDraftPreviewModal";
+import CmsSectionCatalogPicker from "../CmsSectionCatalogPicker";
 import cmsService, {
   ABOUT_SECTION_TYPES,
   CmsPageSection,
@@ -497,18 +498,11 @@ export default function AdminWebsiteAboutPage() {
         ) : null}
 
         {showCatalog ? (
-          <div className="grid gap-2 rounded-xl border border-[#b9aca2]/60 bg-[#faf9f5] p-3 sm:grid-cols-2 lg:grid-cols-3">
-            {ABOUT_SECTION_TYPES.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => addSection(type)}
-                className="min-h-11 rounded-lg border border-[#b9aca2]/50 bg-white px-3 py-2 text-left text-sm text-[#5d6043] hover:bg-[#eeeae0]"
-              >
-                {PAGE_SECTION_LABELS[type]}
-              </button>
-            ))}
-          </div>
+          <CmsSectionCatalogPicker
+            types={ABOUT_SECTION_TYPES}
+            onSelect={addSection}
+            onClose={() => setShowCatalog(false)}
+          />
         ) : null}
 
         {loading ? (
