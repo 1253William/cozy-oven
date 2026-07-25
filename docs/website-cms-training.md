@@ -129,7 +129,7 @@ How to get a Product ID: open the product in Admin → Products (or from the pro
 3. Use **Preview** anytime
 4. Click **Save** — About goes live when you save (no separate draft for About)
 
-Typical sections: Text intro, Story + image, Feature grid, Values chips, Closing note.
+Typical sections: Text intro, Story + image, Feature grid, Values chips, Closing note, Steps, Quote, Image gallery, Hours & location, Stats, Icon features, Photo break, Page FAQ, WhatsApp band.
 
 ---
 
@@ -195,6 +195,19 @@ If status is **Published**, you’ll get a short checklist (title, slug, promo, 
 | **Story + image** | Photo beside text (image left or right) |
 | **Feature grid** | Dark band with a list of points |
 | **Values chips** | Round labels in a row |
+| **Steps / How it works** | Numbered steps (order → bake → enjoy) |
+| **Occasion cards** | Image tiles with links (Birthday, Thank you, Office) |
+| **Quote** | Big customer quote + name |
+| **Hours & location** | Address, phone, hours, map link |
+| **Image gallery** | Photo mosaic (upload or library) |
+| **Stats row** | Big numbers + short labels |
+| **Two CTA cards** | Side-by-side action cards (Shop / Gift) |
+| **Icon feature cards** | Icon + title + short benefit |
+| **Full-bleed photo** | Wide atmosphere photo + optional caption |
+| **Price / menu list** | Item name + price rows (catering/corporate) |
+| **Video** | YouTube, Vimeo, or Cloudinary HTTPS link |
+| **Page FAQ** | Questions & answers for this page only |
+| **WhatsApp band** | Mid-page “message us” button |
 | **Product strip** | Hand-picked products, category filter, and/or on-sale products |
 | **Promo section** | Mid-height dark promo band |
 | **Gift box / Featured / FAQs / Newsletter** | Same styles as the homepage |
@@ -290,6 +303,29 @@ You don’t need a special page just to discount one product.
 1. Website → Pages → New page → Seasonal → fill content → Status **Published** → Save  
 2. **Copy link**  
 3. Website → Site → add a **Campaign nav link** with that link → turn **on** → optional dates → **Save**
+
+### “I want a How gifting works page”
+
+1. Website → Pages → New page  
+2. Title: How gifting works (slug fills in)  
+3. Add **Steps / How it works** — edit the three steps  
+4. Add **Occasion cards** — Birthday / Thank you / Office with photos + links to `/shop`  
+5. Optional: **Quote** and **Image gallery**  
+6. Status **Published** → Save (tick “I previewed”)  
+7. **Copy link** and share (or add a Site campaign nav link)
+
+### “I want a corporate / catering menu page”
+
+1. Website → Pages → New page → title e.g. Office orders  
+2. Add **Text intro** + **Price / menu list** (item + GHS price)  
+3. Optional: **Two CTA cards** (Shop loaves / WhatsApp us) and **WhatsApp band**  
+4. Status **Published** → Save  
+
+### “I want a contact-style page block”
+
+1. On a page (or About), add **Hours & location**  
+2. Add **WhatsApp band** — button link is already filled; change text if you want  
+3. Save / Publish
 
 ### “I accidentally ruined the homepage — undo”
 

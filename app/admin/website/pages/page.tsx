@@ -14,6 +14,8 @@ import AdminLayout from "../../components/AdminLayout";
 import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
 import CmsProductPicker from "../CmsProductPicker";
+import CmsCardsField, { cardsVariantForSectionType } from "../CmsCardsField";
+import CmsGalleryField from "../CmsGalleryField";
 import CmsDraftPreviewModal from "../CmsDraftPreviewModal";
 import PublishChecklistModal, {
   type PublishChecklistItem,
@@ -66,6 +68,12 @@ const FIELD_LABELS: Partial<Record<keyof CmsPageSectionContent, string>> = {
   imagePosition: "Image side",
   showOnSaleProducts: "Show on-sale products",
   tone: "Style",
+  cards: "Cards",
+  galleryUrls: "Gallery images",
+  address: "Address",
+  phone: "Phone",
+  hours: "Hours",
+  videoUrl: "Video link (YouTube, Vimeo, or Cloudinary)",
 };
 
 const normalizeSlug = (value: string) =>
@@ -586,11 +594,80 @@ export default function AdminWebsitePagesPage() {
         </label>
       );
     }
-    if (field === "body") {
+    if (field === "cards") {
+      const variant = cardsVariantForSectionType(editingSection?.type);
+      const labelByVariant: Record<string, string> = {
+        steps: "Steps",
+        occasions: "Occasion cards",
+        stats: "Stats",
+        dualCta: "CTA cards",
+        icons: "Feature cards",
+        priceList: "Menu items",
+        faq: "Questions",
+      };
+      return (
+        <CmsCardsField
+          key={field}
+          label={labelByVariant[variant] || "Cards"}
+          variant={variant}
+          value={draftContent.cards || []}
+          onChange={(cards) => setDraftContent((prev) => ({ ...prev, cards }))}
+        />
+      );
+    }
+    if (field === "videoUrl") {
       return (
         <label key={field} className="block text-sm">
           <span className="mb-1 block font-semibold text-[#5d6043]">
             {FIELD_LABELS[field]}
+          </span>
+          <input
+            value={draftContent.videoUrl || ""}
+            onChange={(e) =>
+              setDraftContent((prev) => ({ ...prev, videoUrl: e.target.value }))
+            }
+            placeholder="https://youtu.be/..."
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          />
+          <span className="mt-1 block text-xs text-[#5d6043]">
+            Paste a YouTube, Vimeo, or Cloudinary HTTPS link.
+          </span>
+        </label>
+      );
+    }
+    if (field === "galleryUrls") {
+      return (
+        <CmsGalleryField
+          key={field}
+          value={draftContent.galleryUrls || []}
+          onChange={(galleryUrls) =>
+            setDraftContent((prev) => ({ ...prev, galleryUrls }))
+          }
+        />
+      );
+    }
+    if (field === "hours") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {FIELD_LABELS[field]}
+          </span>
+          <textarea
+            rows={4}
+            value={draftContent.hours || ""}
+            onChange={(e) =>
+              setDraftContent((prev) => ({ ...prev, hours: e.target.value }))
+            }
+            className="w-full rounded-lg border border-[#b9aca2] px-3 py-2"
+          />
+        </label>
+      );
+    }
+    if (field === "body") {
+      return (
+        <label key={field} className="block text-sm">
+          <span className="mb-1 block font-semibold text-[#5d6043]">
+            {editingSection?.type === "quote" ? "Quote" : FIELD_LABELS[field]}
           </span>
           <textarea
             rows={4}
