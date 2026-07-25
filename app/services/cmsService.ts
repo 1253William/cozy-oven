@@ -355,6 +355,46 @@ export const PAGE_SECTION_LABELS: Record<CmsPageSectionType, string> = {
   whatsappBand: "WhatsApp band",
 };
 
+/** Short Anita-facing blurbs for the section catalog. */
+export const PAGE_SECTION_BLURBS: Record<CmsPageSectionType, string> = {
+  promoBanner: "Mid-height dark promo with a button",
+  hero: "Big opening with buttons and a photo",
+  signature: "Featured product spotlight",
+  giftCta: "Gift-box call to action",
+  productStrip: "Row of shop products",
+  faq: "Intro for site FAQ answers (homepage list)",
+  newsletter: "Stay-in-the-loop message",
+  textIntro: "Centered headline and paragraphs",
+  storySplit: "Photo beside a story",
+  featureGrid: "Dark band with a list of points",
+  valuesRow: "Round value labels in a row",
+  closingCta: "Signed thank-you / closing note",
+  steps: "Numbered how-it-works steps",
+  occasionCards: "Image tiles with links (Birthday, etc.)",
+  quote: "Big customer quote + name",
+  hoursLocation: "Address, phone, hours, map link",
+  imageGallery: "Photo mosaic from your library",
+  statsRow: "Big numbers with short labels",
+  dualCta: "Two side-by-side action cards",
+  iconFeatureCards: "Icon + title + short benefit",
+  photoBreak: "Wide atmosphere photo + caption",
+  priceList: "Item name + price rows",
+  videoEmbed: "YouTube, Vimeo, or Cloudinary video",
+  customFaq: "Questions & answers for this page only",
+  whatsappBand: "Mid-page “message us” button",
+};
+
+/** Sample bakery images for catalog demos only (not written on Save). */
+const DEMO_IMG_LOAF =
+  "https://res.cloudinary.com/daljxj4yl/image/upload/v1782461961/cozyoven/products_thumbnails/urzdqfzt92jqdnhx0mef.jpg";
+const DEMO_IMG_STORY =
+  "https://res.cloudinary.com/daljxj4yl/image/upload/v1783602095/ChatGPT_Image_Jul_9_2026_12_57_32_PM_ajo0cz.png";
+const DEMO_IMG_OVEN =
+  "https://res.cloudinary.com/daljxj4yl/image/upload/v1783602096/ChatGPT_Image_Jul_9_2026_12_55_18_PM_sqhhpo.png";
+const DEMO_IMG_GIFT = "/gift.png";
+const DEMO_VIDEO =
+  "https://res.cloudinary.com/demo/video/upload/dog.mp4";
+
 export const PAGE_TEMPLATE_LABELS: Record<CmsPageTemplate, string> = {
   simple: "Simple",
   seasonal: "Seasonal",
@@ -730,6 +770,85 @@ export const createBlankPageSection = (
     default:
       return base;
   }
+};
+
+/**
+ * Rich demo section for the Add-section catalog preview.
+ * Does not replace createBlankPageSection — picking a type still adds a blank Anita can edit.
+ */
+export const createDemoPageSection = (type: CmsPageSectionType): CmsPageSection => {
+  const blank = createBlankPageSection(type, 0);
+  const content = { ...(blank.content || {}) };
+
+  switch (type) {
+    case "promoBanner":
+      content.imageUrl = DEMO_IMG_LOAF;
+      break;
+    case "hero":
+      content.headline = "Fresh banana bread, delivered warm";
+      content.body = "Small-batch loaves from Tema — perfect for gifts and Tuesday treats.";
+      content.imageUrl = DEMO_IMG_LOAF;
+      content.secondaryCtaLabel = "Build a gift box";
+      content.secondaryCtaHref = "/shop#package";
+      break;
+    case "signature":
+      content.headline = "Classic banana bread";
+      content.body = "Our signature loaf — soft, fragrant, and baked to order.";
+      content.imageUrl = DEMO_IMG_LOAF;
+      break;
+    case "giftCta":
+      content.imageUrl = DEMO_IMG_GIFT;
+      break;
+    case "productStrip":
+      content.showOnSaleProducts = true;
+      content.body = "A few favourites from the shop (demo uses on-sale products).";
+      break;
+    case "storySplit":
+      content.headline = "Baked in Tema with care";
+      content.body =
+        "Cozy Oven started as a home bakery. Every loaf is still made in small batches — so it tastes like it came from a friend’s kitchen.";
+      content.imageUrl = DEMO_IMG_STORY;
+      content.ctaLabel = "Read more";
+      content.ctaHref = "/about";
+      break;
+    case "occasionCards":
+      content.cards = (content.cards || []).map((card, index) => ({
+        ...card,
+        imageUrl: [DEMO_IMG_LOAF, DEMO_IMG_GIFT, DEMO_IMG_OVEN][index] || DEMO_IMG_LOAF,
+      }));
+      break;
+    case "imageGallery":
+      content.galleryUrls = [DEMO_IMG_LOAF, DEMO_IMG_STORY, DEMO_IMG_OVEN, DEMO_IMG_GIFT];
+      break;
+    case "dualCta":
+      content.cards = (content.cards || []).map((card, index) => ({
+        ...card,
+        imageUrl: index === 0 ? DEMO_IMG_LOAF : DEMO_IMG_GIFT,
+      }));
+      break;
+    case "iconFeatureCards":
+      content.cards = (content.cards || []).map((card, index) => ({
+        ...card,
+        imageUrl: [DEMO_IMG_LOAF, DEMO_IMG_GIFT, DEMO_IMG_OVEN][index] || DEMO_IMG_LOAF,
+      }));
+      break;
+    case "photoBreak":
+      content.imageUrl = DEMO_IMG_OVEN;
+      content.body = "Fresh from the oven in Tema.";
+      break;
+    case "videoEmbed":
+      content.videoUrl = DEMO_VIDEO;
+      content.body = "Sample video — replace with your own YouTube or Cloudinary link.";
+      break;
+    default:
+      break;
+  }
+
+  return {
+    ...blank,
+    id: `demo-${type}`,
+    content,
+  };
 };
 
 export const presetPageSections = (template: CmsPageTemplate): CmsPageSection[] => {
