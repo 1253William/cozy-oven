@@ -172,6 +172,19 @@ export const CMS_PAGE_SECTION_TYPES = [
   "featureGrid",
   "valuesRow",
   "closingCta",
+  "steps",
+  "occasionCards",
+  "quote",
+  "hoursLocation",
+  "imageGallery",
+  "statsRow",
+  "dualCta",
+  "iconFeatureCards",
+  "photoBreak",
+  "priceList",
+  "videoEmbed",
+  "customFaq",
+  "whatsappBand",
 ] as const;
 
 export type CmsPageSectionType = (typeof CMS_PAGE_SECTION_TYPES)[number];
@@ -183,10 +196,26 @@ export const ABOUT_SECTION_TYPES = [
   "featureGrid",
   "valuesRow",
   "closingCta",
+  "steps",
+  "quote",
+  "imageGallery",
+  "hoursLocation",
+  "statsRow",
+  "iconFeatureCards",
+  "photoBreak",
+  "customFaq",
+  "whatsappBand",
   "promoBanner",
   "hero",
   "giftCta",
 ] as const satisfies readonly CmsPageSectionType[];
+
+export interface CmsSectionCard {
+  title?: string;
+  body?: string;
+  imageUrl?: string;
+  href?: string;
+}
 
 export interface CmsPageSectionContent {
   eyebrow?: string;
@@ -207,6 +236,12 @@ export interface CmsPageSectionContent {
   imagePosition?: "left" | "right";
   showOnSaleProducts?: boolean;
   tone?: "sale" | "seasonal" | "announcement" | string;
+  cards?: CmsSectionCard[];
+  galleryUrls?: string[];
+  address?: string;
+  phone?: string;
+  hours?: string;
+  videoUrl?: string;
 }
 
 export interface CmsPageSection {
@@ -305,6 +340,19 @@ export const PAGE_SECTION_LABELS: Record<CmsPageSectionType, string> = {
   featureGrid: "Feature grid",
   valuesRow: "Values chips",
   closingCta: "Closing note",
+  steps: "Steps / How it works",
+  occasionCards: "Occasion cards",
+  quote: "Quote",
+  hoursLocation: "Hours & location",
+  imageGallery: "Image gallery",
+  statsRow: "Stats row",
+  dualCta: "Two CTA cards",
+  iconFeatureCards: "Icon feature cards",
+  photoBreak: "Full-bleed photo",
+  priceList: "Price / menu list",
+  videoEmbed: "Video",
+  customFaq: "Page FAQ",
+  whatsappBand: "WhatsApp band",
 };
 
 export const PAGE_TEMPLATE_LABELS: Record<CmsPageTemplate, string> = {
@@ -356,6 +404,19 @@ export const PAGE_SECTION_FIELD_MAP: Record<
   featureGrid: ["headline", "body", "items"],
   valuesRow: ["items"],
   closingCta: ["headline", "body", "ctaLabel", "secondaryCtaLabel", "ctaHref"],
+  steps: ["headline", "cards"],
+  occasionCards: ["headline", "cards"],
+  quote: ["body", "ctaLabel", "secondaryCtaLabel"],
+  hoursLocation: ["headline", "address", "phone", "hours", "ctaLabel", "ctaHref"],
+  imageGallery: ["headline", "galleryUrls"],
+  statsRow: ["headline", "cards"],
+  dualCta: ["headline", "cards"],
+  iconFeatureCards: ["headline", "cards"],
+  photoBreak: ["imageUrl", "body"],
+  priceList: ["headline", "cards"],
+  videoEmbed: ["headline", "body", "videoUrl"],
+  customFaq: ["headline", "cards"],
+  whatsappBand: ["headline", "body", "ctaLabel", "ctaHref"],
 };
 
 const newSectionId = (type: CmsPageSectionType, index = 0) =>
@@ -474,6 +535,196 @@ export const createBlankPageSection = (
           body: "Thank you for being here.",
           ctaLabel: "Anita",
           secondaryCtaLabel: "Creator of Cozy Oven",
+        },
+      };
+    case "steps":
+      return {
+        ...base,
+        content: {
+          headline: "How it works",
+          cards: [
+            {
+              title: "Choose your treats",
+              body: "Pick loaves, yoghurt, or a gift box from the shop.",
+            },
+            {
+              title: "We bake it fresh",
+              body: "Your order is made with care in Tema.",
+            },
+            {
+              title: "Enjoy or gift",
+              body: "We deliver on bakery days — or you can pick up.",
+            },
+          ],
+        },
+      };
+    case "occasionCards":
+      return {
+        ...base,
+        content: {
+          headline: "Shop by occasion",
+          cards: [
+            {
+              title: "Birthday",
+              body: "A warm loaf or gift box for the day.",
+              href: "/shop",
+              imageUrl: "",
+            },
+            {
+              title: "Thank you",
+              body: "Say thanks with something freshly baked.",
+              href: "/shop",
+              imageUrl: "",
+            },
+            {
+              title: "Office treat",
+              body: "Share comfort with the team.",
+              href: "/shop#package",
+              imageUrl: "",
+            },
+          ],
+        },
+      };
+    case "quote":
+      return {
+        ...base,
+        content: {
+          body: "The bread melts in your mouth.",
+          ctaLabel: "Happy customer",
+          secondaryCtaLabel: "Tema",
+        },
+      };
+    case "hoursLocation":
+      return {
+        ...base,
+        content: {
+          headline: "Visit & pickup",
+          address: "Tema Community 22, Nhmf Estates",
+          phone: "0249612035",
+          hours: "Delivery days: Tuesdays and Thursdays\nMessage us for pickup times",
+          ctaLabel: "Get directions",
+          ctaHref: "https://maps.google.com/?q=Tema+Community+22",
+        },
+      };
+    case "imageGallery":
+      return {
+        ...base,
+        content: {
+          headline: "From the oven",
+          galleryUrls: [],
+        },
+      };
+    case "statsRow":
+      return {
+        ...base,
+        content: {
+          headline: "Baked with love",
+          cards: [
+            { title: "1,300+", body: "Deliveries" },
+            { title: "Tema", body: "Home bakery" },
+            { title: "Fresh", body: "Small batches" },
+          ],
+        },
+      };
+    case "dualCta":
+      return {
+        ...base,
+        content: {
+          headline: "What would you like?",
+          cards: [
+            {
+              title: "Shop loaves",
+              body: "Banana bread and yoghurt favourites.",
+              href: "/shop",
+              imageUrl: "",
+            },
+            {
+              title: "Build a gift box",
+              body: "Warm gifts for birthdays and thank-yous.",
+              href: "/shop#package",
+              imageUrl: "",
+            },
+          ],
+        },
+      };
+    case "iconFeatureCards":
+      return {
+        ...base,
+        content: {
+          headline: "Why Cozy Oven",
+          cards: [
+            {
+              title: "Freshly baked",
+              body: "Made in small batches with care.",
+              imageUrl: "",
+            },
+            {
+              title: "Gift-ready",
+              body: "Boxes that arrive ready to share.",
+              imageUrl: "",
+            },
+            {
+              title: "Tema delivery",
+              body: "Reliable drop-offs on bakery days.",
+              imageUrl: "",
+            },
+          ],
+        },
+      };
+    case "photoBreak":
+      return {
+        ...base,
+        content: {
+          imageUrl: "",
+          body: "Fresh from the oven in Tema.",
+        },
+      };
+    case "priceList":
+      return {
+        ...base,
+        content: {
+          headline: "Sample menu",
+          cards: [
+            { title: "Classic banana bread loaf", body: "GHS 55" },
+            { title: "Chocolate banana bread", body: "GHS 65" },
+            { title: "Gift box (small)", body: "From GHS 120" },
+          ],
+        },
+      };
+    case "videoEmbed":
+      return {
+        ...base,
+        content: {
+          headline: "A peek inside",
+          body: "See how we bake.",
+          videoUrl: "",
+        },
+      };
+    case "customFaq":
+      return {
+        ...base,
+        content: {
+          headline: "Questions",
+          cards: [
+            {
+              title: "How do I order a gift box?",
+              body: "Shop packages, pick your items, and checkout — we’ll bake and deliver.",
+            },
+            {
+              title: "When do you deliver?",
+              body: "Fresh deliveries go out on Tuesdays and Thursdays.",
+            },
+          ],
+        },
+      };
+    case "whatsappBand":
+      return {
+        ...base,
+        content: {
+          headline: "Need help choosing?",
+          body: "Message us on WhatsApp — we’re happy to help with orders and gifts.",
+          ctaLabel: "Chat on WhatsApp",
+          ctaHref: "https://api.whatsapp.com/message/QAOMJAY7KI7WP1",
         },
       };
     default:
