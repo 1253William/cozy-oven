@@ -1,18 +1,76 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
+import { orderService } from "../services/orderService";
+import {
+  clearCheckoutResumeToken,
+  getCheckoutResumeToken,
+} from "../utils/checkoutRecovery";
+import { isAllowedPaymentRedirectUrl } from "../utils/paymentRedirect";
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, getCartTotal } = useCart();
+  const [pendingCheckoutAvailable, setPendingCheckoutAvailable] = useState(false);
+  const [isResumingCheckout, setIsResumingCheckout] = useState(false);
+  const [resumeError, setResumeError] = useState<string | null>(null);
   
   const subtotal = getCartTotal();
   const total = subtotal;
+
+  useEffect(() => {
+    setPendingCheckoutAvailable(Boolean(getCheckoutResumeToken()));
+  }, []);
+
+  const handleResumeCheckout = async () => {
+    const resumeToken = getCheckoutResumeToken();
+    if (!resumeToken) {
+      setPendingCheckoutAvailable(false);
+      return;
+    }
+
+    setIsResumingCheckout(true);
+    setResumeError(null);
+
+    try {
+      const response = await orderService.resumeCheckout(resumeToken);
+      const checkoutUrl =
+        response.checkoutUrl ||
+        response.data?.checkoutUrl ||
+        response.authorizationUrl ||
+        response.data?.authorizationUrl;
+
+      if (response.success && checkoutUrl) {
+        if (!isAllowedPaymentRedirectUrl(checkoutUrl)) {
+          throw new Error("Invalid payment redirect URL. Please contact support.");
+        }
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      throw new Error(response.message || "Unable to resume checkout");
+    } catch (err) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 404 || status === 400) {
+        clearCheckoutResumeToken();
+        setPendingCheckoutAvailable(false);
+      }
+      const axiosMessage = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setResumeError(
+        axiosMessage ||
+          (err instanceof Error ? err.message : "Unable to resume checkout. Please place the order again.")
+      );
+    } finally {
+      setIsResumingCheckout(false);
+    }
+  };
 
   const handleQuantityChange = (
     productId: string,
@@ -63,6 +121,43 @@ export default function CartPage() {
           <h1 className="font-editorial mb-8 text-3xl tracking-[-0.03em] text-[#222222] sm:text-4xl">
             Shopping Cart
           </h1>
+
+          {pendingCheckoutAvailable && (
+            <div className="mb-6 rounded-[24px] border border-[#bd6325]/30 bg-orange-50 p-4 shadow-[0_12px_40px_rgba(34,34,34,0.08)]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-semibold text-[#222222]">Continue your pending payment</p>
+                  <p className="mt-1 text-sm text-[#5d6043]">
+                    We found an unfinished checkout on this device.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResumeCheckout}
+                    disabled={isResumingCheckout}
+                    className="rounded-full bg-[#222222] px-4 py-2 text-sm font-semibold text-[#faf9f5] transition-colors hover:bg-[#5d6043] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isResumingCheckout ? "Opening..." : "Continue"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearCheckoutResumeToken();
+                      setPendingCheckoutAvailable(false);
+                      setResumeError(null);
+                    }}
+                    className="rounded-full border border-[#b9aca2] px-4 py-2 text-sm font-semibold text-[#5d6043] transition-colors hover:bg-[#faf9f5]"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+              {resumeError && (
+                <p className="mt-3 text-sm text-red-700">{resumeError}</p>
+              )}
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items - Left Side */}

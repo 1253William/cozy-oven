@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { orderService } from "../services/orderService";
+import { clearCheckoutResumeToken } from "../utils/checkoutRecovery";
 
 function PaymentVerificationContent() {
   const router = useRouter();
@@ -28,6 +29,7 @@ function PaymentVerificationContent() {
         const response = await orderService.verifyPayment(reference);
 
         if (response.success) {
+          clearCheckoutResumeToken();
           setStatus("success");
           setMessage(response.message || "Payment verified successfully!");
           setOrderNumber(response.data.orderId);

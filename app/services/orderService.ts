@@ -25,6 +25,7 @@ export interface CheckoutRequest {
   specialInstruction?: string;
   contactNumber: string;
   paymentMethod: string;
+  transactionDate?: string;
   fullName?: string;
   email?: string;
   orderDetails?: {
@@ -111,6 +112,10 @@ export interface PaymentInitiationResponse {
   paymentBreakdown?: PaymentBreakdown;
 }
 
+export interface ResumeCheckoutResponse extends PaymentInitiationResponse {
+  order?: Order;
+}
+
 // Payment verification response
 export interface PaymentVerificationResponse {
   success: boolean;
@@ -129,6 +134,7 @@ export interface ApiResponse<T = unknown> {
   message: string;
   data?: T;
   order?: T;
+  checkoutResumeToken?: string;
   pagination?: {
     currentPage: number;
     totalPages: number;
@@ -189,6 +195,13 @@ export const orderService = {
   initiatePayment: async (orderId: string): Promise<PaymentInitiationResponse> => {
     const response = await apiClient.post(
       `/api/v1/store/customer/orders/${orderId}/initiate-payment`
+    );
+    return response.data;
+  },
+
+  resumeCheckout: async (resumeToken: string): Promise<ResumeCheckoutResponse> => {
+    const response = await apiClient.get(
+      `/api/v1/store/customer/orders/resume-checkout/${encodeURIComponent(resumeToken)}`
     );
     return response.data;
   },

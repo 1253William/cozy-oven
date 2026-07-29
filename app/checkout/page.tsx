@@ -11,6 +11,11 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { orderService, type OrderItem } from "../services/orderService";
 import { saveGuestOrderProfile } from "../utils/guestOrderProfile";
+import {
+  clearCheckoutResumeToken,
+  getCheckoutResumeToken,
+  saveCheckoutResumeToken,
+} from "../utils/checkoutRecovery";
 import { calculatePaystackPaymentBreakdown } from "../utils/paymentBreakdown";
 import { isAllowedPaymentRedirectUrl } from "../utils/paymentRedirect";
 
@@ -25,6 +30,8 @@ export default function CheckoutPage() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [incompleteOrderModalOpen, setIncompleteOrderModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isResumingCheckout, setIsResumingCheckout] = useState(false);
+  const [pendingCheckoutAvailable, setPendingCheckoutAvailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasStartedCheckout, setHasStartedCheckout] = useState(false);
 
@@ -53,6 +60,10 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [cart, router]);
+
+  useEffect(() => {
+    setPendingCheckoutAvailable(Boolean(getCheckoutResumeToken()));
+  }, []);
 
   // Track when user starts checkout
   useEffect(() => {
@@ -170,6 +181,62 @@ export default function CheckoutPage() {
     }
   };
 
+  const extractPaymentUrl = (response: {
+    checkoutUrl?: string;
+    authorizationUrl?: string;
+    data?: {
+      checkoutUrl?: string;
+      authorizationUrl?: string;
+    };
+  }): string | null => {
+    return (
+      response.checkoutUrl ||
+      response.data?.checkoutUrl ||
+      response.authorizationUrl ||
+      response.data?.authorizationUrl ||
+      null
+    );
+  };
+
+  const handleResumeCheckout = async () => {
+    const resumeToken = getCheckoutResumeToken();
+    if (!resumeToken) {
+      setPendingCheckoutAvailable(false);
+      return;
+    }
+
+    setIsResumingCheckout(true);
+    setError(null);
+
+    try {
+      const response = await orderService.resumeCheckout(resumeToken);
+      const checkoutUrl = extractPaymentUrl(response);
+
+      if (response.success && checkoutUrl) {
+        if (!isAllowedPaymentRedirectUrl(checkoutUrl)) {
+          throw new Error("Invalid payment redirect URL. Please contact support.");
+        }
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      throw new Error(response.message || "Unable to resume checkout");
+    } catch (err) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 404 || status === 400) {
+        clearCheckoutResumeToken();
+        setPendingCheckoutAvailable(false);
+      }
+      const axiosMessage = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setError(
+        axiosMessage ||
+          (err instanceof Error ? err.message : "Unable to resume checkout. Please place the order again.")
+      );
+    } finally {
+      setIsResumingCheckout(false);
+    }
+  };
 
 
   const handlePlaceOrder = async () => {
@@ -265,6 +332,9 @@ export default function CheckoutPage() {
         throw new Error(checkoutResponse.message || "Failed to create order");
       }
 
+      saveCheckoutResumeToken(checkoutResponse.checkoutResumeToken);
+      setPendingCheckoutAvailable(Boolean(checkoutResponse.checkoutResumeToken));
+
       // Use the orderId field (e.g., "CZ-850560") instead of _id for payment initiation
       const orderId = checkoutResponse.order.orderId || checkoutResponse.order._id;
 
@@ -283,17 +353,6 @@ export default function CheckoutPage() {
 
       // Initiate payment
       const paymentResponse = await orderService.initiatePayment(orderId);
-
-      // Extract checkout URL from response.
-      const extractPaymentUrl = (response: typeof paymentResponse): string | null => {
-        return (
-          response.checkoutUrl || 
-          response.data?.checkoutUrl ||
-          response.authorizationUrl || 
-          response.data?.authorizationUrl ||
-          null
-        );
-      };
 
       const checkoutUrl = extractPaymentUrl(paymentResponse);
       
@@ -347,6 +406,37 @@ export default function CheckoutPage() {
                   Delivery from GHS 30, paid on delivery. The delivery address should be visible on Google Maps.
                 </p>
               </div>
+
+              {pendingCheckoutAvailable && (
+                <div className="mb-6 flex flex-col gap-3 rounded-[24px] border border-[#bd6325]/30 bg-orange-50 p-4 shadow-[0_12px_40px_rgba(34,34,34,0.08)] sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-[#222222]">Continue your pending payment</p>
+                    <p className="mt-1 text-sm text-[#5d6043]">
+                      We found an unfinished checkout on this device.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleResumeCheckout}
+                      disabled={isResumingCheckout}
+                      className="rounded-full bg-[#222222] px-4 py-2 text-sm font-semibold text-[#faf9f5] transition-colors hover:bg-[#5d6043] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isResumingCheckout ? "Opening..." : "Continue"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearCheckoutResumeToken();
+                        setPendingCheckoutAvailable(false);
+                      }}
+                      className="rounded-full border border-[#b9aca2] px-4 py-2 text-sm font-semibold text-[#5d6043] transition-colors hover:bg-[#faf9f5]"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Progress Indicator */}
               <div className="mb-8 flex items-center justify-between">
