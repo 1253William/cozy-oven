@@ -48,7 +48,9 @@ export interface Order {
   total?: string;
   amount?: string;        
   date?: string;
-  paidAt?: string;          
+  paidAt?: string;
+  paidAtIso?: string;
+  transactionDateIso?: string;
   paymentBreakdown?: PaymentBreakdown;
   source?: string;
   invoice?: {

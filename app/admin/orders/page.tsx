@@ -66,6 +66,16 @@ const getStatusIcon = (status?: string) => {
   }
 };
 
+const formatOrderDate = (order: Order) => {
+  const dateValue = order.transactionDateIso || order.createdAt;
+  if (!dateValue) return order.date || "-";
+
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return order.date || "-";
+
+  return parsedDate.toLocaleDateString();
+};
+
 export default function OrdersPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -466,7 +476,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-[#5d6043]">
-                          {order.date || 'N/A'}
+                          {formatOrderDate(order)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -577,7 +587,7 @@ export default function OrdersPage() {
                       <div>
                         <p className="text-xs text-[#5d6043] mb-1">Date</p>
                        <p className="text-sm font-medium text-[#222222]">
-                        {order.date ? new Date(order.date).toLocaleDateString() : "-"}
+                        {formatOrderDate(order)}
                       </p>
 
                       </div>
