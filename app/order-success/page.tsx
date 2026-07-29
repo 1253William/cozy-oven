@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { clearCheckoutResumeToken } from "../utils/checkoutRecovery";
 
 function OrderSuccessContent() {
   const { clearCart } = useCart();
@@ -17,6 +18,7 @@ function OrderSuccessContent() {
 
   useEffect(() => {
     clearCart();
+    clearCheckoutResumeToken();
   }, [clearCart]);
 
   const handleTrackOrder = () => {

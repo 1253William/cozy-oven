@@ -27,6 +27,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const [contactNumber, setContactNumber] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [city, setCity] = useState("");
+  const [transactionDate, setTransactionDate] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -106,6 +107,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
         fullName: customerName.trim(),
         email: customerEmail.trim() || undefined,
         paymentMethod: "cash",
+        transactionDate: transactionDate || undefined,
       });
 
       // Reset form
@@ -114,6 +116,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       setContactNumber("");
       setDeliveryAddress("");
       setCity("");
+      setTransactionDate("");
       setSpecialInstructions("");
       setOrderItems([]);
       setSelectedProductId("");
@@ -230,6 +233,18 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#5d6043] mb-2">
+                        Transaction Date (Optional)
+                      </label>
+                      <input
+                        type="date"
+                        value={transactionDate}
+                        max={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setTransactionDate(e.target.value)}
                         className="w-full px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
                       />
                     </div>
