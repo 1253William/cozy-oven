@@ -28,7 +28,7 @@ export const useAdminProducts = (params?: ProductsQueryParams) => {
     } finally {
       setLoading(false);
     }
-  }, [params?.page, params?.limit, params?.category, params?.sortBy, params?.order]);
+  }, [params?.page, params?.limit, params?.category, params?.search, params?.sortBy, params?.order]);
 
   useEffect(() => {
     fetchProducts();

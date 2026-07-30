@@ -5,6 +5,10 @@ import { X, Plus, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { orderService } from "../../../services/orderService";
 import useCustomerProducts from "../../../hooks/useCustomerProducts";
+import PackageSelectionEditor, {
+  type PackageSelection,
+  usePackageSelection,
+} from "./PackageSelectionEditor";
 
 interface AddOrderModalProps {
   isOpen: boolean;
@@ -18,6 +22,7 @@ interface OrderItem {
   quantity: number;
   unitPrice: number;
   size?: string;
+  packageSelections?: PackageSelection[];
 }
 
 export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderModalProps) {
@@ -38,6 +43,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
   const availableSizes = selectedProduct?.selectOptions?.filter(opt => opt.isAvailable !== false) || [];
+  const packageSelection = usePackageSelection(selectedProduct);
 
   const handleAddItem = () => {
     if (!selectedProductId || quantity < 1) {
@@ -47,6 +53,15 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
 
     const product = products.find(p => p.id === selectedProductId);
     if (!product) return;
+
+    if (product.productType === "package" && !packageSelection.isComplete) {
+      setError(
+        packageSelection.groups.length === 0
+          ? "This package has no valid configuration"
+          : "Please complete the package selections before adding this item"
+      );
+      return;
+    }
 
     const sizeOption = selectedSize 
       ? product.selectOptions?.find(opt => opt.label === selectedSize && opt.isAvailable !== false)
@@ -60,6 +75,9 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       quantity,
       unitPrice,
       ...(selectedSize && { size: selectedSize }),
+      ...(product.productType === "package" && {
+        packageSelections: packageSelection.selections,
+      }),
     };
 
     setOrderItems([...orderItems, newItem]);
@@ -95,6 +113,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         ...(item.size && { size: item.size }),
+        ...(item.packageSelections?.length ? { packageSelections: item.packageSelections } : {}),
       }));
 
       await orderService.createOfflineSale({
@@ -323,6 +342,13 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                         </button>
                       </div>
                     </div>
+                    <PackageSelectionEditor
+                      product={selectedProduct}
+                      groups={packageSelection.groups}
+                      counts={packageSelection.counts}
+                      onChangeCount={packageSelection.changeCount}
+                      contextLabel="order"
+                    />
                   </div>
 
                   {/* Order Items List */}
@@ -338,6 +364,15 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                             <p className="text-sm text-[#5d6043]">
                               {item.size || "Regular"} × {item.quantity} = GHS {(item.unitPrice * item.quantity).toFixed(2)}
                             </p>
+                            {item.packageSelections?.map((selection) => (
+                              <p
+                                key={`${selection.groupId || selection.groupLabel}-${selection.label}`}
+                                className="text-xs text-[#5d6043]"
+                              >
+                                {selection.groupLabel ? `${selection.groupLabel}: ` : ""}
+                                {selection.label} x {selection.quantity}
+                              </p>
+                            ))}
                           </div>
                           <button
                             type="button"

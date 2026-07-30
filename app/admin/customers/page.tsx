@@ -11,6 +11,7 @@ export default function CustomersPage() {
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+  const [appliedSearch, setAppliedSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all")
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
@@ -31,7 +32,7 @@ export default function CustomersPage() {
       fetchOverview()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage, statusFilter])
+  }, [isAuthenticated, user, currentPage, statusFilter, appliedSearch])
 
   const fetchCustomers = async () => {
     try {
@@ -39,7 +40,7 @@ export default function CustomersPage() {
       const response = await customerService.getAllCustomers({
         page: currentPage,
         limit: 10,
-        search: searchQuery || undefined,
+        search: appliedSearch || undefined,
         status: statusFilter !== "all" ? statusFilter : undefined,
       })
 
@@ -74,7 +75,7 @@ export default function CustomersPage() {
 
   const handleSearch = () => {
     setCurrentPage(1)
-    fetchCustomers()
+    setAppliedSearch(searchQuery.trim())
   }
 
   const handleViewDetails = async (customerId: string) => {
@@ -183,7 +184,7 @@ export default function CustomersPage() {
                     handleSearch()
                   }
                 }}
-                placeholder="Search by name, email..."
+                placeholder="Search by name, email, or phone..."
                 className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>

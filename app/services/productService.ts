@@ -118,6 +118,7 @@ export interface ProductsQueryParams {
   page?: number;
   limit?: number;
   category?: string;
+  search?: string;
   sortBy?: "createdAt" | "price" | "rating" | "productName" | "stockQuantity";
   order?: "asc" | "desc";
 }
@@ -149,6 +150,7 @@ export const productService = {
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.category) queryParams.append("category", params.category);
+    if (params?.search) queryParams.append("search", params.search);
     if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
     if (params?.order) queryParams.append("order", params.order);
 

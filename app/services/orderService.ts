@@ -226,11 +226,17 @@ export const orderService = {
   getAllOrders: async (params?: {
     page?: number;
     limit?: number;
+    search?: string;
+    status?: string;
+    paymentMethod?: string;
   }): Promise<GetAllOrdersResponse> => {
     const queryParams = new URLSearchParams();
     
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.status) queryParams.append("status", params.status);
+    if (params?.paymentMethod) queryParams.append("paymentMethod", params.paymentMethod);
 
     const response = await apiClient.get(
       `/api/v1/dashboard/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
