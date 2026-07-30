@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -27,26 +27,26 @@ interface AdminLayoutProps {
 }
 
 const menuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-  { name: "Customer Management", icon: Users, href: "/admin/customers" },
-  { name: "Purchases", icon: Package, href: "/admin/inventory" },
-  { name: "Production", icon: Package, href: "/admin/operations/production" },
-  { name: "Finished Stock", icon: ShoppingBag, href: "/admin/operations/stock" },
-  { name: "Cost Items", icon: BarChart3, href: "/admin/cost-items" },
-  { name: "Recipes", icon: BarChart3, href: "/admin/recipes" },
-  { name: "Inventory Review", icon: Package, href: "/admin/operations/counts" },
-  { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
-  { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
-  { name: "Promotions", icon: Star, href: "/admin/promotions" },
-  { name: "Website", icon: LayoutDashboard, href: "/admin/website" },
-  { name: "Subscribers", icon: Mail, href: "/admin/subscribers" },
-  { name: "Email Marketing", icon: Mail, href: "/admin/email-marketing" },
-  { name: "FAQs", icon: Mail, href: "/admin/faqs" },
-  { name: "Reviews", icon: Star, href: "/admin/reviews" },
-  { name: "Overhead Costs", icon: BarChart3, href: "/admin/expenses" },
-  { name: "Notifications", icon: Bell, href: "/admin/notifications" },
-  { name: "Admin Profile", icon: UserCircle, href: "/admin/profile" },
-  { name: "Reports", icon: BarChart3, href: "/admin/reports" },
+  { section: "Overview", name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+  { section: "Sales", name: "Customers", icon: Users, href: "/admin/customers" },
+  { section: "Sales", name: "Products", icon: ShoppingBag, href: "/admin/products" },
+  { section: "Sales", name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
+  { section: "Sales", name: "Promotions", icon: Star, href: "/admin/promotions" },
+  { section: "Operations", name: "Purchases", icon: Package, href: "/admin/inventory" },
+  { section: "Operations", name: "Production", icon: Package, href: "/admin/operations/production" },
+  { section: "Operations", name: "Finished Stock", icon: ShoppingBag, href: "/admin/operations/stock" },
+  { section: "Operations", name: "Inventory Review", icon: Package, href: "/admin/operations/counts" },
+  { section: "Costing", name: "Cost Items", icon: BarChart3, href: "/admin/cost-items" },
+  { section: "Costing", name: "Recipes", icon: BarChart3, href: "/admin/recipes" },
+  { section: "Finance", name: "Overhead Costs", icon: BarChart3, href: "/admin/expenses" },
+  { section: "Finance", name: "Reports", icon: BarChart3, href: "/admin/reports" },
+  { section: "Content", name: "Website", icon: LayoutDashboard, href: "/admin/website" },
+  { section: "Content", name: "Subscribers", icon: Mail, href: "/admin/subscribers" },
+  { section: "Content", name: "Email Marketing", icon: Mail, href: "/admin/email-marketing" },
+  { section: "Content", name: "FAQs", icon: Mail, href: "/admin/faqs" },
+  { section: "Content", name: "Reviews", icon: Star, href: "/admin/reviews" },
+  { section: "Administration", name: "Notifications", icon: Bell, href: "/admin/notifications" },
+  { section: "Administration", name: "Admin Profile", icon: UserCircle, href: "/admin/profile" },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -113,13 +113,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
-            {menuItems.map((item) => {
+            {menuItems.map((item, index) => {
               const Icon = item.icon;
               const isActive =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
-                <li key={item.name}>
+                <Fragment key={item.name}>
+                  {(index === 0 || menuItems[index - 1].section !== item.section) && (
+                    <li className={index === 0 ? "px-4 pb-1" : "px-4 pb-1 pt-4"}>
+                      <span className="text-xs font-semibold uppercase text-[#5d6043]/70">
+                        {item.section}
+                      </span>
+                    </li>
+                  )}
+                <li>
                   <Link
                     href={item.href}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
@@ -137,6 +145,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     )}
                   </Link>
                 </li>
+                </Fragment>
               );
             })}
           </ul>
@@ -168,7 +177,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-[#faf9f5] border-r border-[#b9aca2]/60 z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed left-0 top-0 flex h-full w-64 flex-col bg-[#faf9f5] border-r border-[#b9aca2]/60 z-50 transform transition-transform duration-300 lg:hidden ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -188,13 +197,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         <nav className="flex-1 overflow-y-auto p-4">
           <ul className="space-y-2">
-            {menuItems.map((item) => {
+            {menuItems.map((item, index) => {
               const Icon = item.icon;
               const isActive =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
-                <li key={item.name}>
+                <Fragment key={item.name}>
+                  {(index === 0 || menuItems[index - 1].section !== item.section) && (
+                    <li className={index === 0 ? "px-4 pb-1" : "px-4 pb-1 pt-4"}>
+                      <span className="text-xs font-semibold uppercase text-[#5d6043]/70">
+                        {item.section}
+                      </span>
+                    </li>
+                  )}
+                <li>
                   <Link
                     href={item.href}
                     onClick={() => setIsSidebarOpen(false)}
@@ -213,6 +230,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     )}
                   </Link>
                 </li>
+                </Fragment>
               );
             })}
           </ul>
