@@ -13,6 +13,13 @@ const UNITS = {
   batch: ["batch"],
 } as const;
 type UnitType = keyof typeof UNITS;
+type PriceHistory = {
+  _id: string;
+  effectiveFrom: string;
+  costPerUnit: number;
+};
+const requestMessage = (error: unknown, fallback: string) =>
+  (error as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback;
 const emptyForm = {
   name: "",
   categoryId: "",
@@ -30,7 +37,7 @@ export default function CostItemsPage() {
   const [categories, setCategories] = useState<CostCategory[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editing, setEditing] = useState<CostItem | null>(null);
-  const [history, setHistory] = useState<any[] | null>(null);
+  const [history, setHistory] = useState<PriceHistory[] | null>(null);
   const [historyName, setHistoryName] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -74,8 +81,8 @@ export default function CostItemsPage() {
       else await costingService.createItem(payload);
       reset();
       await load();
-    } catch (error: any) {
-      setMessage(error.response?.data?.message || "Could not save cost item.");
+    } catch (error: unknown) {
+      setMessage(requestMessage(error, "Could not save cost item."));
     } finally {
       setSaving(false);
     }
