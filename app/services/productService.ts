@@ -1,12 +1,18 @@
 import apiClient from "./apiClient";
 
 export interface SelectOption {
+  variantId?: string;
   label: string;
   additionalPrice: number;
   isAvailable?: boolean;
 }
 
 export interface PackageOption {
+  optionId?: string;
+  componentType?: "product" | "supply";
+  childProductId?: string;
+  childVariantId?: string;
+  supplyCostItemId?: string;
   label: string;
   description?: string;
   isAvailable?: boolean;

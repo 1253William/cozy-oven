@@ -29,6 +29,8 @@ const emptyForm = {
   cost: "",
   supplier: "",
   effectiveFrom: new Date().toISOString().slice(0, 10),
+  tracksStock: false,
+  openingStock: "",
 };
 const field = "w-full rounded-md border border-[#b9aca2] bg-white px-3 py-2";
 
@@ -75,6 +77,8 @@ export default function CostItemsPage() {
       purchaseBatch: { quantity: Number(form.quantity), cost: Number(form.cost) },
       supplier: form.supplier || undefined,
       effectiveFrom: form.effectiveFrom,
+      tracksStock: form.tracksStock,
+      openingStock: form.openingStock === "" ? undefined : Number(form.openingStock),
     };
     try {
       if (editing) await costingService.updateItem(editing._id, payload);
@@ -99,6 +103,8 @@ export default function CostItemsPage() {
       cost: String(item.purchaseBatch.cost),
       supplier: item.supplier || "",
       effectiveFrom: new Date().toISOString().slice(0, 10),
+      tracksStock: Boolean(item.tracksStock),
+      openingStock: "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -134,12 +140,14 @@ export default function CostItemsPage() {
         <form onSubmit={submit} className="grid gap-3 border-b border-[#b9aca2]/60 pb-6 md:grid-cols-3">
           <label className="text-sm font-medium">Item name<input className={`${field} mt-1`} placeholder="e.g. Bread flour" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></label>
           <label className="text-sm font-medium">Direct-cost category<select className={`${field} mt-1`} value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required><option value="">Select category</option>{categories.map((row) => <option key={row._id} value={row._id}>{row.name}</option>)}</select></label>
-          <label className="text-sm font-medium">Measurement type<select className={`${field} mt-1`} value={form.unitType} onChange={(e) => { const unitType = e.target.value as UnitType; setForm({ ...form, unitType, unit: UNITS[unitType][0] }); }}>{Object.keys(UNITS).map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
+          <label className="text-sm font-medium">Measurement type<select className={`${field} mt-1`} value={form.unitType} onChange={(e) => { const unitType = e.target.value as UnitType; setForm({ ...form, unitType, unit: UNITS[unitType][0], tracksStock: unitType === "time" || unitType === "batch" ? false : form.tracksStock }); }}>{Object.keys(UNITS).map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
           <label className="text-sm font-medium">Costing unit<select className={`${field} mt-1`} value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>{UNITS[form.unitType].map((unit) => <option key={unit} value={unit}>{unit}</option>)}</select></label>
           <label className="text-sm font-medium">Purchased quantity<input className={`${field} mt-1`} type="number" min="0.000001" step="any" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder={`Quantity in ${form.unit}`} required /></label>
           <label className="text-sm font-medium">Total batch cost (GHS)<input className={`${field} mt-1`} type="number" min="0" step="0.01" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} required /></label>
           <label className="text-sm font-medium">Supplier (optional)<input className={`${field} mt-1`} value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} /></label>
           <label className="text-sm font-medium">Effective from<input className={`${field} mt-1`} type="date" value={form.effectiveFrom} onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })} required /></label>
+          <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={form.tracksStock} disabled={form.unitType === "time" || form.unitType === "batch"} onChange={(e) => setForm({ ...form, tracksStock: e.target.checked })} />Track physical stock</label>
+          {form.tracksStock && !editing && <label className="text-sm font-medium">Opening stock<input className={`${field} mt-1`} type="number" min="0" step="any" value={form.openingStock} onChange={(e) => setForm({ ...form, openingStock: e.target.value })} placeholder={`Quantity in ${form.unit}`} /></label>}
           <div className="flex items-end justify-between gap-3 rounded-md border border-[#b9aca2]/60 px-3 py-2">
             <div><p className="text-xs text-[#5d6043]">Calculated rate</p><p className="font-semibold">GHS {derivedRate.toFixed(6)} / {form.unit}</p></div>
             <button disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white disabled:opacity-60">{editing ? <Edit2 size={17} /> : <Plus size={17} />}{editing ? "Update" : "Add"}</button>
@@ -152,7 +160,7 @@ export default function CostItemsPage() {
           <table className="w-full min-w-[760px] text-sm">
             <thead><tr className="border-b text-left"><th className="py-3">Item</th><th>Category</th><th>Latest batch</th><th>Rate</th><th>Effective</th><th className="text-right">Actions</th></tr></thead>
             <tbody>{items.map((item) => <tr key={item._id} className="border-b">
-              <td className="py-3 font-medium">{item.name}<span className="block text-xs font-normal text-[#5d6043]">{item.supplier || "No supplier"}</span></td>
+              <td className="py-3 font-medium">{item.name}<span className="block text-xs font-normal text-[#5d6043]">{item.supplier || "No supplier"}{item.tracksStock ? " · stock tracked" : ""}</span></td>
               <td>{typeof item.categoryId === "object" ? item.categoryId.name : ""}</td>
               <td>{item.purchaseBatch.quantity} {item.unit} · GHS {Number(item.purchaseBatch.cost).toFixed(2)}</td>
               <td>GHS {item.costPerUnit.toFixed(6)} / {item.unit}</td>

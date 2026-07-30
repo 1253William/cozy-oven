@@ -1,6 +1,7 @@
 import { X, Upload, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { PackageConfig, PackageGroup, PackageOption, SelectOption } from "../../../services/productService";
+import { CostItem } from "../../../services/costingService";
+import { PackageConfig, PackageGroup, PackageOption, Product, SelectOption } from "../../../services/productService";
 
 interface ProductFormProps {
   productType: "standard" | "package";
@@ -19,6 +20,8 @@ interface ProductFormProps {
   packageOptionInput: PackageOption;
   loading: boolean;
   categories: string[];
+  componentProducts: Product[];
+  supplyItems: CostItem[];
   onProductTypeChange: (value: "standard" | "package") => void;
   onProductNameChange: (value: string) => void;
   onProductCategoryChange: (value: string) => void;
@@ -62,6 +65,8 @@ export default function ProductForm({
   packageOptionInput,
   loading,
   categories,
+  componentProducts,
+  supplyItems,
   onProductTypeChange,
   onProductNameChange,
   onProductCategoryChange,
@@ -141,7 +146,11 @@ export default function ProductForm({
               options: [
                 ...group.options,
                 {
-                  label: "New option",
+                  componentType: "product",
+                  childProductId: "",
+                  childVariantId: "",
+                  supplyCostItemId: "",
+                  label: "",
                   description: "",
                   isAvailable: true,
                   quantity: 1,
@@ -186,6 +195,10 @@ export default function ProductForm({
       ),
     });
   };
+
+  const productById = (id?: string) => componentProducts.find((product) => product.id === id);
+  const variantLabel = (product?: Product, variantId?: string) =>
+    product?.selectOptions?.find((option) => option.variantId === variantId)?.label;
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -601,43 +614,117 @@ export default function ProductForm({
                 )}
 
                 <div className="space-y-2">
-                  {group.options.map((option, optionIndex) => (
-                    <div key={`${groupIndex}-${optionIndex}`} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_90px_auto] gap-2">
-                      <input
-                        type="text"
-                        value={option.label}
-                        onChange={(e) => updateGroupOption(groupIndex, optionIndex, { label: e.target.value })}
-                        className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
-                        placeholder="Option label"
-                      />
-                      <input
-                        type="text"
-                        value={option.description || ""}
-                        onChange={(e) => updateGroupOption(groupIndex, optionIndex, { description: e.target.value })}
-                        className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
-                        placeholder="Description"
-                      />
-                      <input
-                        type="number"
-                        min="1"
-                        value={option.quantity || 1}
-                        onChange={(e) =>
-                          updateGroupOption(groupIndex, optionIndex, {
-                            quantity: Math.max(1, parseInt(e.target.value, 10) || 1),
-                          })
-                        }
-                        className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
-                        title="Quantity"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeGroupOption(groupIndex, optionIndex)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                  {group.options.map((option, optionIndex) => {
+                    const selectedProduct = productById(option.childProductId);
+                    const selectedSupply = supplyItems.find((item) => item._id === option.supplyCostItemId);
+                    return (
+                      <div key={`${groupIndex}-${optionIndex}`} className="grid grid-cols-1 md:grid-cols-[130px_1fr_1fr_100px_auto] gap-2">
+                        <select
+                          value={option.componentType || "product"}
+                          onChange={(e) =>
+                            updateGroupOption(groupIndex, optionIndex, {
+                              componentType: e.target.value as "product" | "supply",
+                              childProductId: "",
+                              childVariantId: "",
+                              supplyCostItemId: "",
+                              label: "",
+                              description: "",
+                            })
+                          }
+                          className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                        >
+                          <option value="product">Product</option>
+                          <option value="supply">Supply</option>
+                        </select>
+                        {(option.componentType || "product") === "supply" ? (
+                          <select
+                            value={option.supplyCostItemId || ""}
+                            onChange={(e) => {
+                              const supply = supplyItems.find((item) => item._id === e.target.value);
+                              updateGroupOption(groupIndex, optionIndex, {
+                                supplyCostItemId: e.target.value,
+                                label: supply?.name || "",
+                                description: supply ? supply.unit : "",
+                              });
+                            }}
+                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                            required
+                          >
+                            <option value="">Select supply item</option>
+                            {supplyItems.map((item) => (
+                              <option key={item._id} value={item._id}>{item.name} ({item.unit})</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <select
+                            value={option.childProductId || ""}
+                            onChange={(e) => {
+                              const product = productById(e.target.value);
+                              const firstVariant = product?.selectOptions?.[0]?.variantId || "";
+                              updateGroupOption(groupIndex, optionIndex, {
+                                childProductId: e.target.value,
+                                childVariantId: firstVariant,
+                                label: product?.productName || "",
+                                description: variantLabel(product, firstVariant) || "",
+                              });
+                            }}
+                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                            required
+                          >
+                            <option value="">Select product</option>
+                            {componentProducts.map((product) => (
+                              <option key={product.id} value={product.id}>{product.productName}</option>
+                            ))}
+                          </select>
+                        )}
+                        {(option.componentType || "product") === "product" ? (
+                          <select
+                            value={option.childVariantId || ""}
+                            onChange={(e) =>
+                              updateGroupOption(groupIndex, optionIndex, {
+                                childVariantId: e.target.value,
+                                description: variantLabel(selectedProduct, e.target.value) || "",
+                              })
+                            }
+                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                          >
+                            <option value="">Base size</option>
+                            {(selectedProduct?.selectOptions || []).map((variant) => (
+                              <option key={variant.variantId || variant.label} value={variant.variantId || ""}>{variant.label}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            value={selectedSupply?.unit || ""}
+                            readOnly
+                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm bg-[#f3f0ea]"
+                            placeholder="Unit"
+                          />
+                        )}
+                        <input
+                          type="number"
+                          min="0.000001"
+                          step="any"
+                          value={option.quantity || 1}
+                          onChange={(e) =>
+                            updateGroupOption(groupIndex, optionIndex, {
+                              quantity: Math.max(0.000001, Number(e.target.value) || 1),
+                            })
+                          }
+                          className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                          title="Component quantity"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeGroupOption(groupIndex, optionIndex)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                          title="Remove component"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
                   <button
                     type="button"
                     onClick={() => addOptionToGroup(groupIndex)}

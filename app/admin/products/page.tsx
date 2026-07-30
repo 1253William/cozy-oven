@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { PackageConfig, PackageOption, Product, SelectOption } from "../../services/productService";
+import productService, { PackageConfig, PackageOption, Product, SelectOption } from "../../services/productService";
+import { CostItem, costingService } from "../../services/costingService";
 // import ComboProductModal from "./components/ComboProductModal";
 // import comboService, { ComboProduct } from "../../services/comboService";
 import useAdminProducts from "../../hooks/useAdminProducts";
@@ -71,6 +72,8 @@ export default function ProductManagementPage() {
     description: "",
     isAvailable: true,
   });
+  const [componentProducts, setComponentProducts] = useState<Product[]>([]);
+  const [supplyItems, setSupplyItems] = useState<CostItem[]>([]);
   // const [comboProducts, setComboProducts] = useState<ComboProduct[]>([]);
 
   // Use custom hooks
@@ -84,6 +87,27 @@ export default function ProductManagementPage() {
   });
 
   const PACKAGE_CATEGORY_LABEL = "Gifts and Flight Boxes";
+
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([
+      productService.getProducts({ limit: 100, sortBy: "productName", order: "asc" }),
+      costingService.items({ tracksStock: true, limit: 100 }),
+    ])
+      .then(([productResponse, supplyResponse]) => {
+        if (!mounted) return;
+        setComponentProducts((productResponse.data || []).filter((product) => product.productType !== "package"));
+        setSupplyItems(supplyResponse.data || []);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setComponentProducts([]);
+        setSupplyItems([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Get unique categories dynamically from products
   const categories = React.useMemo(() => {
@@ -248,8 +272,15 @@ export default function ProductManagementPage() {
 
   const packageConfigIsValid = () => {
     if (!isPackageCategory(newProduct.productCategory)) return true;
+    const optionIsValid = (option: PackageOption) => {
+      if (option.isAvailable === false) return true;
+      if (!option.label?.trim()) return false;
+      if (option.componentType === "supply") return Boolean(option.supplyCostItemId);
+      return Boolean(option.childProductId);
+    };
     if (packageConfig.groups && packageConfig.groups.length > 0) {
       return packageConfig.groups.every((group) => {
+        if (!group.options.every(optionIsValid)) return false;
         const availableCount = group.options.filter((option) => option.isAvailable !== false).length;
         if (group.type === "fixed") return availableCount > 0;
         if (!group.requiredSelectionCount || group.requiredSelectionCount < 1) return false;
@@ -257,6 +288,7 @@ export default function ProductManagementPage() {
         return availableCount > 0;
       });
     }
+    if (!packageConfig.options.every(optionIsValid)) return false;
     const availableCount = packageConfig.options.filter((option) => option.isAvailable !== false).length;
     return packageConfig.requiredSelectionCount > 0 && availableCount >= packageConfig.requiredSelectionCount;
   };
@@ -744,6 +776,8 @@ export default function ProductManagementPage() {
         packageOptionInput={packageOptionInput}
         loading={actionLoading}
         categories={categories}
+        componentProducts={componentProducts}
+        supplyItems={supplyItems}
         onProductTypeChange={setProductType}
         onProductNameChange={(value) => setNewProduct({ ...newProduct, productName: value })}
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
@@ -790,6 +824,8 @@ export default function ProductManagementPage() {
         packageOptionInput={packageOptionInput}
         loading={actionLoading}
         categories={categories}
+        componentProducts={componentProducts}
+        supplyItems={supplyItems}
         onProductTypeChange={setProductType}
         onProductNameChange={(value) => setNewProduct({ ...newProduct, productName: value })}
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
