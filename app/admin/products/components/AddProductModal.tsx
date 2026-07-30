@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import ProductForm from "./ProductForm";
-import { PackageConfig, PackageOption, SelectOption } from "../../../services/productService";
+import { CostItem } from "../../../services/costingService";
+import { PackageConfig, PackageOption, Product, SelectOption } from "../../../services/productService";
 
 interface AddProductModalProps {
   show: boolean;
@@ -23,6 +24,8 @@ interface AddProductModalProps {
   packageOptionInput: PackageOption;
   loading: boolean;
   categories: string[];
+  componentProducts: Product[];
+  supplyItems: CostItem[];
   onProductTypeChange: (value: "standard" | "package") => void;
   onProductNameChange: (value: string) => void;
   onProductCategoryChange: (value: string) => void;
@@ -64,6 +67,8 @@ export default function AddProductModal({
   packageOptionInput,
   loading,
   categories,
+  componentProducts,
+  supplyItems,
   onProductTypeChange,
   onProductNameChange,
   onProductCategoryChange,
@@ -113,6 +118,8 @@ export default function AddProductModal({
           packageOptionInput={packageOptionInput}
           loading={loading}
           categories={categories}
+          componentProducts={componentProducts}
+          supplyItems={supplyItems}
           onProductTypeChange={onProductTypeChange}
           onProductNameChange={onProductNameChange}
           onProductCategoryChange={onProductCategoryChange}

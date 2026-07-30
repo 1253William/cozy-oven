@@ -14,6 +14,7 @@ export interface InventoryItem {
   purchasedAt?: string;
   paymentMethod?: string;
   paymentReference?: string;
+  costItemId?: string;
   createdAt?: string;
 }
 
@@ -28,6 +29,7 @@ export interface PurchaseInput {
   purchasedAt: string;
   paymentMethod?: string;
   paymentReference?: string;
+  costItemId?: string;
 }
 
 export const inventoryService = {

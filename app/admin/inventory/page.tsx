@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertCircle, Edit2, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
+import { CostItem, costingService } from "../../services/costingService";
 import inventoryService, { InventoryItem, PurchaseInput } from "../../services/inventoryService";
 
 const categories = ["Raw Materials", "Packaging", "Equipment", "Supplies", "Other"];
@@ -28,6 +29,7 @@ const emptyForm: PurchaseInput = {
   purchasedAt: new Date().toISOString().slice(0, 10),
   paymentMethod: "",
   paymentReference: "",
+  costItemId: "",
 };
 const field = "w-full rounded-md border border-[#b9aca2]/70 bg-white px-3 py-2";
 
@@ -41,6 +43,7 @@ export default function PurchasesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [supplyItems, setSupplyItems] = useState<CostItem[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -59,6 +62,11 @@ export default function PurchasesPage() {
     }
   }, [appliedSearch]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    costingService.items({ tracksStock: true, limit: 100 })
+      .then((response) => setSupplyItems(response.data || []))
+      .catch(() => setSupplyItems([]));
+  }, []);
 
   const total = useMemo(
     () => rows.reduce((sum, row) => sum + Number(row.totalCost || 0), 0),
@@ -99,6 +107,7 @@ export default function PurchasesPage() {
       purchasedAt: new Date(row.purchasedAt || row.createdAt || Date.now()).toISOString().slice(0, 10),
       paymentMethod: row.paymentMethod || "",
       paymentReference: row.paymentReference || "",
+      costItemId: row.costItemId || "",
     });
     setShowForm(true);
   };
@@ -116,7 +125,7 @@ export default function PurchasesPage() {
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" />
             <div className="grid gap-3 text-sm text-[#5d6043] md:grid-cols-2">
               <div><p className="font-semibold text-[#222]">Record here</p><p>Supplier purchases of flour, sugar, boxes, equipment, and other supplies. This preserves purchase date, vendor, payment method, and cash spent.</p></div>
-              <div><p className="font-semibold text-[#222]">Costing follow-up</p><p>If the purchase changes what an ingredient or package costs per recipe unit, also update its rate under <Link href="/admin/cost-items" className="font-semibold underline">Cost Items</Link>. Purchases do not track raw-material consumption or finished stock.</p></div>
+              <div><p className="font-semibold text-[#222]">Costing follow-up</p><p>Link a purchase to a stock-tracked <Link href="/admin/cost-items" className="font-semibold underline">Cost Item</Link> when it should increase supply stock and update that item&apos;s recipe rate. Leave it unlinked for equipment or financial-only purchases.</p></div>
             </div>
           </div>
         </section>
@@ -132,6 +141,15 @@ export default function PurchasesPage() {
         {showForm && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><div><h2 className="text-xl font-semibold">{editingId ? "Edit purchase" : "Record purchase"}</h2><p className="text-sm text-[#5d6043]">Cost price is the price of one purchased unit.</p></div><button title="Close" onClick={reset} className="p-2"><X /></button></div><form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-2">
           <label className="text-sm font-medium">Item name<input className={`${field} mt-1`} value={form.itemName} onChange={(event) => setForm({ ...form, itemName: event.target.value })} required /></label>
           <label className="text-sm font-medium">Category<select className={`${field} mt-1`} value={form.itemCategory} onChange={(event) => setForm({ ...form, itemCategory: event.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
+          <label className="text-sm font-medium">Linked supply stock item<select className={`${field} mt-1`} value={form.costItemId || ""} onChange={(event) => {
+            const item = supplyItems.find((candidate) => candidate._id === event.target.value);
+            setForm({
+              ...form,
+              costItemId: event.target.value,
+              itemName: item?.name || form.itemName,
+              itemCategory: item ? "Raw Materials" : form.itemCategory,
+            });
+          }}><option value="">No stock link</option>{supplyItems.map((item) => <option key={item._id} value={item._id}>{item.name} ({item.unit})</option>)}</select></label>
           <label className="text-sm font-medium">Quantity purchased<input className={`${field} mt-1`} type="number" min="0.000001" step="any" value={form.quantityPurchased} onChange={(event) => setForm({ ...form, quantityPurchased: Number(event.target.value) })} required /></label>
           <label className="text-sm font-medium">Cost per purchased unit (GHS)<input className={`${field} mt-1`} type="number" min="0" step="0.01" value={form.costPrice || ""} onChange={(event) => setForm({ ...form, costPrice: Number(event.target.value) || 0 })} required /></label>
           <label className="text-sm font-medium">Supplier<input className={`${field} mt-1`} value={form.vendorName} onChange={(event) => setForm({ ...form, vendorName: event.target.value })} required /></label>
