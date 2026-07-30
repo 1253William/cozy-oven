@@ -12,7 +12,6 @@ interface EditProductModalProps {
   productCategory: string;
   price: number;
   salePrice?: number | null;
-  unitCost?: number | null;
   saleStartsAt?: string;
   saleEndsAt?: string;
   productDetails: string;
@@ -31,7 +30,6 @@ interface EditProductModalProps {
   onProductCategoryChange: (value: string) => void;
   onPriceChange: (value: number) => void;
   onSalePriceChange?: (value: number | null) => void;
-  onUnitCostChange?: (value: number | null) => void;
   onSaleStartsAtChange?: (value: string) => void;
   onSaleEndsAtChange?: (value: string) => void;
   onProductDetailsChange: (value: string) => void;
@@ -57,7 +55,6 @@ export default function EditProductModal({
   productCategory,
   price,
   salePrice = null,
-  unitCost = null,
   saleStartsAt = "",
   saleEndsAt = "",
   productDetails,
@@ -76,7 +73,6 @@ export default function EditProductModal({
   onProductCategoryChange,
   onPriceChange,
   onSalePriceChange,
-  onUnitCostChange,
   onSaleStartsAtChange,
   onSaleEndsAtChange,
   onProductDetailsChange,
@@ -112,7 +108,6 @@ export default function EditProductModal({
           productCategory={productCategory}
           price={price}
           salePrice={salePrice}
-          unitCost={unitCost}
           saleStartsAt={saleStartsAt}
           saleEndsAt={saleEndsAt}
           productDetails={productDetails}
@@ -131,7 +126,6 @@ export default function EditProductModal({
           onProductCategoryChange={onProductCategoryChange}
           onPriceChange={onPriceChange}
           onSalePriceChange={onSalePriceChange}
-          onUnitCostChange={onUnitCostChange}
           onSaleStartsAtChange={onSaleStartsAtChange}
           onSaleEndsAtChange={onSaleEndsAtChange}
           onProductDetailsChange={onProductDetailsChange}
