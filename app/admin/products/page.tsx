@@ -54,7 +54,6 @@ export default function ProductManagementPage() {
     productCategory: "",
     price: 0,
     salePrice: null as number | null,
-    unitCost: null as number | null,
     saleStartsAt: "",
     saleEndsAt: "",
     productDetails: "",
@@ -283,7 +282,6 @@ export default function ProductManagementPage() {
       productCategory: "",
       price: 0,
       salePrice: null,
-      unitCost: null,
       saleStartsAt: "",
       saleEndsAt: "",
       productDetails: "",
@@ -346,7 +344,6 @@ export default function ProductManagementPage() {
       formData.append("productDetails", newProduct.productDetails.trim());
       formData.append("price", newProduct.price.toString());
       formData.append("salePrice", newProduct.salePrice == null ? "" : String(newProduct.salePrice));
-      formData.append("unitCost", newProduct.unitCost == null ? "" : String(newProduct.unitCost));
       formData.append("saleStartsAt", newProduct.saleStartsAt || "");
       formData.append("saleEndsAt", newProduct.saleEndsAt || "");
       formData.append("productType", nextProductType);
@@ -423,7 +420,6 @@ export default function ProductManagementPage() {
       formData.append("productDetails", newProduct.productDetails.trim());
       formData.append("price", newProduct.price.toString());
       formData.append("salePrice", newProduct.salePrice == null ? "" : String(newProduct.salePrice));
-      formData.append("unitCost", newProduct.unitCost == null ? "" : String(newProduct.unitCost));
       formData.append("saleStartsAt", newProduct.saleStartsAt || "");
       formData.append("saleEndsAt", newProduct.saleEndsAt || "");
       formData.append("productType", nextProductType);
@@ -472,7 +468,6 @@ export default function ProductManagementPage() {
           : product.productCategory,
       price: product.price,
       salePrice: product.salePrice ?? null,
-      unitCost: product.unitCost ?? null,
       saleStartsAt: toDateTimeLocalValue(product.saleStartsAt),
       saleEndsAt: toDateTimeLocalValue(product.saleEndsAt),
       productDetails: product.productDetails,
@@ -738,7 +733,6 @@ export default function ProductManagementPage() {
         productCategory={newProduct.productCategory}
         price={newProduct.price}
         salePrice={newProduct.salePrice}
-        unitCost={newProduct.unitCost}
         saleStartsAt={newProduct.saleStartsAt}
         saleEndsAt={newProduct.saleEndsAt}
         productDetails={newProduct.productDetails}
@@ -755,7 +749,6 @@ export default function ProductManagementPage() {
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
         onPriceChange={(value) => setNewProduct({ ...newProduct, price: value })}
         onSalePriceChange={(value) => setNewProduct({ ...newProduct, salePrice: value })}
-        onUnitCostChange={(value) => setNewProduct({ ...newProduct, unitCost: value })}
         onSaleStartsAtChange={(value) => setNewProduct({ ...newProduct, saleStartsAt: value })}
         onSaleEndsAtChange={(value) => setNewProduct({ ...newProduct, saleEndsAt: value })}
         onProductDetailsChange={(value) => setNewProduct({ ...newProduct, productDetails: value })}
@@ -785,7 +778,6 @@ export default function ProductManagementPage() {
         productCategory={newProduct.productCategory}
         price={newProduct.price}
         salePrice={newProduct.salePrice}
-        unitCost={newProduct.unitCost}
         saleStartsAt={newProduct.saleStartsAt}
         saleEndsAt={newProduct.saleEndsAt}
         productDetails={newProduct.productDetails}
@@ -803,7 +795,6 @@ export default function ProductManagementPage() {
         onProductCategoryChange={(value) => setNewProduct({ ...newProduct, productCategory: value })}
         onPriceChange={(value) => setNewProduct({ ...newProduct, price: value })}
         onSalePriceChange={(value) => setNewProduct({ ...newProduct, salePrice: value })}
-        onUnitCostChange={(value) => setNewProduct({ ...newProduct, unitCost: value })}
         onSaleStartsAtChange={(value) => setNewProduct({ ...newProduct, saleStartsAt: value })}
         onSaleEndsAtChange={(value) => setNewProduct({ ...newProduct, saleEndsAt: value })}
         onProductDetailsChange={(value) => setNewProduct({ ...newProduct, productDetails: value })}

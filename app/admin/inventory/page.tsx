@@ -240,7 +240,7 @@ export default function InventoryPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-[#222222]">Inventory Management</h1>
+            <h1 className="text-3xl font-bold text-[#222222]">Purchases</h1>
             <p className="text-[#5d6043] mt-1">Track and manage your product stock levels</p>
           </div>
           <button

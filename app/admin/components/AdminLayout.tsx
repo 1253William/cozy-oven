@@ -29,7 +29,12 @@ interface AdminLayoutProps {
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
   { name: "Customer Management", icon: Users, href: "/admin/customers" },
-  { name: "Inventory", icon: Package, href: "/admin/inventory" },
+  { name: "Purchases", icon: Package, href: "/admin/inventory" },
+  { name: "Production", icon: Package, href: "/admin/operations/production" },
+  { name: "Finished Stock", icon: ShoppingBag, href: "/admin/operations/stock" },
+  { name: "Cost Items", icon: BarChart3, href: "/admin/cost-items" },
+  { name: "Recipes", icon: BarChart3, href: "/admin/recipes" },
+  { name: "Physical Counts", icon: Package, href: "/admin/operations/counts" },
   { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
   { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
   { name: "Promotions", icon: Star, href: "/admin/promotions" },
