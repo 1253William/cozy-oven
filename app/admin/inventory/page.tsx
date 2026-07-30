@@ -1,624 +1,146 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { AlertCircle, Edit2, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
-import { useAuth } from "../../context/AuthContext";
-import {
-  Package,
-  Search,
-  Filter,
-  TrendingDown,
-  TrendingUp,
-  AlertCircle,
-  Edit2,
-  Plus,
-  Loader2,
-  Trash2,
-} from "lucide-react";
-import inventoryService, { type InventoryItem } from "../../services/inventoryService";
-import AddInventoryModal from "./components/AddInventoryModal";
-import EditInventoryModal from "./components/EditInventoryModal";
+import inventoryService, { InventoryItem, PurchaseInput } from "../../services/inventoryService";
 
-export default function InventoryPage() {
-  const { user, isAuthenticated } = useAuth();
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
+const categories = ["Raw Materials", "Packaging", "Equipment", "Supplies", "Other"];
+const paymentLabels: Record<string, string> = {
+  cash: "Cash",
+  "mobile-money": "Mobile Money",
+  "bank-transfer": "Bank Transfer",
+  cheque: "Cheque",
+  card: "Card",
+  other: "Other",
+};
+const emptyForm: PurchaseInput = {
+  itemName: "",
+  quantityPurchased: 1,
+  costPrice: 0,
+  vendorName: "",
+  vendorContact: "",
+  purchasePurpose: "",
+  itemCategory: "Raw Materials",
+  purchasedAt: new Date().toISOString().slice(0, 10),
+  paymentMethod: "",
+  paymentReference: "",
+};
+const field = "w-full rounded-md border border-[#b9aca2]/70 bg-white px-3 py-2";
+
+export default function PurchasesPage() {
+  const [rows, setRows] = useState<InventoryItem[]>([]);
+  const [form, setForm] = useState<PurchaseInput>(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Add Inventory Modal State
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [addLoading, setAddLoading] = useState(false);
-  const [addItemName, setAddItemName] = useState("");
-  const [addQuantityPurchased, setAddQuantityPurchased] = useState(0);
-  const [addCostPrice, setAddCostPrice] = useState(0);
-  const [addVendorName, setAddVendorName] = useState("");
-  const [addVendorContact, setAddVendorContact] = useState("");
-  const [addPurchasePurpose, setAddPurchasePurpose] = useState("");
-  const [addItemCategory, setAddItemCategory] = useState("");
-
-  // Edit Inventory Modal State
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editLoading, setEditLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [editItemName, setEditItemName] = useState("");
-  const [editQuantityPurchased, setEditQuantityPurchased] = useState(0);
-  const [editCostPrice, setEditCostPrice] = useState(0);
-  const [editVendorName, setEditVendorName] = useState("");
-  const [editVendorContact, setEditVendorContact] = useState("");
-  const [editPurchasePurpose, setEditPurchasePurpose] = useState("");
-  const [editItemCategory, setEditItemCategory] = useState("");
-
-  useEffect(() => {
-    if (!isAuthenticated || user?.role !== "Admin") {
-      router.push("/admin/login");
-    }
-  }, [isAuthenticated, user, router]);
-
-  useEffect(() => {
-    if (isAuthenticated && user?.role === "Admin") {
-      fetchInventory();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage, statusFilter, appliedSearch]);
-
-  const fetchInventory = async () => {
+  const load = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const response = await inventoryService.getAllInventory({
-        page: currentPage,
-        limit: 10,
         search: appliedSearch || undefined,
-        status: statusFilter !== "all" ? statusFilter : undefined,
+        page: 1,
+        limit: 100,
       });
-      if (response.success) {
-        setInventory(response.data || []);
-        setTotalPages(Math.max(response.totalPages || 1, 1));
-      }
-    } catch (error) {
-      console.error("Error fetching inventory:", error);
+      setRows(response.data || []);
+      setError("");
+    } catch {
+      setError("Could not load purchases.");
     } finally {
       setLoading(false);
     }
   };
+  useEffect(() => { load(); }, [appliedSearch]);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this inventory item?")) {
-      try {
-        const response = await inventoryService.deleteInventory(id);
-        if (response.success) {
-          alert(response.message);
-          fetchInventory();
-        }
-      } catch (error) {
-        console.error("Error deleting inventory:", error);
-        alert("Failed to delete inventory item");
-      }
-    }
+  const total = useMemo(
+    () => rows.reduce((sum, row) => sum + Number(row.totalCost || 0), 0),
+    [rows]
+  );
+
+  const reset = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(false);
   };
 
-  // Add Inventory Handler
-  const handleAddInventory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAddLoading(true);
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
     try {
-      const response = await inventoryService.createInventory({
-        itemName: addItemName,
-        quantityPurchased: addQuantityPurchased,
-        costPrice: addCostPrice,
-        vendorName: addVendorName,
-        vendorContact: addVendorContact,
-        purchasePurpose: addPurchasePurpose,
-        itemCategory: addItemCategory,
-      });
-      if (response.success) {
-        alert(response.message);
-        setShowAddModal(false);
-        resetAddForm();
-        fetchInventory();
-      }
-    } catch (error) {
-      console.error("Error creating inventory:", error);
-      alert("Failed to create inventory item");
+      if (editingId) await inventoryService.updateInventory(editingId, form);
+      else await inventoryService.createInventory(form);
+      reset();
+      await load();
+    } catch (requestError: any) {
+      setError(requestError.response?.data?.message || "Could not save purchase.");
     } finally {
-      setAddLoading(false);
+      setSaving(false);
     }
   };
 
-  const resetAddForm = () => {
-    setAddItemName("");
-    setAddQuantityPurchased(0);
-    setAddCostPrice(0);
-    setAddVendorName("");
-    setAddVendorContact("");
-    setAddPurchasePurpose("");
-    setAddItemCategory("");
+  const edit = (row: InventoryItem) => {
+    setEditingId(row._id);
+    setForm({
+      itemName: row.itemName,
+      quantityPurchased: row.quantityPurchased,
+      costPrice: row.costPrice,
+      vendorName: row.vendorName,
+      vendorContact: row.vendorContact || "",
+      purchasePurpose: row.purchasePurpose || "",
+      itemCategory: row.itemCategory,
+      purchasedAt: new Date(row.purchasedAt || row.createdAt || Date.now()).toISOString().slice(0, 10),
+      paymentMethod: row.paymentMethod || "",
+      paymentReference: row.paymentReference || "",
+    });
+    setShowForm(true);
   };
-
-  // Edit Inventory Handler
-  const handleEditClick = async (item: InventoryItem) => {
-    try {
-      // Fetch full item details
-      const response = await inventoryService.getInventoryItem(item._id);
-      if (response.success) {
-        const fullItem = response.data;
-        setSelectedItem(fullItem);
-        setEditItemName(fullItem.itemName);
-        setEditQuantityPurchased(fullItem.quantityRemaining);
-        setEditCostPrice(fullItem.costPrice);
-        setEditVendorName(fullItem.vendorName);
-        setEditVendorContact(fullItem.vendorContact || "");
-        setEditPurchasePurpose(fullItem.purchasePurpose || "");
-        setEditItemCategory(fullItem.itemCategory);
-        setShowEditModal(true);
-      }
-    } catch (error) {
-      console.error("Error fetching inventory item:", error);
-      alert("Failed to fetch inventory item details");
-    }
-  };
-
-  const handleEditInventory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedItem) return;
-
-    setEditLoading(true);
-    try {
-      const response = await inventoryService.updateInventory(selectedItem._id, {
-        itemName: editItemName,
-        itemQuantity: editQuantityPurchased,
-        itemPrice: editCostPrice,
-        itemCategory: editItemCategory,
-      });
-      if (response.success) {
-        alert(response.message);
-        setShowEditModal(false);
-        setSelectedItem(null);
-        fetchInventory();
-      }
-    } catch (error) {
-      console.error("Error updating inventory:", error);
-      alert("Failed to update inventory item");
-    } finally {
-      setEditLoading(false);
-    }
-  };
-
-  if (!isAuthenticated || user?.role !== "Admin") {
-    return null;
-  }
-
-  const filteredInventory = inventory;
-
-  const stats = {
-    totalProducts: inventory?.length,
-    lowStock: inventory?.filter((item) => item.itemStatus === "low stock").length,
-    outOfStock: inventory?.filter((item) => item.itemStatus === "out of stock").length,
-    totalValue: inventory
-      ?.reduce((acc, item) => acc + item.quantityRemaining * item.costPrice, 0)
-      .toFixed(2),
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "in stock":
-        return "bg-green-100 text-green-700";
-      case "low stock":
-        return "bg-yellow-100 text-yellow-700";
-      case "out of stock":
-        return "bg-red-100 text-red-700";
-      case "damaged":
-        return "bg-orange-100 text-orange-700";
-      default:
-        return "bg-[#b9aca2] text-[#5d6043]";
-    }
-  };
-
-  const getStockIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "in stock":
-        return <TrendingUp className="w-4 h-4" />;
-      case "low stock":
-        return <AlertCircle className="w-4 h-4" />;
-      case "out of stock":
-        return <TrendingDown className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
-
-
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-[#222222]">Purchases</h1>
-            <p className="text-[#5d6043] mt-1">Track and manage your product stock levels</p>
-          </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add Inventory
-          </button>
-        </div>
+      <main className="space-y-6 p-4 md:p-8">
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div><h1 className="text-2xl font-bold">Purchases</h1><p className="text-sm text-[#5d6043]">Supplier transactions and procurement cash outflow.</p></div>
+          <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white"><Plus size={18} />Record purchase</button>
+        </header>
 
-        {/* Stats Cards */}
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Package className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Total Products</p>
-                  <p className="text-2xl font-bold text-[#222222]">{stats.totalProducts}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Low Stock</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <TrendingDown className="w-5 h-5 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Out of Stock</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-[#5d6043] font-medium">Total Value</p>
-                  <p className="text-xl font-bold text-[#222222]">GHS {stats.totalValue}</p>
-                </div>
-              </div>
+        <section className="border-y border-[#b9aca2]/60 bg-white/60 px-4 py-4">
+          <div className="flex gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" />
+            <div className="grid gap-3 text-sm text-[#5d6043] md:grid-cols-2">
+              <div><p className="font-semibold text-[#222]">Record here</p><p>Supplier purchases of flour, sugar, boxes, equipment, and other supplies. This preserves purchase date, vendor, payment method, and cash spent.</p></div>
+              <div><p className="font-semibold text-[#222]">Costing follow-up</p><p>If the purchase changes what an ingredient or package costs per recipe unit, also update its rate under <Link href="/admin/cost-items" className="font-semibold underline">Cost Items</Link>. Purchases do not track raw-material consumption or finished stock.</p></div>
             </div>
           </div>
-        )}
+        </section>
 
-        {/* Search and Filters */}
-        <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b9aca2]" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setCurrentPage(1);
-                    setAppliedSearch(searchQuery.trim());
-                  }
-                }}
-                placeholder="Search by product name, SKU, or category..."
-                className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
-              />
-            </div>
+        <section className="flex flex-wrap items-center justify-between gap-3">
+          <form onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }} className="relative w-full max-w-md"><Search className="absolute left-3 top-2.5 h-5 w-5 text-[#5d6043]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search item, reference, or category" className={`${field} pl-10`} /></form>
+          <div className="text-right"><p className="text-xs text-[#5d6043]">Visible purchase total</p><p className="text-xl font-semibold">GHS {total.toFixed(2)}</p></div>
+        </section>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#b9aca2]" />
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
-              >
-                <option value="all">All Status</option>
-                <option value="in stock">In Stock</option>
-                <option value="low stock">Low Stock</option>
-                <option value="out of stock">Out of Stock</option>
-              </select>
-            </div>
-          </div>
-        </div>
+        {error && <p className="text-sm text-red-700">{error}</p>}
+        {loading ? <p className="flex items-center gap-2 text-sm text-[#5d6043]"><Loader2 className="animate-spin" size={17} />Loading purchases...</p> : rows.length === 0 ? <p className="text-sm text-[#5d6043]">No purchases found.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-sm"><thead><tr className="border-b text-left"><th className="py-3">Purchase date</th><th>Item</th><th>Category</th><th>Supplier</th><th>Quantity</th><th>Unit price</th><th>Payment</th><th className="text-right">Total</th><th /></tr></thead><tbody>{rows.map((row) => <tr key={row._id} className="border-b"><td className="py-3">{new Date(row.purchasedAt || row.createdAt || Date.now()).toLocaleDateString("en-GB")}</td><td className="font-medium">{row.itemName}<span className="block text-xs font-normal text-[#5d6043]">{row.purchasePurpose}</span></td><td>{row.itemCategory}</td><td>{row.vendorName}</td><td>{row.quantityPurchased}</td><td>GHS {Number(row.costPrice).toFixed(2)}</td><td>{paymentLabels[row.paymentMethod || ""] || "—"}{row.paymentReference && <span className="block text-xs text-[#5d6043]">{row.paymentReference}</span>}</td><td className="text-right font-semibold">GHS {Number(row.totalCost).toFixed(2)}</td><td><div className="flex justify-end"><button title="Edit purchase" onClick={() => edit(row)} className="p-2"><Edit2 size={17} /></button><button title="Delete purchase" onClick={async () => { if (confirm("Delete this purchase?")) { await inventoryService.deleteInventory(row._id); await load(); } }} className="p-2 text-red-700"><Trash2 size={17} /></button></div></td></tr>)}</tbody></table></div>}
 
-        {/* Inventory Table/Cards */}
-        <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 overflow-hidden">
-          {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#faf9f5] border-b border-[#b9aca2]/60">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Product
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    SKU
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Current Stock
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Reorder Point
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Unit Cost
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#5d6043] uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-[#faf9f5] divide-y divide-[#b9aca2]/60">
-                {loading ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center">
-                      <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin mx-auto" />
-                    </td>
-                  </tr>
-                ) : filteredInventory?.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-[#5d6043]">
-                      No inventory items found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredInventory?.map((item) => (
-                    <tr key={item._id} className="hover:bg-[#faf9f5]">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-[#b9aca2] rounded-lg flex items-center justify-center">
-                            <Package className="w-5 h-5 text-[#5d6043]" />
-                          </div>
-                          <span className="ml-3 text-sm font-medium text-[#222222]">
-                            {item.itemName}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-[#5d6043]">{item.itemSKU}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-[#5d6043]">{item.itemCategory}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-[#222222]">
-                            {item.quantityRemaining}
-                          </span>
-                          <span className="text-xs text-[#5d6043]">
-                            / {item.quantityPurchased}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-[#5d6043]">-</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-[#222222]">
-                          GHS {item.costPrice.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                            item.itemStatus
-                          )}`}
-                        >
-                          {getStockIcon(item.itemStatus)}
-                          {(item.itemStatus?.charAt(0) || "").toUpperCase() + (item.itemStatus?.slice(1) || "")}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="p-1 text-[#5d6043] hover:bg-[#b9aca2] rounded transition-colors"
-                            title="Edit"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item._id)}
-                            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile Cards View - Simplified */}
-          <div className="md:hidden p-4 space-y-4">
-            {loading ? (
-              <div className="text-center py-8">
-                <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin mx-auto" />
-              </div>
-            ) : filteredInventory?.length === 0 ? (
-              <div className="text-center py-12">
-                <Package className="w-16 h-16 text-[#b9aca2] mx-auto mb-4" />
-                <p className="text-[#5d6043]">No inventory items found</p>
-              </div>
-            ) : (
-              filteredInventory?.map((item) => (
-                <div key={item._id} className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-[#b9aca2] rounded-lg flex items-center justify-center">
-                        <Package className="w-6 h-6 text-[#5d6043]" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-[#222222]">{item.itemName}</h3>
-                        <p className="text-sm text-[#5d6043]">{item.itemCategory}</p>
-                      </div>
-                    </div>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.itemStatus)}`}>
-                      {getStockIcon(item.itemStatus)}
-                           {(item.itemStatus?.charAt(0) || "").toUpperCase() + (item.itemStatus?.slice(1) || "")}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <p className="text-xs text-[#5d6043] mb-1">SKU</p>
-                      <p className="text-sm font-medium text-[#222222]">{item.itemSKU}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#5d6043] mb-1">Stock</p>
-                      <p className="text-sm font-semibold text-[#222222]">
-                        {item.quantityRemaining} / {item.quantityPurchased}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#5d6043] mb-1">Unit Cost</p>
-                      <p className="text-sm font-semibold text-[#222222]">GHS {item.costPrice.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#5d6043] mb-1">Actions</p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditClick(item)}
-                          className="p-1 text-[#5d6043] hover:bg-[#b9aca2] rounded transition-colors"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Empty State */}
-          {filteredInventory?.length === 0 && !loading && (
-            <div className="hidden md:block text-center py-12">
-              <Package className="w-16 h-16 text-[#b9aca2] mx-auto mb-4" />
-              <p className="text-[#5d6043]">No inventory items found</p>
-            </div>
-          )}
-        </div>
-
-        {!loading && totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-              disabled={currentPage === 1}
-              className="rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-medium text-[#222222] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="text-sm text-[#5d6043]">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
-              disabled={currentPage === totalPages}
-              className="rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-medium text-[#222222] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Add Inventory Modal */}
-      <AddInventoryModal
-        show={showAddModal}
-        onClose={() => {
-          setShowAddModal(false);
-          resetAddForm();
-        }}
-        onSubmit={handleAddInventory}
-        itemName={addItemName}
-        quantityPurchased={addQuantityPurchased}
-        costPrice={addCostPrice}
-        vendorName={addVendorName}
-        vendorContact={addVendorContact}
-        purchasePurpose={addPurchasePurpose}
-        itemCategory={addItemCategory}
-        loading={addLoading}
-        onItemNameChange={setAddItemName}
-        onQuantityPurchasedChange={setAddQuantityPurchased}
-        onCostPriceChange={setAddCostPrice}
-        onVendorNameChange={setAddVendorName}
-        onVendorContactChange={setAddVendorContact}
-        onPurchasePurposeChange={setAddPurchasePurpose}
-        onItemCategoryChange={setAddItemCategory}
-      />
-
-      {/* Edit Inventory Modal */}
-      <EditInventoryModal
-        show={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setSelectedItem(null);
-        }}
-        onSubmit={handleEditInventory}
-        selectedItem={selectedItem}
-        itemName={editItemName}
-        quantityPurchased={editQuantityPurchased}
-        costPrice={editCostPrice}
-        vendorName={editVendorName}
-        vendorContact={editVendorContact}
-        purchasePurpose={editPurchasePurpose}
-        itemCategory={editItemCategory}
-        loading={editLoading}
-        onItemNameChange={setEditItemName}
-        onQuantityPurchasedChange={setEditQuantityPurchased}
-        onCostPriceChange={setEditCostPrice}
-        onVendorNameChange={setEditVendorName}
-        onVendorContactChange={setEditVendorContact}
-        onPurchasePurposeChange={setEditPurchasePurpose}
-        onItemCategoryChange={setEditItemCategory}
-      />
+        {showForm && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><div><h2 className="text-xl font-semibold">{editingId ? "Edit purchase" : "Record purchase"}</h2><p className="text-sm text-[#5d6043]">Cost price is the price of one purchased unit.</p></div><button title="Close" onClick={reset} className="p-2"><X /></button></div><form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-2">
+          <label className="text-sm font-medium">Item name<input className={`${field} mt-1`} value={form.itemName} onChange={(event) => setForm({ ...form, itemName: event.target.value })} required /></label>
+          <label className="text-sm font-medium">Category<select className={`${field} mt-1`} value={form.itemCategory} onChange={(event) => setForm({ ...form, itemCategory: event.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
+          <label className="text-sm font-medium">Quantity purchased<input className={`${field} mt-1`} type="number" min="0.000001" step="any" value={form.quantityPurchased} onChange={(event) => setForm({ ...form, quantityPurchased: Number(event.target.value) })} required /></label>
+          <label className="text-sm font-medium">Cost per purchased unit (GHS)<input className={`${field} mt-1`} type="number" min="0" step="0.01" value={form.costPrice || ""} onChange={(event) => setForm({ ...form, costPrice: Number(event.target.value) || 0 })} required /></label>
+          <label className="text-sm font-medium">Supplier<input className={`${field} mt-1`} value={form.vendorName} onChange={(event) => setForm({ ...form, vendorName: event.target.value })} required /></label>
+          <label className="text-sm font-medium">Supplier contact (optional)<input className={`${field} mt-1`} value={form.vendorContact || ""} onChange={(event) => setForm({ ...form, vendorContact: event.target.value })} /></label>
+          <label className="text-sm font-medium">Purchase date<input className={`${field} mt-1`} type="date" max={new Date().toISOString().slice(0, 10)} value={form.purchasedAt} onChange={(event) => setForm({ ...form, purchasedAt: event.target.value })} required /></label>
+          <label className="text-sm font-medium">Payment method<select className={`${field} mt-1`} value={form.paymentMethod || ""} onChange={(event) => setForm({ ...form, paymentMethod: event.target.value })}><option value="">Not recorded</option>{Object.entries(paymentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label className="text-sm font-medium">Payment reference (optional)<input className={`${field} mt-1`} value={form.paymentReference || ""} onChange={(event) => setForm({ ...form, paymentReference: event.target.value })} /></label>
+          <label className="text-sm font-medium">Purchase purpose<textarea className={`${field} mt-1`} rows={2} value={form.purchasePurpose} onChange={(event) => setForm({ ...form, purchasePurpose: event.target.value })} required /></label>
+          <div className="flex items-end justify-between rounded-md border px-3 py-2"><div><p className="text-xs text-[#5d6043]">Total purchase</p><p className="font-semibold">GHS {(Number(form.quantityPurchased) * Number(form.costPrice)).toFixed(2)}</p></div><button disabled={saving} className="rounded-md bg-[#5d6043] px-4 py-2 text-white disabled:opacity-60">{editingId ? "Update" : "Record"}</button></div>
+        </form></section></div>}
+      </main>
     </AdminLayout>
   );
 }
