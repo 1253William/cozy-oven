@@ -88,7 +88,7 @@ export default function ApiWarmupBanner() {
   const showProgress = state === "warming" || isReady || isFailed;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-[80] w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-[22px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5] px-4 py-3 text-sm text-[#222222] shadow-lg md:bottom-6">
+    <div className="fixed left-1/2 top-[7.25rem] z-[80] w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-[22px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5] px-3 py-2 text-sm text-[#222222] shadow-lg sm:bottom-6 sm:top-auto sm:px-4 sm:py-3">
       <div className="flex items-start gap-3">
         {!isReady && !isFailed && (
           <span className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[#bd6325] border-r-transparent" />
