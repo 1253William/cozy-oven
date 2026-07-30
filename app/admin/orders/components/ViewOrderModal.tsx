@@ -50,6 +50,8 @@ interface OrderDetails {
   pricing: {
     subtotal: number;
     discountAmount: number;
+    manualDiscountAmount: number;
+    codeDiscountAmount: number;
     deliveryFee: number;
     totalAmount: number;
     paymentBreakdown?: PaymentBreakdown;
@@ -62,6 +64,12 @@ interface OrderDetails {
     paidAt?: string;
   };
   source?: string;
+  promotion?: {
+    code: string;
+    name: string;
+    kind: "general" | "influencer";
+    influencerName?: string;
+  };
   invoice?: {
     invoiceId?: string;
     status?: string;
@@ -142,6 +150,20 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
           : typeof raw.discountAmount === "number"
             ? raw.discountAmount
             : 0;
+      const codeDiscountAmount =
+        typeof rawPricing.codeDiscountAmount === "number"
+          ? rawPricing.codeDiscountAmount
+          : typeof raw.codeDiscountAmount === "number"
+            ? raw.codeDiscountAmount
+            : raw.promotion?.appliedAmount || 0;
+      const manualDiscountAmount =
+        typeof rawPricing.manualDiscountAmount === "number"
+          ? rawPricing.manualDiscountAmount
+          : typeof raw.manualDiscountAmount === "number"
+            ? raw.manualDiscountAmount
+            : raw.promotion
+              ? Math.max(0, pricingDiscount - codeDiscountAmount)
+              : pricingDiscount;
 
       const normalized: OrderDetails = {
         orderId: raw.orderId || raw._id || orderId,
@@ -199,6 +221,8 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
         pricing: {
           subtotal: pricingSubtotal,
           discountAmount: pricingDiscount,
+          manualDiscountAmount,
+          codeDiscountAmount,
           deliveryFee,
           totalAmount:
             typeof rawPricing.totalAmount === "number"
@@ -219,6 +243,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
           paidAt: raw.payment?.paidAt || raw.paidAt,
         },
         source: raw.source,
+        promotion: raw.promotion,
         invoice: raw.invoice,
         orderStatus: raw.orderStatus || raw.status || "pending",
         createdAt: raw.createdAt || raw.date || new Date().toISOString(),
@@ -432,11 +457,24 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                         GHS {orderDetails.pricing.subtotal.toFixed(2)}
                       </span>
                     </div>
-                    {orderDetails.pricing.discountAmount > 0 && (
+                    {orderDetails.pricing.codeDiscountAmount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-[#5d6043]">Discount</span>
+                        <span className="text-[#5d6043]">
+                          Promotion
+                          {orderDetails.promotion?.code
+                            ? ` (${orderDetails.promotion.code})`
+                            : ""}
+                        </span>
                         <span className="text-green-700">
-                          -GHS {orderDetails.pricing.discountAmount.toFixed(2)}
+                          -GHS {orderDetails.pricing.codeDiscountAmount.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                    {orderDetails.pricing.manualDiscountAmount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#5d6043]">Manual discount</span>
+                        <span className="text-green-700">
+                          -GHS {orderDetails.pricing.manualDiscountAmount.toFixed(2)}
                         </span>
                       </div>
                     )}

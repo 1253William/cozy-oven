@@ -18,6 +18,8 @@ import {
 } from "../utils/checkoutRecovery";
 import { calculatePaystackPaymentBreakdown } from "../utils/paymentBreakdown";
 import { isAllowedPaymentRedirectUrl } from "../utils/paymentRedirect";
+import PromotionCodeField from "../components/PromotionCodeField";
+import { usePromotion } from "../context/PromotionContext";
 
 type DeliveryMethod = "delivery" | "pickup";
 type CheckoutStep = "info" | "delivery" | "payment" | "review";
@@ -25,6 +27,7 @@ type CheckoutStep = "info" | "delivery" | "payment" | "review";
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, getCartTotal } = useCart();
+  const { quote: promotionQuote, revalidate: revalidatePromotion } = usePromotion();
   const { isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("info");
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -52,7 +55,8 @@ export default function CheckoutPage() {
   const paymentMethod = "paystack";
 
   const subtotal = getCartTotal();
-  const total = subtotal; // Delivery fee not included in checkout
+  const codeDiscountAmount = promotionQuote?.pricing.codeDiscountAmount || 0;
+  const total = Math.max(0, subtotal - codeDiscountAmount); // Delivery fee is paid separately.
   const paymentBreakdown = calculatePaystackPaymentBreakdown(total);
 
   useEffect(() => {
@@ -280,7 +284,7 @@ export default function CheckoutPage() {
     }
 
     // Validate minimum order amount (40 cedis)
-    if (total < 40) {
+    if (subtotal < 40) {
       setError("Minimum order amount is GHS 40.00. Please add more items to your cart.");
       return;
     }
@@ -289,6 +293,10 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
+      if (promotionQuote && !(await revalidatePromotion())) {
+        throw new Error("Your promotion code is no longer valid");
+      }
+
       const items: OrderItem[] = cart.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
@@ -318,6 +326,7 @@ export default function CheckoutPage() {
         fullName: customerInfo.name.trim(),
         email: customerInfo.email.trim(),
         paymentMethod,
+        discountCode: promotionQuote?.promotion.code,
         ...(deliveryMethod === "pickup" && {
           orderDetails: {
             pickUpDetails: {
@@ -711,8 +720,19 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-5 space-y-2 text-sm text-[#5d6043]">
+                  <PromotionCodeField />
                   <div className="flex justify-between">
-                    <span>Product total</span>
+                    <span>Product subtotal</span>
+                    <span>GHS {subtotal.toFixed(2)}</span>
+                  </div>
+                  {codeDiscountAmount > 0 && (
+                    <div className="flex justify-between text-green-700">
+                      <span>Promotion ({promotionQuote?.promotion.code})</span>
+                      <span>-GHS {codeDiscountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Order total</span>
                     <span>GHS {total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
@@ -805,7 +825,17 @@ export default function CheckoutPage() {
                   <div className="rounded-[22px] border border-[rgba(34,34,34,0.08)] bg-[#faf9f5] p-5">
                     <div className="space-y-2 text-sm text-[#5d6043]">
                       <div className="flex justify-between">
-                        <span>Product total</span>
+                        <span>Product subtotal</span>
+                        <span>GHS {subtotal.toFixed(2)}</span>
+                      </div>
+                      {codeDiscountAmount > 0 && (
+                        <div className="flex justify-between text-green-700">
+                          <span>Promotion ({promotionQuote?.promotion.code})</span>
+                          <span>-GHS {codeDiscountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Order total</span>
                         <span>GHS {total.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">

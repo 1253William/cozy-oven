@@ -13,16 +13,20 @@ import {
   getCheckoutResumeToken,
 } from "../utils/checkoutRecovery";
 import { isAllowedPaymentRedirectUrl } from "../utils/paymentRedirect";
+import PromotionCodeField from "../components/PromotionCodeField";
+import { usePromotion } from "../context/PromotionContext";
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, getCartTotal } = useCart();
+  const { quote } = usePromotion();
   const [pendingCheckoutAvailable, setPendingCheckoutAvailable] = useState(false);
   const [isResumingCheckout, setIsResumingCheckout] = useState(false);
   const [resumeError, setResumeError] = useState<string | null>(null);
   
   const subtotal = getCartTotal();
-  const total = subtotal;
+  const codeDiscountAmount = quote?.pricing.codeDiscountAmount || 0;
+  const total = Math.max(0, subtotal - codeDiscountAmount);
 
   useEffect(() => {
     setPendingCheckoutAvailable(Boolean(getCheckoutResumeToken()));
@@ -269,10 +273,17 @@ export default function CartPage() {
                 </h2>
 
                 <div className="mb-6 space-y-3">
+                  <PromotionCodeField compact />
                   <div className="flex justify-between text-[#5d6043]">
                     <span>Subtotal</span>
                     <span>GHS {subtotal.toFixed(2)}</span>
                   </div>
+                  {codeDiscountAmount > 0 && (
+                    <div className="flex justify-between text-green-700">
+                      <span>Promotion ({quote?.promotion.code})</span>
+                      <span>-GHS {codeDiscountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <p className="text-xs leading-5 text-[#5d6043]">
                     Delivery from GHS 30, paid on delivery.
                   </p>

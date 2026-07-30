@@ -10,6 +10,8 @@ import PackageSelectionEditor, {
   type PackageSelection,
   usePackageSelection,
 } from "./PackageSelectionEditor";
+import AdminPromotionSelector from "./AdminPromotionSelector";
+import type { PromotionQuote } from "../../../services/promotionService";
 
 interface AddInvoiceModalProps {
   isOpen: boolean;
@@ -34,6 +36,8 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [city, setCity] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const [discountAmount, setDiscountAmount] = useState("");
+  const [promotionQuote, setPromotionQuote] = useState<PromotionQuote | null>(null);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -44,8 +48,31 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
   const selectedProduct = products.find((p) => p.id === selectedProductId);
   const availableSizes = selectedProduct?.selectOptions?.filter((opt) => opt.isAvailable !== false) || [];
   const packageSelection = usePackageSelection(selectedProduct);
-  const totalAmount = invoiceItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+  const subtotalAmount = invoiceItems.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
+    0
+  );
+  const codeDiscountAmount = promotionQuote?.pricing.codeDiscountAmount || 0;
+  const remainingSubtotal = Math.max(0, subtotalAmount - codeDiscountAmount);
+  const parsedManualDiscount = discountAmount.trim() ? Number(discountAmount) : 0;
+  const displayedManualDiscount =
+    Number.isFinite(parsedManualDiscount) && parsedManualDiscount > 0
+      ? Math.min(parsedManualDiscount, remainingSubtotal)
+      : 0;
+  const totalAmount = Math.max(
+    0,
+    subtotalAmount - codeDiscountAmount - displayedManualDiscount
+  );
   const paymentBreakdown = calculatePaystackPaymentBreakdown(totalAmount);
+  const promotionItems = invoiceItems.map((item) => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+    ...(item.size ? { size: item.size } : {}),
+    ...(item.packageSelections?.length
+      ? { packageSelections: item.packageSelections }
+      : {}),
+  }));
 
   const resetForm = () => {
     setCustomerName("");
@@ -54,6 +81,8 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
     setDeliveryAddress("");
     setCity("");
     setSpecialInstructions("");
+    setDiscountAmount("");
+    setPromotionQuote(null);
     setInvoiceItems([]);
     setSelectedProductId("");
     setSelectedSize("");
@@ -115,6 +144,16 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
       setError("Please add at least one item to the invoice");
       return;
     }
+    if (
+      !Number.isFinite(parsedManualDiscount) ||
+      parsedManualDiscount < 0 ||
+      parsedManualDiscount > remainingSubtotal
+    ) {
+      setError(
+        "Manual discount must be between GHS 0.00 and the subtotal remaining after the promotion"
+      );
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -139,6 +178,8 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
         fullName: customerName.trim(),
         email: customerEmail.trim(),
         paymentMethod: "paystack",
+        discountAmount: parsedManualDiscount || undefined,
+        discountCode: promotionQuote?.promotion.code,
       });
 
       const orderId = response.data?.orderId || response.order?.orderId;
@@ -342,6 +383,42 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
                       ))}
                       <div className="border-t border-[#b9aca2]/60 pt-4">
                         <div className="space-y-2">
+                          <AdminPromotionSelector
+                            items={promotionItems}
+                            quote={promotionQuote}
+                            onChange={setPromotionQuote}
+                          />
+                          <div className="pt-2">
+                            <label className="mb-2 block text-sm font-medium text-[#5d6043]">
+                              Manual Discount Amount (Optional)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              max={remainingSubtotal}
+                              step="0.01"
+                              value={discountAmount}
+                              onChange={(event) => setDiscountAmount(event.target.value)}
+                              placeholder="0.00"
+                              className="w-full rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between text-sm text-[#5d6043]">
+                            <span>Product subtotal</span>
+                            <span>GHS {subtotalAmount.toFixed(2)}</span>
+                          </div>
+                          {codeDiscountAmount > 0 && (
+                            <div className="flex items-center justify-between text-sm text-green-700">
+                              <span>Promotion ({promotionQuote?.promotion.code})</span>
+                              <span>-GHS {codeDiscountAmount.toFixed(2)}</span>
+                            </div>
+                          )}
+                          {displayedManualDiscount > 0 && (
+                            <div className="flex items-center justify-between text-sm text-green-700">
+                              <span>Manual discount</span>
+                              <span>-GHS {displayedManualDiscount.toFixed(2)}</span>
+                            </div>
+                          )}
                           <div className="flex items-center justify-between text-sm text-[#5d6043]">
                             <span>Order total</span>
                             <span>GHS {totalAmount.toFixed(2)}</span>

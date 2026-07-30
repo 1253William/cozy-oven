@@ -180,6 +180,9 @@ export default function ReportsPage() {
 
   const fulfillment = financeSummary?.fulfillment;
   const statusBreakdown = financeSummary?.statusBreakdown || [];
+  const discountBreakdown =
+    financeSummary?.discounts || financeSummary?.pnl?.discounts;
+  const promotionCodes = financeSummary?.promotionCodes || [];
 
   if (!isAuthenticated || user?.role !== "Admin") {
     return null;
@@ -309,6 +312,80 @@ export default function ReportsPage() {
                   : ""}
               </p>
             ) : null}
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="rounded-lg border border-[#b9aca2]/40 bg-[#faf9f5] p-5 lg:col-span-1">
+                <h3 className="font-semibold text-[#222222]">Discount breakdown</h3>
+                <div className="mt-4 space-y-3 text-sm">
+                  {[
+                    ["Product sales", discountBreakdown?.productSale || 0],
+                    ["Promotion codes", discountBreakdown?.promotionCode || 0],
+                    ["Manual discounts", discountBreakdown?.manual || 0],
+                  ].map(([label, value]) => (
+                    <div key={String(label)} className="flex justify-between text-[#5d6043]">
+                      <span>{label}</span>
+                      <span>GHS {Number(value).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between border-t border-[#b9aca2]/50 pt-3 font-semibold text-[#222222]">
+                    <span>Total discounts</span>
+                    <span>GHS {(discountBreakdown?.total || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-lg border border-[#b9aca2]/40 bg-[#faf9f5] lg:col-span-2">
+                <div className="border-b border-[#b9aca2]/40 p-5">
+                  <h3 className="font-semibold text-[#222222]">Promotion code performance</h3>
+                  <p className="mt-1 text-xs text-[#5d6043]">
+                    Paid orders attributed during this report period.
+                  </p>
+                </div>
+                {promotionCodes.length === 0 ? (
+                  <p className="p-8 text-center text-sm text-[#5d6043]">
+                    No paid promotion-code orders this month.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[640px] text-sm">
+                      <thead className="bg-[#f4efe7] text-left text-xs uppercase text-[#5d6043]">
+                        <tr>
+                          <th className="px-4 py-3">Code</th>
+                          <th className="px-4 py-3 text-right">Uses</th>
+                          <th className="px-4 py-3 text-right">Customers</th>
+                          <th className="px-4 py-3 text-right">Discount</th>
+                          <th className="px-4 py-3 text-right">Net revenue</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#b9aca2]/40">
+                        {promotionCodes.map((promotion) => (
+                          <tr key={`${promotion.promotionId || promotion.code}-${promotion.code}`}>
+                            <td className="px-4 py-3">
+                              <p className="font-semibold text-[#222222]">{promotion.code}</p>
+                              <p className="text-xs text-[#5d6043]">
+                                {promotion.influencerName || promotion.name}
+                              </p>
+                            </td>
+                            <td className="px-4 py-3 text-right text-[#5d6043]">
+                              {promotion.paidUses}
+                            </td>
+                            <td className="px-4 py-3 text-right text-[#5d6043]">
+                              {promotion.uniqueCustomers}
+                            </td>
+                            <td className="px-4 py-3 text-right text-green-700">
+                              GHS {promotion.discountGiven.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-[#222222]">
+                              GHS {promotion.netRevenue.toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">

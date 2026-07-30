@@ -10,6 +10,8 @@ import PackageSelectionEditor, {
   usePackageSelection,
 } from "./PackageSelectionEditor";
 import customerService, { type Customer } from "../../../services/customerService";
+import type { PromotionQuote } from "../../../services/promotionService";
+import AdminPromotionSelector from "./AdminPromotionSelector";
 
 type ManualPaymentMethod = "cash" | "mobile-money" | "bank-transfer" | "cheque";
 
@@ -45,6 +47,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const [paymentMethod, setPaymentMethod] = useState<ManualPaymentMethod>("cash");
   const [paymentReference, setPaymentReference] = useState("");
   const [discountAmount, setDiscountAmount] = useState("");
+  const [promotionQuote, setPromotionQuote] = useState<PromotionQuote | null>(null);
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -169,9 +172,11 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       (sum, item) => sum + item.unitPrice * item.quantity,
       0
     );
+    const codeDiscountAmount = promotionQuote?.pricing.codeDiscountAmount || 0;
+    const remainingSubtotal = Math.max(0, subtotalAmount - codeDiscountAmount);
     const parsedDiscount = discountAmount.trim() ? Number(discountAmount) : 0;
-    if (!Number.isFinite(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > subtotalAmount) {
-      setError("Discount amount must be between GHS 0.00 and the order subtotal");
+    if (!Number.isFinite(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > remainingSubtotal) {
+      setError("Manual discount must be between GHS 0.00 and the subtotal remaining after the promotion");
       return;
     }
 
@@ -197,6 +202,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
         email: customerEmail.trim() || undefined,
         customerId: selectedCustomerId || undefined,
         discountAmount: parsedDiscount || undefined,
+        discountCode: promotionQuote?.promotion.code,
         paymentMethod,
         paymentReference: paymentMethod !== "cash" ? paymentReference.trim() || undefined : undefined,
         transactionDate: transactionDate || undefined,
@@ -216,6 +222,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       setPaymentMethod("cash");
       setPaymentReference("");
       setDiscountAmount("");
+      setPromotionQuote(null);
       setSpecialInstructions("");
       setOrderItems([]);
       setSelectedProductId("");
@@ -233,12 +240,26 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   };
 
   const subtotalAmount = orderItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+  const codeDiscountAmount = promotionQuote?.pricing.codeDiscountAmount || 0;
+  const remainingSubtotal = Math.max(0, subtotalAmount - codeDiscountAmount);
   const parsedDiscountAmount = Number(discountAmount);
-  const displayedDiscount =
+  const displayedManualDiscount =
     Number.isFinite(parsedDiscountAmount) && parsedDiscountAmount > 0
-      ? Math.min(parsedDiscountAmount, subtotalAmount)
+      ? Math.min(parsedDiscountAmount, remainingSubtotal)
       : 0;
-  const totalAmount = Math.max(0, subtotalAmount - displayedDiscount);
+  const totalAmount = Math.max(
+    0,
+    subtotalAmount - codeDiscountAmount - displayedManualDiscount
+  );
+  const promotionItems = orderItems.map((item) => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+    ...(item.size ? { size: item.size } : {}),
+    ...(item.packageSelections?.length
+      ? { packageSelections: item.packageSelections }
+      : {}),
+  }));
 
   if (!isOpen) return null;
 
@@ -544,13 +565,20 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                       ))}
                       <div className="mt-4 pt-4 border-t border-[#b9aca2]/60">
                         <div className="mb-3">
+                          <AdminPromotionSelector
+                            items={promotionItems}
+                            quote={promotionQuote}
+                            onChange={setPromotionQuote}
+                          />
+                        </div>
+                        <div className="mb-3">
                           <label className="mb-2 block text-sm font-medium text-[#5d6043]">
                             Discount Amount (Optional)
                           </label>
                           <input
                             type="number"
                             min="0"
-                            max={subtotalAmount}
+                            max={remainingSubtotal}
                             step="0.01"
                             value={discountAmount}
                             onChange={(e) => setDiscountAmount(e.target.value)}
@@ -562,10 +590,20 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                           <span className="text-[#5d6043]">Subtotal</span>
                           <span className="text-[#222222]">GHS {subtotalAmount.toFixed(2)}</span>
                         </div>
-                        {displayedDiscount > 0 && (
+                        {codeDiscountAmount > 0 && (
                           <div className="mt-1 flex items-center justify-between text-sm">
-                            <span className="text-[#5d6043]">Discount</span>
-                            <span className="text-green-700">-GHS {displayedDiscount.toFixed(2)}</span>
+                            <span className="text-[#5d6043]">
+                              Promotion ({promotionQuote?.promotion.code})
+                            </span>
+                            <span className="text-green-700">
+                              -GHS {codeDiscountAmount.toFixed(2)}
+                            </span>
+                          </div>
+                        )}
+                        {displayedManualDiscount > 0 && (
+                          <div className="mt-1 flex items-center justify-between text-sm">
+                            <span className="text-[#5d6043]">Manual discount</span>
+                            <span className="text-green-700">-GHS {displayedManualDiscount.toFixed(2)}</span>
                           </div>
                         )}
                         <div className="mt-2 flex items-center justify-between border-t border-[#b9aca2]/40 pt-2">

@@ -17,6 +17,7 @@ import {
   Eye,
   Download,
   CreditCard,
+  TicketPercent,
 } from "lucide-react";
 import { orderService, type Order } from "../../services/orderService";
 import ViewOrderModal from "./components/ViewOrderModal";
@@ -86,6 +87,7 @@ export default function OrdersPage() {
   const [appliedSearch, setAppliedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
+  const [discountCodeFilter, setDiscountCodeFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export default function OrdersPage() {
       fetchOrders();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage, appliedSearch, statusFilter, paymentMethodFilter]);
+  }, [isAuthenticated, user, currentPage, appliedSearch, statusFilter, paymentMethodFilter, discountCodeFilter]);
 
   const fetchOrders = async () => {
   try {
@@ -124,6 +126,7 @@ export default function OrdersPage() {
       search: appliedSearch || undefined,
       status: statusFilter !== "all" ? statusFilter : undefined,
       paymentMethod: paymentMethodFilter !== "all" ? paymentMethodFilter : undefined,
+      discountCode: discountCodeFilter.trim() || undefined,
     });
 
     if (!response?.success || !response.data) {
@@ -351,6 +354,21 @@ export default function OrdersPage() {
                 <option value="bank-transfer">Bank Transfer</option>
                 <option value="cheque">Cheque</option>
               </select>
+            </div>
+
+            <div className="relative min-w-[190px]">
+              <TicketPercent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b9aca2]" />
+              <input
+                type="text"
+                value={discountCodeFilter}
+                onChange={(event) => {
+                  setDiscountCodeFilter(event.target.value.toUpperCase());
+                  setCurrentPage(1);
+                }}
+                placeholder="Filter by code"
+                maxLength={32}
+                className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 uppercase focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
+              />
             </div>
           </div>
         </div>

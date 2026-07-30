@@ -28,6 +28,7 @@ export interface CheckoutRequest {
   paymentReference?: string;
   customerId?: string;
   discountAmount?: number;
+  discountCode?: string;
   transactionDate?: string;
   fullName?: string;
   email?: string;
@@ -70,6 +71,16 @@ export interface Order {
   title?: string;
   subtotal?: number;
   discountAmount?: number;
+  manualDiscountAmount?: number;
+  codeDiscountAmount?: number;
+  promotion?: {
+    promotionId?: string;
+    code: string;
+    name: string;
+    kind: "general" | "influencer";
+    influencerName?: string;
+    appliedAmount: number;
+  };
   deliveryFee?: number;
   chargedAmount?: string;
   price?: number;
@@ -233,6 +244,7 @@ export const orderService = {
     search?: string;
     status?: string;
     paymentMethod?: string;
+    discountCode?: string;
   }): Promise<GetAllOrdersResponse> => {
     const queryParams = new URLSearchParams();
     
@@ -241,6 +253,7 @@ export const orderService = {
     if (params?.search) queryParams.append("search", params.search);
     if (params?.status) queryParams.append("status", params.status);
     if (params?.paymentMethod) queryParams.append("paymentMethod", params.paymentMethod);
+    if (params?.discountCode) queryParams.append("discountCode", params.discountCode);
 
     const response = await apiClient.get(
       `/api/v1/dashboard/admin/orders${queryParams.toString() ? `?${queryParams.toString()}` : ""}`

@@ -10,6 +10,7 @@ import DeliveryBanner from "./components/DeliveryBanner";
 import StorefrontMotion from "./components/StorefrontMotion";
 import ApiWarmupBanner from "./components/ApiWarmupBanner";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
+import { PromotionProvider } from "./context/PromotionContext";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://cozyoven.store"),
@@ -69,16 +70,18 @@ export default function RootLayout({
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>
-              <SiteSettingsProvider>
-                <CartToastWrapper>
-                  <ApiWarmupBanner />
-                  <DeliveryBanner />
-                  <StorefrontMotion />
-                  {children}
-                  <PurchaseToast />
-                  <ReviewPromptModal />
-                </CartToastWrapper>
-              </SiteSettingsProvider>
+              <PromotionProvider>
+                <SiteSettingsProvider>
+                  <CartToastWrapper>
+                    <ApiWarmupBanner />
+                    <DeliveryBanner />
+                    <StorefrontMotion />
+                    {children}
+                    <PurchaseToast />
+                    <ReviewPromptModal />
+                  </CartToastWrapper>
+                </SiteSettingsProvider>
+              </PromotionProvider>
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

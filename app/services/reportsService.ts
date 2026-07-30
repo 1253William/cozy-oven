@@ -48,6 +48,27 @@ export interface ChannelBreakdown {
   revenue: number;
 }
 
+export interface DiscountBreakdown {
+  productSale: number;
+  promotionCode: number;
+  manual: number;
+  total: number;
+}
+
+export interface PromotionCodePerformance {
+  promotionId?: string;
+  code: string;
+  name: string;
+  kind: "general" | "influencer";
+  influencerName?: string;
+  paidUses: number;
+  uniqueCustomers: number;
+  grossMerchandiseValue: number;
+  discountGiven: number;
+  netRevenue: number;
+  averageOrderValue: number;
+}
+
 export interface ReviewsSummary {
   total: number;
   pending: number;
@@ -72,6 +93,7 @@ export interface PnLBlock {
   netMarginPercent: number;
   netMargin: string;
   promoDiscounts?: number;
+  discounts?: DiscountBreakdown;
   cogsCoverage?: {
     totalLines: number;
     linesWithCost: number;
@@ -96,6 +118,8 @@ export interface FinanceSummary {
   weeklySales?: WeeklySale[];
   byPaymentMethod?: PaymentMethodBreakdown[];
   byChannel?: ChannelBreakdown[];
+  discounts?: DiscountBreakdown;
+  promotionCodes?: PromotionCodePerformance[];
   fees?: {
     transactionFees: number;
     grossSales: number;
