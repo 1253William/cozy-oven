@@ -49,6 +49,7 @@ interface OrderDetails {
   orderDetails?: OrderDetailsData;
   pricing: {
     subtotal: number;
+    discountAmount: number;
     deliveryFee: number;
     totalAmount: number;
     paymentBreakdown?: PaymentBreakdown;
@@ -135,6 +136,13 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
           ? raw.deliveryFee
           : 0;
 
+      const pricingDiscount =
+        typeof rawPricing.discountAmount === "number"
+          ? rawPricing.discountAmount
+          : typeof raw.discountAmount === "number"
+            ? raw.discountAmount
+            : 0;
+
       const normalized: OrderDetails = {
         orderId: raw.orderId || raw._id || orderId,
         customer: {
@@ -190,13 +198,14 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
             },
         pricing: {
           subtotal: pricingSubtotal,
+          discountAmount: pricingDiscount,
           deliveryFee,
           totalAmount:
             typeof rawPricing.totalAmount === "number"
               ? rawPricing.totalAmount
               : typeof raw.totalAmount === "number"
               ? raw.totalAmount
-              : pricingSubtotal + deliveryFee,
+              : pricingSubtotal - pricingDiscount + deliveryFee,
           paymentBreakdown: rawPaymentBreakdown,
         },
         payment: {
@@ -417,6 +426,20 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 <div className="p-4 bg-[#faf9f5] rounded-lg">
                   <h4 className="text-sm font-semibold text-[#222222] mb-3">Pricing Summary</h4>
                   <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#5d6043]">Subtotal</span>
+                      <span className="text-[#5d6043]">
+                        GHS {orderDetails.pricing.subtotal.toFixed(2)}
+                      </span>
+                    </div>
+                    {orderDetails.pricing.discountAmount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#5d6043]">Discount</span>
+                        <span className="text-green-700">
+                          -GHS {orderDetails.pricing.discountAmount.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-[#5d6043]">Order total</span>
                       <span className="text-[#5d6043]">

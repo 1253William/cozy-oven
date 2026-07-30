@@ -27,6 +27,7 @@ export interface CheckoutRequest {
   paymentMethod: string;
   paymentReference?: string;
   customerId?: string;
+  discountAmount?: number;
   transactionDate?: string;
   fullName?: string;
   email?: string;
@@ -68,6 +69,7 @@ export interface Order {
   customerId?: string;
   title?: string;
   subtotal?: number;
+  discountAmount?: number;
   deliveryFee?: number;
   chargedAmount?: string;
   price?: number;

@@ -44,6 +44,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const [transactionDate, setTransactionDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<ManualPaymentMethod>("cash");
   const [paymentReference, setPaymentReference] = useState("");
+  const [discountAmount, setDiscountAmount] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -164,6 +165,16 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       return;
     }
 
+    const subtotalAmount = orderItems.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
+    const parsedDiscount = discountAmount.trim() ? Number(discountAmount) : 0;
+    if (!Number.isFinite(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > subtotalAmount) {
+      setError("Discount amount must be between GHS 0.00 and the order subtotal");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -185,6 +196,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
         fullName: customerName.trim(),
         email: customerEmail.trim() || undefined,
         customerId: selectedCustomerId || undefined,
+        discountAmount: parsedDiscount || undefined,
         paymentMethod,
         paymentReference: paymentMethod !== "cash" ? paymentReference.trim() || undefined : undefined,
         transactionDate: transactionDate || undefined,
@@ -203,6 +215,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       setTransactionDate("");
       setPaymentMethod("cash");
       setPaymentReference("");
+      setDiscountAmount("");
       setSpecialInstructions("");
       setOrderItems([]);
       setSelectedProductId("");
@@ -219,7 +232,13 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
     }
   };
 
-  const totalAmount = orderItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+  const subtotalAmount = orderItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+  const parsedDiscountAmount = Number(discountAmount);
+  const displayedDiscount =
+    Number.isFinite(parsedDiscountAmount) && parsedDiscountAmount > 0
+      ? Math.min(parsedDiscountAmount, subtotalAmount)
+      : 0;
+  const totalAmount = Math.max(0, subtotalAmount - displayedDiscount);
 
   if (!isOpen) return null;
 
@@ -524,8 +543,33 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                         </div>
                       ))}
                       <div className="mt-4 pt-4 border-t border-[#b9aca2]/60">
-                        <div className="flex items-center justify-between">
-                          <span className="text-lg font-semibold text-[#222222]">Total:</span>
+                        <div className="mb-3">
+                          <label className="mb-2 block text-sm font-medium text-[#5d6043]">
+                            Discount Amount (Optional)
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            max={subtotalAmount}
+                            step="0.01"
+                            value={discountAmount}
+                            onChange={(e) => setDiscountAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-[#5d6043]">Subtotal</span>
+                          <span className="text-[#222222]">GHS {subtotalAmount.toFixed(2)}</span>
+                        </div>
+                        {displayedDiscount > 0 && (
+                          <div className="mt-1 flex items-center justify-between text-sm">
+                            <span className="text-[#5d6043]">Discount</span>
+                            <span className="text-green-700">-GHS {displayedDiscount.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="mt-2 flex items-center justify-between border-t border-[#b9aca2]/40 pt-2">
+                          <span className="text-lg font-semibold text-[#222222]">Total</span>
                           <span className="text-xl font-bold text-[#5d6043]">GHS {totalAmount.toFixed(2)}</span>
                         </div>
                       </div>
