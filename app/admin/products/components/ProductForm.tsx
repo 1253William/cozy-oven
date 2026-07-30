@@ -618,7 +618,7 @@ export default function ProductForm({
                     const selectedProduct = productById(option.childProductId);
                     const selectedSupply = supplyItems.find((item) => item._id === option.supplyCostItemId);
                     return (
-                      <div key={`${groupIndex}-${optionIndex}`} className="grid grid-cols-1 md:grid-cols-[130px_1fr_1fr_100px_auto] gap-2">
+                      <div key={`${groupIndex}-${optionIndex}`} className="grid grid-cols-1 md:grid-cols-[120px_minmax(0,1fr)_minmax(0,140px)_88px_auto] gap-2">
                         <select
                           value={option.componentType || "product"}
                           onChange={(e) =>
@@ -631,7 +631,7 @@ export default function ProductForm({
                               description: "",
                             })
                           }
-                          className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                          className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
                         >
                           <option value="product">Product</option>
                           <option value="supply">Supply</option>
@@ -647,7 +647,7 @@ export default function ProductForm({
                                 description: supply ? supply.unit : "",
                               });
                             }}
-                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                            className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
                             required
                           >
                             <option value="">Select supply item</option>
@@ -668,7 +668,7 @@ export default function ProductForm({
                                 description: variantLabel(product, firstVariant) || "",
                               });
                             }}
-                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                            className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
                             required
                           >
                             <option value="">Select product</option>
@@ -686,7 +686,7 @@ export default function ProductForm({
                                 description: variantLabel(selectedProduct, e.target.value) || "",
                               })
                             }
-                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                            className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
                           >
                             <option value="">Base size</option>
                             {(selectedProduct?.selectOptions || []).map((variant) => (
@@ -697,7 +697,7 @@ export default function ProductForm({
                           <input
                             value={selectedSupply?.unit || ""}
                             readOnly
-                            className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm bg-[#f3f0ea]"
+                            className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm bg-[#f3f0ea]"
                             placeholder="Unit"
                           />
                         )}
@@ -711,7 +711,7 @@ export default function ProductForm({
                               quantity: Math.max(0.000001, Number(e.target.value) || 1),
                             })
                           }
-                          className="px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
+                          className="min-w-0 w-full px-3 py-2 border border-[#b9aca2] rounded-lg text-sm"
                           title="Component quantity"
                         />
                         <button

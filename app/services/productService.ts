@@ -138,6 +138,10 @@ export function normalizeProduct(raw: any): Product {
     thumbnail: raw.thumbnail || raw.productThumbnail,
     images: raw.images || raw.productImages || [],
     imageCount: raw.imageCount ?? (raw.images || raw.productImages || []).length,
+    selectOptions: (raw.selectOptions || []).map((option: SelectOption) => ({
+      ...option,
+      variantId: option.variantId || option.label,
+    })),
     productType: raw.productType || "standard",
     packageConfig: raw.packageConfig,
   };
