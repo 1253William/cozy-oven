@@ -1,33 +1,37 @@
 import apiClient from "./apiClient";
 
-export type ExpenseCategory =
-  | "ingredients"
-  | "packaging"
-  | "rent"
-  | "salaries"
-  | "utilities"
-  | "transport"
-  | "marketing"
-  | "events"
-  | "other";
+export interface OverheadCategory {
+  _id: string;
+  name: string;
+  subtype: string;
+  costClass: "operatingExpense";
+}
 
 export interface Expense {
   id: string;
   title: string;
-  category: ExpenseCategory;
+  category?: string;
+  categoryId?: string;
+  categoryName: string;
   amount: number;
   expenseDate: string;
   notes?: string;
+  vendor?: string;
+  paymentMethod?: string;
+  paymentReference?: string;
   expenseMonth: string;
   expenseYear: string;
 }
 
 export interface ExpenseInput {
   title: string;
-  category: ExpenseCategory;
+  categoryId: string;
   amount: number;
   expenseDate: string;
   notes?: string;
+  vendor?: string;
+  paymentMethod?: string;
+  paymentReference?: string;
 }
 
 const expenseService = {
@@ -40,24 +44,18 @@ const expenseService = {
     });
     return response.data as {
       success: boolean;
-      categories: ExpenseCategory[];
+      categories: OverheadCategory[];
       data: Expense[];
     };
   },
-
   async create(data: ExpenseInput) {
-    const response = await apiClient.post("/api/v1/dashboard/admin/expenses", data);
-    return response.data;
+    return (await apiClient.post("/api/v1/dashboard/admin/expenses", data)).data;
   },
-
   async update(id: string, data: ExpenseInput) {
-    const response = await apiClient.patch(`/api/v1/dashboard/admin/expenses/${id}`, data);
-    return response.data;
+    return (await apiClient.patch(`/api/v1/dashboard/admin/expenses/${id}`, data)).data;
   },
-
   async remove(id: string) {
-    const response = await apiClient.delete(`/api/v1/dashboard/admin/expenses/${id}`);
-    return response.data;
+    return (await apiClient.delete(`/api/v1/dashboard/admin/expenses/${id}`)).data;
   },
 };
 

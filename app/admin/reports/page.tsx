@@ -268,16 +268,16 @@ export default function ReportsPage() {
               </div>
 
               <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
-                <p className="text-sm font-medium text-[#5d6043]">COGS + OpEx</p>
+                <p className="text-sm font-medium text-[#5d6043]">COGS + Overhead</p>
                 <h3 className="mt-2 text-2xl font-bold text-[#222222]">
                   GHS{" "}
                   {(
-                    (financeSummary?.pnl?.cogs || 0) + (financeSummary?.pnl?.totalOpex || financeSummary?.totalExpenses || 0)
+                    (financeSummary?.pnl?.cogs || 0) + (financeSummary?.pnl?.totalOpex ?? 0)
                   ).toFixed(2)}
                 </h3>
                 <p className="mt-2 text-xs text-[#5d6043]">
                   COGS GHS {(financeSummary?.pnl?.cogs || 0).toFixed(2)} · OpEx GHS{" "}
-                  {(financeSummary?.pnl?.totalOpex || financeSummary?.totalExpenses || 0).toFixed(2)}
+                  {(financeSummary?.pnl?.totalOpex ?? 0).toFixed(2)}
                 </p>
               </div>
 
@@ -462,10 +462,10 @@ export default function ReportsPage() {
                 </p>
               </div>
               <div className="rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5] p-5 shadow-sm">
-                <h3 className="font-semibold text-[#222222]">Expense breakdown</h3>
+                <h3 className="font-semibold text-[#222222]">Overhead cost breakdown</h3>
                 <div className="mt-3 space-y-2">
                   {(financeSummary?.pnl?.opexBreakdown || []).length === 0 ? (
-                    <p className="text-sm text-[#5d6043]">No expenses recorded.</p>
+                    <p className="text-sm text-[#5d6043]">No overhead costs recorded.</p>
                   ) : (
                     financeSummary?.pnl?.opexBreakdown?.map((row) => (
                       <div key={row.category} className="flex justify-between text-sm text-[#5d6043]">
