@@ -423,6 +423,11 @@ export default function OrdersPage() {
                     <tr key={order.orderId || order._id || idx} className="hover:bg-[#faf9f5]">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-semibold text-[#222222]">{order.orderId}</span>
+                        {order.promotion?.code && (
+                          <span className="mt-1 block text-xs font-semibold text-green-700">
+                            {order.promotion.code}
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -580,6 +585,11 @@ export default function OrdersPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="font-semibold text-[#222222]">{order.orderId}</h3>
+                        {order.promotion?.code && (
+                          <p className="text-xs font-semibold text-green-700">
+                            Promotion: {order.promotion.code}
+                          </p>
+                        )}
                         <p className="text-sm text-[#5d6043]">{order.contactNumber}</p>
                       </div>
                       <span

@@ -359,12 +359,15 @@ function StatsModal({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 lg:grid-cols-4">
           {[
             ["Paid uses", promotion.stats.paidUses],
             ["Pending", promotion.stats.pendingApplications],
+            ["Unique customers", promotion.stats.uniqueCustomers],
+            ["Merchandise value", `GHS ${promotion.stats.grossMerchandiseValue.toFixed(2)}`],
             ["Discount given", `GHS ${promotion.stats.discountGiven.toFixed(2)}`],
             ["Net revenue", `GHS ${promotion.stats.netRevenue.toFixed(2)}`],
+            ["Average order", `GHS ${promotion.stats.averageOrderValue.toFixed(2)}`],
           ].map(([label, value]) => (
             <div key={String(label)} className="rounded-lg border border-[#b9aca2]/50 p-4">
               <p className="text-xs text-[#5d6043]">{label}</p>

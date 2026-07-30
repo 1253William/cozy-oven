@@ -347,14 +347,16 @@ export default function ReportsPage() {
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[640px] text-sm">
+                    <table className="w-full min-w-[860px] text-sm">
                       <thead className="bg-[#f4efe7] text-left text-xs uppercase text-[#5d6043]">
                         <tr>
                           <th className="px-4 py-3">Code</th>
                           <th className="px-4 py-3 text-right">Uses</th>
                           <th className="px-4 py-3 text-right">Customers</th>
+                          <th className="px-4 py-3 text-right">GMV</th>
                           <th className="px-4 py-3 text-right">Discount</th>
                           <th className="px-4 py-3 text-right">Net revenue</th>
+                          <th className="px-4 py-3 text-right">AOV</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#b9aca2]/40">
@@ -372,11 +374,17 @@ export default function ReportsPage() {
                             <td className="px-4 py-3 text-right text-[#5d6043]">
                               {promotion.uniqueCustomers}
                             </td>
+                            <td className="px-4 py-3 text-right text-[#5d6043]">
+                              GHS {promotion.grossMerchandiseValue.toFixed(2)}
+                            </td>
                             <td className="px-4 py-3 text-right text-green-700">
                               GHS {promotion.discountGiven.toFixed(2)}
                             </td>
                             <td className="px-4 py-3 text-right font-semibold text-[#222222]">
                               GHS {promotion.netRevenue.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-3 text-right text-[#5d6043]">
+                              GHS {promotion.averageOrderValue.toFixed(2)}
                             </td>
                           </tr>
                         ))}
