@@ -276,7 +276,7 @@ export default function ReportsPage() {
                   ).toFixed(2)}
                 </h3>
                 <p className="mt-2 text-xs text-[#5d6043]">
-                  COGS GHS {(financeSummary?.pnl?.cogs || 0).toFixed(2)} · OpEx GHS{" "}
+                  COGS GHS {(financeSummary?.pnl?.cogs || 0).toFixed(2)} · Overhead GHS{" "}
                   {(financeSummary?.pnl?.totalOpex ?? 0).toFixed(2)}
                 </p>
               </div>

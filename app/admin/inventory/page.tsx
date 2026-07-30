@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertCircle, Edit2, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
@@ -15,6 +15,8 @@ const paymentLabels: Record<string, string> = {
   card: "Card",
   other: "Other",
 };
+const requestMessage = (error: unknown, fallback: string) =>
+  (error as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback;
 const emptyForm: PurchaseInput = {
   itemName: "",
   quantityPurchased: 1,
@@ -40,7 +42,7 @@ export default function PurchasesPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const response = await inventoryService.getAllInventory({
@@ -55,8 +57,8 @@ export default function PurchasesPage() {
     } finally {
       setLoading(false);
     }
-  };
-  useEffect(() => { load(); }, [appliedSearch]);
+  }, [appliedSearch]);
+  useEffect(() => { load(); }, [load]);
 
   const total = useMemo(
     () => rows.reduce((sum, row) => sum + Number(row.totalCost || 0), 0),
@@ -77,8 +79,8 @@ export default function PurchasesPage() {
       else await inventoryService.createInventory(form);
       reset();
       await load();
-    } catch (requestError: any) {
-      setError(requestError.response?.data?.message || "Could not save purchase.");
+    } catch (requestError: unknown) {
+      setError(requestMessage(requestError, "Could not save purchase."));
     } finally {
       setSaving(false);
     }

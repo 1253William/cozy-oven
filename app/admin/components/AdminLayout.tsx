@@ -54,12 +54,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const { user, logout, isLoading, isAuthenticated } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isLoading) return;
@@ -92,8 +87,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, [user]);
 
   // Prevent hydration mismatch by using stable placeholders
-  const displayName = mounted && user?.fullName ? user.fullName : "Loading...";
-  const displayEmail = mounted && user?.email ? user.email : "Loading...";
+  const displayName = user?.fullName || "Admin";
+  const displayEmail = user?.email || "";
 
   const handleLogout = async () => {
     await logout();
