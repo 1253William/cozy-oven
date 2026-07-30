@@ -348,6 +348,8 @@ export default function OrdersPage() {
                 <option value="cash">Cash</option>
                 <option value="paystack">Paystack</option>
                 <option value="mobile-money">Mobile Money</option>
+                <option value="bank-transfer">Bank Transfer</option>
+                <option value="cheque">Cheque</option>
               </select>
             </div>
           </div>

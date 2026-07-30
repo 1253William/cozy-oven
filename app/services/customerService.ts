@@ -3,6 +3,7 @@ import apiClient from "./apiClient";
 // Customer interfaces
 export interface Customer {
   _id: string | null;
+  registeredUserId?: string | null;
   fullName: string | null;
   email: string | null;
   phoneNumber: string | null;
@@ -148,6 +149,7 @@ export const customerService = {
 
       return {
         _id: c.id || `anon-${index}`, // Fallback for React keys if ID is null
+        registeredUserId: c.id,
         fullName: c.customer || "Unknown Customer",
         email: c.contact?.email ?? null,
         phoneNumber: c.contact?.phone ?? null,

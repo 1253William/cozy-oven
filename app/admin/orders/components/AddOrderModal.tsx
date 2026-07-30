@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { X, Plus, Trash2, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Plus, Trash2, Loader2, Search, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { orderService } from "../../../services/orderService";
 import useCustomerProducts from "../../../hooks/useCustomerProducts";
@@ -9,6 +9,9 @@ import PackageSelectionEditor, {
   type PackageSelection,
   usePackageSelection,
 } from "./PackageSelectionEditor";
+import customerService, { type Customer } from "../../../services/customerService";
+
+type ManualPaymentMethod = "cash" | "mobile-money" | "bank-transfer" | "cheque";
 
 interface AddOrderModalProps {
   isOpen: boolean;
@@ -30,9 +33,17 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [selectedCustomerLabel, setSelectedCustomerLabel] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [customerResults, setCustomerResults] = useState<Customer[]>([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [customerSearchError, setCustomerSearchError] = useState<string | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [city, setCity] = useState("");
   const [transactionDate, setTransactionDate] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<ManualPaymentMethod>("cash");
+  const [paymentReference, setPaymentReference] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -44,6 +55,54 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const selectedProduct = products.find(p => p.id === selectedProductId);
   const availableSizes = selectedProduct?.selectOptions?.filter(opt => opt.isAvailable !== false) || [];
   const packageSelection = usePackageSelection(selectedProduct);
+
+  useEffect(() => {
+    if (!isOpen || selectedCustomerLabel) return;
+
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsLoadingCustomers(true);
+        setCustomerSearchError(null);
+        const response = await customerService.getAllCustomers({
+          page: 1,
+          limit: 20,
+          search: customerSearch.trim() || undefined,
+        });
+        if (active) setCustomerResults(response.data || []);
+      } catch (err) {
+        console.error("Customer directory search failed:", err);
+        if (active) {
+          setCustomerResults([]);
+          setCustomerSearchError("Unable to load customers");
+        }
+      } finally {
+        if (active) setIsLoadingCustomers(false);
+      }
+    }, customerSearch.trim() ? 300 : 0);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [customerSearch, isOpen, selectedCustomerLabel]);
+
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomerId(customer.registeredUserId || null);
+    setSelectedCustomerLabel(customer.fullName || customer.email || customer.phoneNumber || "Existing customer");
+    setCustomerName(customer.fullName || "");
+    setCustomerEmail(customer.email || "");
+    setContactNumber(customer.phoneNumber || "");
+    setCustomerSearch("");
+    setCustomerResults([]);
+    setCustomerSearchError(null);
+  };
+
+  const handleClearCustomerSelection = () => {
+    setSelectedCustomerId(null);
+    setSelectedCustomerLabel("");
+    setCustomerSearch("");
+  };
 
   const handleAddItem = () => {
     if (!selectedProductId || quantity < 1) {
@@ -125,7 +184,9 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
         contactNumber: contactNumber.trim(),
         fullName: customerName.trim(),
         email: customerEmail.trim() || undefined,
-        paymentMethod: "cash",
+        customerId: selectedCustomerId || undefined,
+        paymentMethod,
+        paymentReference: paymentMethod !== "cash" ? paymentReference.trim() || undefined : undefined,
         transactionDate: transactionDate || undefined,
       });
 
@@ -133,9 +194,15 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
       setCustomerName("");
       setCustomerEmail("");
       setContactNumber("");
+      setSelectedCustomerId(null);
+      setSelectedCustomerLabel("");
+      setCustomerSearch("");
+      setCustomerResults([]);
       setDeliveryAddress("");
       setCity("");
       setTransactionDate("");
+      setPaymentMethod("cash");
+      setPaymentReference("");
       setSpecialInstructions("");
       setOrderItems([]);
       setSelectedProductId("");
@@ -195,6 +262,79 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                 {/* Customer Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-[#222222] mb-4">Customer Information</h3>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-[#5d6043] mb-2">
+                      Existing Customer (Optional)
+                    </label>
+                    {selectedCustomerLabel ? (
+                      <div className="flex items-center justify-between gap-3 rounded-lg border border-[#5d6043]/30 bg-[#eeeae0] px-4 py-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <User className="h-5 w-5 shrink-0 text-[#5d6043]" />
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-[#222222]">{selectedCustomerLabel}</p>
+                            <p className="text-xs text-[#5d6043]">
+                              {selectedCustomerId ? "Registered customer" : "Previous guest customer"}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleClearCustomerSelection}
+                          className="shrink-0 text-sm font-medium text-[#5d6043] hover:text-[#222222]"
+                        >
+                          Use different customer
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-[#b9aca2]/70 bg-white">
+                        <div className="relative">
+                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]" />
+                          <input
+                            type="search"
+                            value={customerSearch}
+                            onChange={(e) => setCustomerSearch(e.target.value)}
+                            placeholder="Search by name, email, or phone"
+                            className="w-full rounded-lg border-0 bg-transparent py-2.5 pl-9 pr-10 focus:ring-2 focus:ring-[#5d6043]"
+                          />
+                          {isLoadingCustomers && (
+                            <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-[#5d6043]" />
+                          )}
+                        </div>
+                        <div className="max-h-48 overflow-y-auto border-t border-[#b9aca2]/50">
+                          {customerSearchError ? (
+                            <p className="px-4 py-3 text-sm text-red-700">{customerSearchError}</p>
+                          ) : !isLoadingCustomers && customerResults.length === 0 ? (
+                            <p className="px-4 py-3 text-sm text-[#5d6043]">No existing customers found.</p>
+                          ) : (
+                            customerResults.map((customer, index) => (
+                              <button
+                                key={
+                                  customer.registeredUserId ||
+                                  customer.email ||
+                                  customer.phoneNumber ||
+                                  customer._id ||
+                                  index
+                                }
+                                type="button"
+                                onClick={() => handleSelectCustomer(customer)}
+                                className="flex w-full items-center gap-3 border-b border-[#b9aca2]/40 px-4 py-3 text-left last:border-b-0 hover:bg-[#faf9f5]"
+                              >
+                                <User className="h-4 w-4 shrink-0 text-[#5d6043]" />
+                                <span className="min-w-0">
+                                  <span className="block truncate text-sm font-medium text-[#222222]">
+                                    {customer.fullName || "Unnamed customer"}
+                                  </span>
+                                  <span className="block truncate text-xs text-[#5d6043]">
+                                    {[customer.email, customer.phoneNumber].filter(Boolean).join(" | ") || "No contact details"}
+                                  </span>
+                                </span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[#5d6043] mb-2">
@@ -394,10 +534,50 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                 </div>
 
                 {/* Payment Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Payment Method:</strong> Cash (automatically set for manual orders)
-                  </p>
+                <div>
+                  <h3 className="mb-4 text-lg font-semibold text-[#222222]">Payment Information</h3>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-[#5d6043]">
+                        Payment Method *
+                      </label>
+                      <select
+                        value={paymentMethod}
+                        onChange={(e) => {
+                          const nextMethod = e.target.value as ManualPaymentMethod;
+                          setPaymentMethod(nextMethod);
+                          if (nextMethod === "cash") setPaymentReference("");
+                        }}
+                        className="w-full rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
+                      >
+                        <option value="cash">Cash</option>
+                        <option value="mobile-money">Mobile Money</option>
+                        <option value="bank-transfer">Bank Transfer</option>
+                        <option value="cheque">Cheque</option>
+                      </select>
+                    </div>
+                    {paymentMethod !== "cash" && (
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-[#5d6043]">
+                          {paymentMethod === "cheque" ? "Cheque Number" : "Transaction Reference"} (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={120}
+                          value={paymentReference}
+                          onChange={(e) => setPaymentReference(e.target.value)}
+                          placeholder={
+                            paymentMethod === "mobile-money"
+                              ? "Mobile Money transaction ID"
+                              : paymentMethod === "bank-transfer"
+                                ? "Bank transfer reference"
+                                : "Cheque number"
+                          }
+                          className="w-full rounded-lg border border-[#b9aca2] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Actions */}

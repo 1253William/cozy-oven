@@ -20,6 +20,7 @@ import reportsService, {
   type TopSellingProduct,
   type TopCustomer,
 } from "../../services/reportsService";
+import { formatPaymentMethod } from "../../utils/paymentMethod";
 
 const CATEGORY_COLORS = [
   "#5d6043",
@@ -351,7 +352,7 @@ export default function ReportsPage() {
                         key={row.paymentMethod}
                         className="flex justify-between text-sm text-[#5d6043]"
                       >
-                        <span>{row.paymentMethod}</span>
+                        <span>{formatPaymentMethod(row.paymentMethod)}</span>
                         <span>
                           GHS {row.revenue.toFixed(2)} · {row.orders}
                         </span>

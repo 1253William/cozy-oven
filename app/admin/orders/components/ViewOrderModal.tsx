@@ -6,6 +6,7 @@ import { orderService } from "../../../services/orderService";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PaymentBreakdown } from "../../../utils/paymentBreakdown";
+import { formatPaymentMethod } from "../../../utils/paymentMethod";
 
 interface OrderItem {
   productId: string;
@@ -474,8 +475,8 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                     </div>
                     <div>
                       <p className="text-xs text-[#5d6043]">Payment Method</p>
-                      <p className="text-sm font-medium text-[#222222] capitalize">
-                        {orderDetails.payment.method}
+                      <p className="text-sm font-medium text-[#222222]">
+                        {formatPaymentMethod(orderDetails.payment.method)}
                       </p>
                     </div>
                     {orderDetails.payment.transactionRef && (

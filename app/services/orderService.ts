@@ -25,6 +25,8 @@ export interface CheckoutRequest {
   specialInstruction?: string;
   contactNumber: string;
   paymentMethod: string;
+  paymentReference?: string;
+  customerId?: string;
   transactionDate?: string;
   fullName?: string;
   email?: string;
