@@ -17,7 +17,6 @@ import {
   X,
   Mail,
   Star,
-  Percent,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import Image from "next/image";
@@ -33,7 +32,7 @@ const menuItems = [
   { name: "Inventory", icon: Package, href: "/admin/inventory" },
   { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
   { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
-  { name: "Promotions", icon: Percent, href: "/admin/promotions" },
+  { name: "Promotions", icon: Star, href: "/admin/promotions" },
   { name: "Website", icon: LayoutDashboard, href: "/admin/website" },
   { name: "Subscribers", icon: Mail, href: "/admin/subscribers" },
   { name: "Email Marketing", icon: Mail, href: "/admin/email-marketing" },

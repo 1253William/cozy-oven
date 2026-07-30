@@ -17,7 +17,6 @@ import {
   Eye,
   Download,
   CreditCard,
-  Percent,
 } from "lucide-react";
 import { orderService, type Order } from "../../services/orderService";
 import ViewOrderModal from "./components/ViewOrderModal";
@@ -357,7 +356,7 @@ export default function OrdersPage() {
             </div>
 
             <div className="relative min-w-[190px]">
-              <Percent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b9aca2]" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b9aca2]" />
               <input
                 type="text"
                 value={discountCodeFilter}

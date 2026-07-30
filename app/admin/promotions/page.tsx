@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Archive,
   BarChart3,
-  Edit3,
+  Edit,
   Eye,
   Loader2,
   Plus,
   Search,
-  Percent,
+  Trash2,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -554,7 +553,7 @@ export default function PromotionsPage() {
           <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" /></div>
         ) : promotions.length === 0 ? (
           <div className="rounded-lg border border-dashed border-[#b9aca2] py-16 text-center">
-            <Percent className="mx-auto h-10 w-10 text-[#b9aca2]" />
+            <Search className="mx-auto h-10 w-10 text-[#b9aca2]" />
             <p className="mt-3 font-semibold text-[#222222]">No promotions found</p>
             <p className="mt-1 text-sm text-[#5d6043]">Create a code or adjust the current filters.</p>
           </div>
@@ -593,8 +592,8 @@ export default function PromotionsPage() {
                           <button type="button" onClick={() => void openStats(promotion)} className="rounded-md p-2 text-blue-700 hover:bg-blue-50" title="View statistics"><Eye className="h-4 w-4" /></button>
                           {promotion.status !== "archived" && (
                             <>
-                              <button type="button" onClick={() => setEditing(promotion)} className="rounded-md p-2 text-[#5d6043] hover:bg-[#b9aca2]/30" title="Edit promotion"><Edit3 className="h-4 w-4" /></button>
-                              <button type="button" onClick={() => void archive(promotion)} className="rounded-md p-2 text-red-700 hover:bg-red-50" title="Archive promotion"><Archive className="h-4 w-4" /></button>
+                              <button type="button" onClick={() => setEditing(promotion)} className="rounded-md p-2 text-[#5d6043] hover:bg-[#b9aca2]/30" title="Edit promotion"><Edit className="h-4 w-4" /></button>
+                              <button type="button" onClick={() => void archive(promotion)} className="rounded-md p-2 text-red-700 hover:bg-red-50" title="Archive promotion"><Trash2 className="h-4 w-4" /></button>
                             </>
                           )}
                         </div>
@@ -618,7 +617,7 @@ export default function PromotionsPage() {
                   </div>
                   <div className="mt-4 flex justify-end gap-2 border-t border-[#b9aca2]/40 pt-3">
                     <button type="button" onClick={() => void openStats(promotion)} className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"><BarChart3 className="h-4 w-4" />Stats</button>
-                    {promotion.status !== "archived" && <button type="button" onClick={() => setEditing(promotion)} className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-white"><Edit3 className="h-4 w-4" />Edit</button>}
+                    {promotion.status !== "archived" && <button type="button" onClick={() => setEditing(promotion)} className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-white"><Edit className="h-4 w-4" />Edit</button>}
                   </div>
                 </div>
               ))}
