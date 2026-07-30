@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
@@ -8,34 +8,19 @@ import {
   TrendingUp,
   Award,
   ArrowRight,
-
   Package,
   Loader2,
 } from "lucide-react";
 import Image from "next/image";
-import { useDashboardOverview, usePopularProducts, useSalesOverview } from "../../hooks/useDashboard";
+import { useDashboardOverview, usePopularProducts } from "../../hooks/useDashboard";
 
 export default function AdminDashboardPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [chartFilter, setChartFilter] = useState<"daily" | "monthly" | "overview">("monthly");
-
-  // Constants
-  // const PRODUCT_ID_DISPLAY_LENGTH = 8;
 
   // Fetch real dashboard data
   const { data: dashboardData, loading: dashboardLoading } = useDashboardOverview();
   const { products: popularProducts, loading: productsLoading } = usePopularProducts(1, 4);
-  
-  // Fetch sales overview data based on chart filter
-  const { data: dailySalesData, loading: dailySalesLoading } = useSalesOverview(
-    chartFilter === "daily",
-    false
-  );
-  const { data: monthlySalesData, loading: monthlySalesLoading } = useSalesOverview(
-    false,
-    chartFilter === "monthly"
-  );
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -48,53 +33,6 @@ export default function AdminDashboardPage() {
   }
 
   const loading = dashboardLoading || productsLoading;
-
-  // Prepare chart data based on filter
-  const getChartData = () => {
-    if (chartFilter === "daily" && dailySalesData && dailySalesData.length > 0) {
-      return dailySalesData.map((point) => ({
-        label: point.date ? new Date(point.date).toLocaleDateString('en-US', { weekday: 'short' }) : '',
-        value: point.sales ?? (point as any).totalSales ?? (point as any).revenue ?? 0,
-      }));
-    } else if (chartFilter === "monthly" && monthlySalesData && monthlySalesData.length > 0) {
-      return monthlySalesData.map((point) => ({
-        label: point.month || '',
-        value: point.sales ?? (point as any).totalSales ?? (point as any).revenue ?? 0,
-      }));
-    }
-    
-    // Fallback to hardcoded data if no API data available
-    if (chartFilter === "daily") {
-      return [
-        { label: "Mon", value: 850 },
-        { label: "Tue", value: 1200 },
-        { label: "Wed", value: 950 },
-        { label: "Thu", value: 1100 },
-        { label: "Fri", value: 1400 },
-        { label: "Sat", value: 1600 },
-        { label: "Sun", value: 1300 },
-      ];
-    } else if (chartFilter === "monthly") {
-      return [
-        { label: "Jan", value: 35000 },
-        { label: "Feb", value: 38000 },
-        { label: "Mar", value: 42000 },
-        { label: "Apr", value: 39000 },
-        { label: "May", value: 45000 },
-        { label: "Jun", value: 46000 },
-      ];
-    } else {
-      return [
-        { label: "Q1", value: 115000 },
-        { label: "Q2", value: 130000 },
-        { label: "Q3", value: 125000 },
-        { label: "Q4", value: 140000 },
-      ];
-    }
-  };
-
-  const chartData = getChartData();
-  const maxValue = Math.max(...chartData.map((d) => d.value));
 
   return (
     <AdminLayout>

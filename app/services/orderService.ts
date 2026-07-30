@@ -204,7 +204,10 @@ export interface GetAllOrdersResponse {
 export const orderService = {
   // Customer: Create a new order (checkout)
   checkout: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {
-    const response = await apiClient.post("/api/v1/store/customer/orders/checkout/", data);
+    // #region agent log
+    fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'D',location:'orderService.ts:checkout',message:'using storefront checkout endpoint',data:{itemCount:data.items?.length??0},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    const response = await apiClient.post("/api/v1/store/customer/orders/checkout", data);
     return response.data;
   },
 
@@ -278,23 +281,13 @@ export const orderService = {
     return response.data;
   },
 
-  // Admin: Create a new order (checkout) - allows admins to checkout
-  // Tries admin endpoint first, falls back to customer endpoint if admin endpoint doesn't exist
+  // Admin: Create a new order via storefront checkout (same endpoint as customers).
+  // Prefer createOfflineSale / createInvoice for in-person or invoice flows.
   adminCheckout: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {
-    try {
-      // Try admin-specific endpoint first
-      const response = await apiClient.post("/api/v1/dashboard/admin/orders/checkout", data);
-      return response.data;
-    } catch (error: any) {
-      // If admin endpoint doesn't exist (404), try customer endpoint
-      // Note: Backend may need to allow admins on customer endpoint or provide admin endpoint
-      if (error.response?.status === 404 || error.response?.status === 403) {
-        // Fallback to customer endpoint (same as AddOrderModal uses)
-        const response = await apiClient.post("/api/v1/store/customer/orders/checkout/", data);
-        return response.data;
-      }
-      throw error;
-    }
+    // #region agent log
+    fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'D',location:'orderService.ts:adminCheckout',message:'adminCheckout delegates to storefront checkout',data:{itemCount:data.items?.length??0},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    return orderService.checkout(data);
   },
 
   createOfflineSale: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {

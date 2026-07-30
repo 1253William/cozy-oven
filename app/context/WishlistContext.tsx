@@ -41,6 +41,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }, [wishlist]);
 
   const addToWishlist = (item: CartItem) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'E',location:'WishlistContext.tsx:addToWishlist',message:'addToWishlist invoked',data:{productId:item.id,hasSize:!!item.selectedSize},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     setWishlist((prevWishlist) => {
       const existingItemIndex = prevWishlist.findIndex(
         (i) => i.id === item.id && i.selectedSize === item.selectedSize

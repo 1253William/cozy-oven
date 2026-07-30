@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import QuantitySelector from "../../components/QuantitySelector";
@@ -11,6 +11,7 @@ import SizeSelector from "../../components/SizeSelector";
 import ProductTabs from "../../components/ProductTabs";
 
 import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 import useCustomerProduct from "../../hooks/useProductDetails";
 import { resolveProductPrice } from "../../lib/productPricing";
 
@@ -18,6 +19,8 @@ export default function ProductDetails() {
   const { id } = useParams();
   const router = useRouter();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null);
 
   const [quantity, setQuantity] = useState(1);
   const [packageSelectionCounts, setPackageSelectionCounts] = useState<Record<string, number>>({});
@@ -225,6 +228,32 @@ export default function ProductDetails() {
       selectedSize ?? undefined,
       packageSelections
     );
+  };
+
+  const wishlistItemKey = selectedSize ?? undefined;
+  const alreadyInWishlist = isInWishlist(product.id, wishlistItemKey);
+
+  const handleToggleWishlist = () => {
+    if (alreadyInWishlist) {
+      removeFromWishlist(product.id, wishlistItemKey);
+      setWishlistFeedback("Removed from wishlist");
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.productName,
+        price: `GHS ${currentPrice.toFixed(2)}`,
+        image: mainImageSrc,
+        description: product.productDetails,
+        rating: product.rating || 4.5,
+        reviews: 0,
+        sizes,
+        details: product.productDetails,
+        quantity: 1,
+        selectedSize: wishlistItemKey,
+      });
+      setWishlistFeedback("Saved to wishlist");
+    }
+    window.setTimeout(() => setWishlistFeedback(null), 2000);
   };
 
   const updatePackageSelection = (groupId: string, label: string, nextCount: number, requiredCount: number) => {
@@ -519,22 +548,42 @@ export default function ProductDetails() {
                 </>
               )}
 
-              <button
-                onClick={handleAddToCart}
-                disabled={isSoldOut || !packageSelectionComplete}
-                className={`flex w-full items-center justify-center gap-3 rounded-full px-8 py-4 font-black transition-all ${
-                  isSoldOut || !packageSelectionComplete
-                    ? "cursor-not-allowed bg-[#b9aca2] text-[#5d6043]"
-                    : "bg-[#222222] text-[#faf9f5] shadow-[0_16px_30px_rgba(34,34,34,0.18)] hover:bg-[#222222]"
-                }`}
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {isSoldOut
-                  ? "Sold Out"
-                  : !packageSelectionComplete
-                  ? `Select ${requiredPackageCount} options`
-                  : "Add to Cart"}
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isSoldOut || !packageSelectionComplete}
+                  className={`flex flex-1 items-center justify-center gap-3 rounded-full px-8 py-4 font-black transition-all ${
+                    isSoldOut || !packageSelectionComplete
+                      ? "cursor-not-allowed bg-[#b9aca2] text-[#5d6043]"
+                      : "bg-[#222222] text-[#faf9f5] shadow-[0_16px_30px_rgba(34,34,34,0.18)] hover:bg-[#222222]"
+                  }`}
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  {isSoldOut
+                    ? "Sold Out"
+                    : !packageSelectionComplete
+                    ? `Select ${requiredPackageCount} options`
+                    : "Add to Cart"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleToggleWishlist}
+                  className={`inline-flex items-center justify-center gap-2 rounded-full border px-6 py-4 font-black transition-all ${
+                    alreadyInWishlist
+                      ? "border-[#bd6325] bg-[#bd6325]/10 text-[#bd6325]"
+                      : "border-[rgba(34,34,34,0.12)] bg-[#faf9f5] text-[#5d6043] hover:border-[#bd6325] hover:text-[#bd6325]"
+                  }`}
+                  aria-label={alreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart
+                    className={`h-5 w-5 ${alreadyInWishlist ? "fill-[#bd6325] text-[#bd6325]" : ""}`}
+                  />
+                  {alreadyInWishlist ? "Saved" : "Wishlist"}
+                </button>
+              </div>
+              {wishlistFeedback ? (
+                <p className="mt-2 text-sm font-medium text-[#5d6043]">{wishlistFeedback}</p>
+              ) : null}
             </div>
           </div>
 

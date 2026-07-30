@@ -308,12 +308,8 @@ export default function CheckoutPage() {
           : {}),
       }));
 
-      // Use admin checkout endpoint if user is admin, otherwise use customer endpoint
-      const checkoutFunction = user?.role === "Admin" 
-        ? orderService.adminCheckout 
-        : orderService.checkout;
-      
-      const checkoutResponse = await checkoutFunction({
+      // Storefront checkout (optional auth) — admins use the same path as customers/guests
+      const checkoutResponse = await orderService.checkout({
         items,
         deliveryFee: 0, // Delivery fee will be paid on delivery
         deliveryAddress:

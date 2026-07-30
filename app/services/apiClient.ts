@@ -55,6 +55,9 @@ apiClient.interceptors.response.use(
         url.includes("/auth/forgot-password");
 
       if (!isAuthProbe && !config.__skipAuthRedirect) {
+        // #region agent log
+        fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'pre-fix',hypothesisId:'C',location:'apiClient.ts:401',message:'401 clearing session',data:{url,path:window.location.pathname,hadUser:!!localStorage.getItem('user')},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         // Do not clear cart

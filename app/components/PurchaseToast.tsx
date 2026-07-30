@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import useCustomerProducts from "../hooks/useCustomerProducts";
 import purchaseToastService, { PurchaseData } from "../services/purchaseToastService";
 
 interface PurchaseNotification {
@@ -14,23 +13,17 @@ interface PurchaseNotification {
   timeAgo: string;
 }
 
-// Fallback fake user names and products for when API returns empty array
-const fakeUsers = [
-  "Elton", "Sarah", "Michael", "Ama", "Kwame", "Grace", "David", "Akosua",
-  "James", "Efua", "John", "Adjoa", "Paul", "Mariama", "Peter", "Fatima"
-];
-
 // Format time ago from ISO date string
 const formatTimeAgo = (dateString: string): string => {
   const now = new Date();
   const purchaseDate = new Date(dateString);
   const diffInMs = now.getTime() - purchaseDate.getTime();
   const diffInMinutes = Math.floor(diffInMs / 60000);
-  
+
   if (diffInMinutes < 1) {
     return "just now";
   } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
   } else {
     const hours = Math.floor(diffInMinutes / 60);
     return `${hours} hour${hours > 1 ? "s" : ""} ago`;
@@ -42,7 +35,6 @@ export default function PurchaseToast() {
   const [currentNotification, setCurrentNotification] = useState<PurchaseNotification | null>(null);
   const [purchases, setPurchases] = useState<PurchaseData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { products } = useCustomerProducts({ limit: 20 });
 
   // Don't show toast on admin pages
   const isAdminPage = pathname?.startsWith("/admin");
@@ -79,50 +71,32 @@ export default function PurchaseToast() {
   }, [isAdminPage]);
 
   useEffect(() => {
-    // Don't show notifications on admin pages
-    if (isAdminPage || isLoading) return;
+    // Don't show notifications on admin pages, while loading, or with no real data
+    if (isAdminPage || isLoading || purchases.length === 0) {
+      // #region agent log
+      if (!isAdminPage && !isLoading && purchases.length === 0) {
+        fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'B',location:'PurchaseToast.tsx:empty',message:'no toast — no real purchases',data:{source:'none',purchaseCount:0},timestamp:Date.now()})}).catch(()=>{});
+      }
+      // #endregion
+      return;
+    }
 
     const showNotification = () => {
-      let notification: PurchaseNotification | null = null;
+      const randomPurchase = purchases[Math.floor(Math.random() * purchases.length)];
+      const firstName = randomPurchase.customerName.split(" ")[0];
 
-      // Use API data if available, otherwise fall back to fake data
-      if (purchases.length > 0) {
-        // Pick a random purchase from API data
-        const randomPurchase = purchases[Math.floor(Math.random() * purchases.length)];
-        const firstName = randomPurchase.customerName.split(' ')[0]; // Get first name
-        
-        notification = {
-          name: firstName,
-          productName: randomPurchase.productName,
-          productImage: randomPurchase.thumbnail,
-          timeAgo: formatTimeAgo(randomPurchase.purchasedAt),
-        };
-      } else if (products.length > 0) {
-        // Fallback to fake data
-        const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-        const randomProduct = products[Math.floor(Math.random() * products.length)];
-        
-        // Generate random time ago (5 minutes to 2 hours)
-        const minutesAgo = Math.floor(Math.random() * 115) + 5;
-        let timeAgo = "";
-        if (minutesAgo < 60) {
-          timeAgo = `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
-        } else {
-          const hours = Math.floor(minutesAgo / 60);
-          timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        }
+      const notification: PurchaseNotification = {
+        name: firstName,
+        productName: randomPurchase.productName,
+        productImage: randomPurchase.thumbnail,
+        timeAgo: formatTimeAgo(randomPurchase.purchasedAt),
+      };
 
-        notification = {
-          name: randomUser,
-          productName: randomProduct.productName,
-          productImage: randomProduct.thumbnail,
-          timeAgo,
-        };
-      }
+      // #region agent log
+      fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'B',location:'PurchaseToast.tsx:real',message:'showing real purchase toast',data:{source:'api',purchaseCount:purchases.length},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
 
-      if (notification) {
-        setCurrentNotification(notification);
-      }
+      setCurrentNotification(notification);
     };
 
     // Show first notification after 2 seconds
@@ -135,7 +109,7 @@ export default function PurchaseToast() {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [purchases, products, isAdminPage, isLoading]);
+  }, [purchases, isAdminPage, isLoading]);
 
   const handleClose = () => {
     setCurrentNotification(null);
@@ -203,4 +177,3 @@ export default function PurchaseToast() {
     </AnimatePresence>
   );
 }
-
