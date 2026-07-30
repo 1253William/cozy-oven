@@ -34,7 +34,7 @@ const menuItems = [
   { name: "Finished Stock", icon: ShoppingBag, href: "/admin/operations/stock" },
   { name: "Cost Items", icon: BarChart3, href: "/admin/cost-items" },
   { name: "Recipes", icon: BarChart3, href: "/admin/recipes" },
-  { name: "Physical Counts", icon: Package, href: "/admin/operations/counts" },
+  { name: "Inventory Review", icon: Package, href: "/admin/operations/counts" },
   { name: "Product Management", icon: ShoppingBag, href: "/admin/products" },
   { name: "Orders", icon: ShoppingCart, href: "/admin/orders" },
   { name: "Promotions", icon: Star, href: "/admin/promotions" },
