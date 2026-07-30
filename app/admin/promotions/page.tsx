@@ -9,7 +9,7 @@ import {
   Loader2,
   Plus,
   Search,
-  TicketPercent,
+  Percent,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -554,7 +554,7 @@ export default function PromotionsPage() {
           <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" /></div>
         ) : promotions.length === 0 ? (
           <div className="rounded-lg border border-dashed border-[#b9aca2] py-16 text-center">
-            <TicketPercent className="mx-auto h-10 w-10 text-[#b9aca2]" />
+            <Percent className="mx-auto h-10 w-10 text-[#b9aca2]" />
             <p className="mt-3 font-semibold text-[#222222]">No promotions found</p>
             <p className="mt-1 text-sm text-[#5d6043]">Create a code or adjust the current filters.</p>
           </div>

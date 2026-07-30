@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Loader2, TicketPercent, X } from "lucide-react";
+import { Check, Loader2, Percent, X } from "lucide-react";
 import { usePromotion } from "../context/PromotionContext";
 
 export default function PromotionCodeField({ compact = false }: { compact?: boolean }) {
@@ -57,7 +57,7 @@ export default function PromotionCodeField({ compact = false }: { compact?: bool
       </label>
       <div className="flex gap-2">
         <div className="relative min-w-0 flex-1">
-          <TicketPercent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]" />
+          <Percent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]" />
           <input
             type="text"
             value={code}
