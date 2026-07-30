@@ -44,6 +44,8 @@ export interface GetInventoryResponse {
   message: string;
   total: number;
   page: number;
+  limit: number;
+  totalPages: number;
   data: InventoryItem[];
 }
 

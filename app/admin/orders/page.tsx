@@ -83,6 +83,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,7 +112,7 @@ export default function OrdersPage() {
       fetchOrders();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage]);
+  }, [isAuthenticated, user, currentPage, appliedSearch, statusFilter, paymentMethodFilter]);
 
   const fetchOrders = async () => {
   try {
@@ -120,6 +121,9 @@ export default function OrdersPage() {
     const response = await orderService.getAllOrders({
       page: currentPage,
       limit: 10,
+      search: appliedSearch || undefined,
+      status: statusFilter !== "all" ? statusFilter : undefined,
+      paymentMethod: paymentMethodFilter !== "all" ? paymentMethodFilter : undefined,
     });
 
     if (!response?.success || !response.data) {
@@ -239,22 +243,7 @@ export default function OrdersPage() {
     }
   };
 
-  // Filtered orders (client-side)
-  const filteredOrders = orders.filter((order) => {
-    const q = searchQuery.trim().toLowerCase();
-    const matchesSearch =
-      !q ||
-      (order.orderId?.toLowerCase().includes(q) ?? false) ||
-      (order.deliveryAddress?.toLowerCase().includes(q) ?? false) ||
-      (order.contactNumber?.toLowerCase().includes(q) ?? false) ||
-      (order.customer?.toLowerCase().includes(q) ?? false) ||
-      (order.email?.toLowerCase().includes(q) ?? false);
-
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    const matchesPaymentMethod = paymentMethodFilter === "all" || order.paymentMethod === paymentMethodFilter;
-
-    return matchesSearch && matchesStatus && matchesPaymentMethod;
-  });
+  const filteredOrders = orders;
 
   return (
     <AdminLayout>
@@ -314,9 +303,12 @@ export default function OrdersPage() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1); // reset page when searching
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setCurrentPage(1);
+                    setAppliedSearch(searchQuery.trim());
+                  }
                 }}
                 placeholder="Search by order ID, customer name, or email..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
@@ -355,7 +347,7 @@ export default function OrdersPage() {
                 <option value="all">All Payment Methods</option>
                 <option value="cash">Cash</option>
                 <option value="paystack">Paystack</option>
-                <option value="mobile_money">Mobile Money</option>
+                <option value="mobile-money">Mobile Money</option>
               </select>
             </div>
           </div>

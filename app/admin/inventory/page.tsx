@@ -24,10 +24,12 @@ export default function InventoryPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Add Inventory Modal State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -63,7 +65,7 @@ export default function InventoryPage() {
       fetchInventory();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, currentPage, statusFilter]);
+  }, [isAuthenticated, user, currentPage, statusFilter, appliedSearch]);
 
   const fetchInventory = async () => {
     try {
@@ -71,11 +73,12 @@ export default function InventoryPage() {
       const response = await inventoryService.getAllInventory({
         page: currentPage,
         limit: 10,
-        search: searchQuery || undefined,
+        search: appliedSearch || undefined,
         status: statusFilter !== "all" ? statusFilter : undefined,
       });
       if (response.success) {
-        setInventory(response.data);
+        setInventory(response.data || []);
+        setTotalPages(Math.max(response.totalPages || 1, 1));
       }
     } catch (error) {
       console.error("Error fetching inventory:", error);
@@ -316,10 +319,10 @@ export default function InventoryPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
                     setCurrentPage(1);
-                    fetchInventory();
+                    setAppliedSearch(searchQuery.trim());
                   }
                 }}
                 placeholder="Search by product name, SKU, or category..."
@@ -332,13 +335,16 @@ export default function InventoryPage() {
               <Filter className="w-5 h-5 text-[#b9aca2]" />
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="px-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               >
                 <option value="all">All Status</option>
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Low Stock</option>
-                <option value="out_of_stock">Out of Stock</option>
+                <option value="in stock">In Stock</option>
+                <option value="low stock">Low Stock</option>
+                <option value="out of stock">Out of Stock</option>
               </select>
             </div>
           </div>
@@ -537,6 +543,30 @@ export default function InventoryPage() {
             </div>
           )}
         </div>
+
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-medium text-[#222222] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-[#5d6043]">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+              className="rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-medium text-[#222222] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Add Inventory Modal */}

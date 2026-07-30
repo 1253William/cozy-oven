@@ -36,6 +36,7 @@ export default function ProductManagementPage() {
 
   // State
   const [searchQuery, setSearchQuery] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [sortBy, setSortBy] = useState<"createdAt" | "price" | "productName">("createdAt");
   const [order, setOrder] = useState<"asc" | "desc">("desc");
@@ -78,6 +79,7 @@ export default function ProductManagementPage() {
     page: currentPage,
     limit: 12,
     category: categoryFilter || undefined,
+    search: appliedSearch || undefined,
     sortBy,
     order,
   });
@@ -147,9 +149,7 @@ export default function ProductManagementPage() {
     return null;
   }
 
-  const filteredProducts = products.filter((product) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -608,6 +608,12 @@ export default function ProductManagementPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setCurrentPage(1);
+                    setAppliedSearch(searchQuery.trim());
+                  }
+                }}
                 placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
