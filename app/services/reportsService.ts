@@ -102,6 +102,62 @@ export interface PnLBlock {
   opexBreakdown?: Array<{ category: string; amount: number }>;
 }
 
+export interface CustomerSummary {
+  total: number;
+  new: number;
+  returning: number;
+}
+
+export interface PeriodComparisonMetrics {
+  month: string;
+  year: number;
+  revenue: number | null;
+  expenses: number | null;
+  profit: number | null;
+  orders: number | null;
+  averageOrderValue: number | null;
+}
+
+export interface ReportComparisons {
+  previousMonth: PeriodComparisonMetrics;
+  sameMonthLastYear: PeriodComparisonMetrics;
+}
+
+export interface DataQuality {
+  warnings: string[];
+  cogsCoverage?: {
+    totalLines: number;
+    linesWithCost: number;
+    coveragePercent: number;
+  };
+}
+
+export interface TopProductByMargin {
+  _id: string;
+  name: string;
+  unitsSold: number;
+  revenue: number;
+  cogs: number;
+  margin: number;
+  marginPercent: number;
+}
+
+export interface MonthPace {
+  elapsedDays: number;
+  daysInMonth: number;
+  projectedRevenue: number;
+  projectedOrders: number;
+}
+
+export interface TopCustomer {
+  rank: number;
+  userId: string;
+  fullName: string;
+  email: string;
+  totalOrders: number;
+  totalSpent: number;
+}
+
 export interface FinanceSummary {
   month: string;
   year: number;
@@ -114,6 +170,12 @@ export interface FinanceSummary {
   orderCount?: number;
   averageOrderValue?: number;
   comparison?: FinanceComparison;
+  comparisons?: ReportComparisons;
+  customerSummary?: CustomerSummary;
+  customers?: CustomerSummary & { top?: TopCustomer[] };
+  dataQuality?: DataQuality;
+  topProductsByMargin?: TopProductByMargin[];
+  pace?: MonthPace;
   dailySales?: DailySale[];
   weeklySales?: WeeklySale[];
   byPaymentMethod?: PaymentMethodBreakdown[];
@@ -142,15 +204,6 @@ export interface TopSellingProduct {
   name: string;
   unitsSold: number;
   revenue: number;
-}
-
-export interface TopCustomer {
-  rank: number;
-  userId: string;
-  fullName: string;
-  email: string;
-  totalOrders: number;
-  totalSpent: number;
 }
 
 export interface FinanceSummaryResponse {
