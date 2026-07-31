@@ -122,16 +122,22 @@ export default function AdminOverheadCostsPage() {
     <AdminLayout>
       <main className="space-y-6 p-4 md:p-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
-          <div><h1 className="text-2xl font-semibold text-[#222]">Overhead Costs</h1><p className="text-sm text-[#5d6043]">General business costs that cannot be measured directly per product.</p></div>
+          <div>
+            <h1 className="text-2xl font-semibold text-[#222]">Overhead Costs</h1>
+            <p className="text-sm text-[#5d6043]">
+              General business costs that cannot be measured directly per product. Each amount counts fully in the month of its cost date — nothing is spread across later months.
+            </p>
+          </div>
           <div className="text-right"><p className="text-xs text-[#5d6043]">{month} {year}</p><p className="text-2xl font-semibold">GHS {total.toFixed(2)}</p></div>
         </header>
 
         <section className="border-y border-[#b9aca2]/60 bg-white/60 px-4 py-4">
           <div className="flex gap-3">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" />
-            <div className="grid gap-3 text-sm text-[#5d6043] md:grid-cols-2">
+            <div className="grid gap-3 text-sm text-[#5d6043] md:grid-cols-3">
               <div><p className="font-semibold text-[#222]">Add here</p><p>Rent, general utilities, internet, marketing, administration, bank charges, software, maintenance, and professional fees.</p></div>
               <div><p className="font-semibold text-[#222]">Do not add here</p><p>Flour, sugar, boxes, decorations, or direct baking labour go in Cost Items. Supplier purchases go in Purchases. Discounts and refunds are handled by Orders.</p></div>
+              <div><p className="font-semibold text-[#222]">One month only</p><p>The full amount reduces profit for the month of the cost date. For a multi-month prepaid cost, enter a separate amount for each month it should cover.</p></div>
             </div>
           </div>
         </section>
@@ -145,7 +151,11 @@ export default function AdminOverheadCostsPage() {
           <label className="text-sm font-medium">Description<input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="e.g. July shop rent" className={`${field} mt-1`} required /></label>
           <label className="text-sm font-medium">Overhead category<div className="mt-1 flex gap-2"><select value={form.categoryId} onChange={(event) => setForm({ ...form, categoryId: event.target.value })} className={field} required><option value="">Select category</option>{categories.map((category) => <option key={category._id} value={category._id}>{category.name}</option>)}</select><button type="button" title="Add category" onClick={() => setShowCategoryForm(true)} className="rounded-md border px-3"><Plus size={18} /></button></div></label>
           <label className="text-sm font-medium">Amount (GHS)<input type="number" min={0} step="0.01" value={form.amount || ""} onChange={(event) => setForm({ ...form, amount: Number(event.target.value) || 0 })} className={`${field} mt-1`} required /></label>
-          <label className="text-sm font-medium">Cost date<input type="date" max={new Date().toISOString().slice(0, 10)} value={form.expenseDate} onChange={(event) => setForm({ ...form, expenseDate: event.target.value })} className={`${field} mt-1`} required /></label>
+          <label className="text-sm font-medium">
+            Cost date
+            <input type="date" max={new Date().toISOString().slice(0, 10)} value={form.expenseDate} onChange={(event) => setForm({ ...form, expenseDate: event.target.value })} className={`${field} mt-1`} required />
+            <span className="mt-1 block text-xs font-normal text-[#5d6043]">This entire amount is counted only in this date&apos;s month on reports.</span>
+          </label>
           <label className="text-sm font-medium">Vendor or payee (optional)<input value={form.vendor || ""} onChange={(event) => setForm({ ...form, vendor: event.target.value })} className={`${field} mt-1`} /></label>
           <label className="text-sm font-medium">Payment method<select value={form.paymentMethod || ""} onChange={(event) => setForm({ ...form, paymentMethod: event.target.value })} className={`${field} mt-1`}><option value="">Not recorded</option>{Object.entries(paymentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label className="text-sm font-medium">Payment reference (optional)<input value={form.paymentReference || ""} onChange={(event) => setForm({ ...form, paymentReference: event.target.value })} className={`${field} mt-1`} /></label>
