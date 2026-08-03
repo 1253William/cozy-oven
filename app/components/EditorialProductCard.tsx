@@ -13,7 +13,9 @@ type EditorialProductCardProps = {
 };
 
 const availableOptions = (product: StoreProduct) =>
-  product.selectOptions?.filter((item) => item.isAvailable !== false) ?? [];
+  product.selectOptions?.filter(
+    (item) => item.isAvailable !== false && item.soldIndividually !== false
+  ) ?? [];
 
 const displayPrice = (product: StoreProduct, selectedLabel?: string) => {
   const options = availableOptions(product);

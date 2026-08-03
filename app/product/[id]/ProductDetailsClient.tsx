@@ -36,7 +36,9 @@ export default function ProductDetails() {
   const minQuantity = isMinisProduct ? 4 : 1;
   
   // Filter to only show available options
-  const availableOptions = product?.selectOptions?.filter(opt => opt.isAvailable !== false) ?? [];
+  const availableOptions = product?.selectOptions?.filter(
+    opt => opt.isAvailable !== false && opt.soldIndividually !== false
+  ) ?? [];
   const sizes = availableOptions.map(opt => opt.label) ?? ["Regular"];
 
   // A product is "sold out" if it has variants and ALL variants are unavailable

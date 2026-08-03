@@ -5,6 +5,8 @@ export interface SelectOption {
   label: string;
   additionalPrice: number;
   isAvailable?: boolean;
+  /** When false, size is for packages/production only — hidden on the storefront. */
+  soldIndividually?: boolean;
 }
 
 export interface PackageOption {
@@ -141,6 +143,7 @@ export function normalizeProduct(raw: any): Product {
     selectOptions: (raw.selectOptions || []).map((option: SelectOption) => ({
       ...option,
       variantId: option.variantId || option.label,
+      soldIndividually: option.soldIndividually !== false,
     })),
     productType: raw.productType || "standard",
     packageConfig: raw.packageConfig,

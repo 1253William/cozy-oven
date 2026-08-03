@@ -39,6 +39,7 @@ interface AddProductModalProps {
   onAddSelectOption: () => void;
   onRemoveSelectOption: (index: number) => void;
   onToggleOptionAvailable?: (index: number) => void;
+  onToggleOptionSoldIndividually?: (index: number) => void;
   onPackageConfigChange: (config: PackageConfig) => void;
   onPackageOptionInputChange: (field: keyof PackageOption, value: string | number | boolean) => void;
   onAddPackageOption: () => void;
@@ -82,6 +83,7 @@ export default function AddProductModal({
   onAddSelectOption,
   onRemoveSelectOption,
   onToggleOptionAvailable,
+  onToggleOptionSoldIndividually,
   onPackageConfigChange,
   onPackageOptionInputChange,
   onAddPackageOption,
@@ -133,6 +135,7 @@ export default function AddProductModal({
           onAddSelectOption={onAddSelectOption}
           onRemoveSelectOption={onRemoveSelectOption}
           onToggleOptionAvailable={onToggleOptionAvailable}
+          onToggleOptionSoldIndividually={onToggleOptionSoldIndividually}
           onPackageConfigChange={onPackageConfigChange}
           onPackageOptionInputChange={onPackageOptionInputChange}
           onAddPackageOption={onAddPackageOption}

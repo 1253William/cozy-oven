@@ -57,7 +57,9 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
   const [error, setError] = useState<string | null>(null);
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
-  const availableSizes = selectedProduct?.selectOptions?.filter(opt => opt.isAvailable !== false) || [];
+  const availableSizes = selectedProduct?.selectOptions?.filter(
+    opt => opt.isAvailable !== false && opt.soldIndividually !== false
+  ) || [];
   const packageSelection = usePackageSelection(selectedProduct);
 
   useEffect(() => {
@@ -127,7 +129,12 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
     }
 
     const sizeOption = selectedSize 
-      ? product.selectOptions?.find(opt => opt.label === selectedSize && opt.isAvailable !== false)
+      ? product.selectOptions?.find(
+          opt =>
+            opt.label === selectedSize &&
+            opt.isAvailable !== false &&
+            opt.soldIndividually !== false
+        )
       : null;
     
     const unitPrice = sizeOption?.additionalPrice ?? product.price;

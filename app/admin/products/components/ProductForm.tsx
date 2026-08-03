@@ -37,6 +37,7 @@ interface ProductFormProps {
   onAddSelectOption: () => void;
   onRemoveSelectOption: (index: number) => void;
   onToggleOptionAvailable?: (index: number) => void;
+  onToggleOptionSoldIndividually?: (index: number) => void;
   onPackageConfigChange: (config: PackageConfig) => void;
   onPackageOptionInputChange: (field: keyof PackageOption, value: string | number | boolean) => void;
   onAddPackageOption: () => void;
@@ -82,6 +83,7 @@ export default function ProductForm({
   onAddSelectOption,
   onRemoveSelectOption,
   onToggleOptionAvailable,
+  onToggleOptionSoldIndividually,
   onPackageConfigChange,
   onPackageOptionInputChange,
   onAddPackageOption,
@@ -444,33 +446,49 @@ export default function ProductForm({
             </button>
           </div>
           {selectOptions.map((option, index) => (
-            <div key={index} className="flex items-center justify-between bg-[#faf9f5] p-2 rounded-lg gap-2">
-              <span className={`text-sm flex-1 ${option.isAvailable === false ? "text-[#b9aca2] line-through" : ""}`}>
-                {option.label} (+GHS {option.additionalPrice.toFixed(2)})
-              </span>
-              {onToggleOptionAvailable && (
+            <div key={index} className="flex flex-col gap-1 bg-[#faf9f5] p-2 rounded-lg">
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-sm flex-1 ${option.isAvailable === false ? "text-[#b9aca2] line-through" : ""}`}>
+                  {option.label} (+GHS {option.additionalPrice.toFixed(2)})
+                  {option.soldIndividually === false && (
+                    <span className="ml-2 text-xs font-medium text-[#5d6043]">Package / production only</span>
+                  )}
+                </span>
+                {onToggleOptionAvailable && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleOptionAvailable(index)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                      option.isAvailable !== false ? "bg-green-500" : "bg-[#b9aca2]"
+                    }`}
+                    title={option.isAvailable !== false ? "Mark as unavailable" : "Mark as available"}
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform rounded-full bg-[#faf9f5] transition-transform ${
+                        option.isAvailable !== false ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => onToggleOptionAvailable(index)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    option.isAvailable !== false ? "bg-green-500" : "bg-[#b9aca2]"
-                  }`}
-                  title={option.isAvailable !== false ? "Mark as unavailable" : "Mark as available"}
+                  onClick={() => onRemoveSelectOption(index)}
+                  className="text-red-600 hover:bg-red-50 p-1 rounded"
                 >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-[#faf9f5] transition-transform ${
-                      option.isAvailable !== false ? "translate-x-5" : "translate-x-1"
-                    }`}
-                  />
+                  <X className="w-4 h-4" />
                 </button>
+              </div>
+              {onToggleOptionSoldIndividually && (
+                <label className="flex items-center gap-2 text-xs text-[#5d6043] pl-0.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={option.soldIndividually !== false}
+                    onChange={() => onToggleOptionSoldIndividually(index)}
+                    className="rounded border-[#b9aca2] text-[#5d6043] focus:ring-[#5d6043]"
+                  />
+                  Sold individually on storefront
+                </label>
               )}
-              <button
-                type="button"
-                onClick={() => onRemoveSelectOption(index)}
-                className="text-red-600 hover:bg-red-50 p-1 rounded"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           ))}
         </div>

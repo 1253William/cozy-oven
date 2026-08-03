@@ -221,7 +221,7 @@ export default function ProductManagementPage() {
 
   const addSelectOption = () => {
     if (selectOptionInput.label) {
-      setSelectOptions([...selectOptions, { ...selectOptionInput, isAvailable: true }]);
+      setSelectOptions([...selectOptions, { ...selectOptionInput, isAvailable: true, soldIndividually: true }]);
       setSelectOptionInput({ label: "", additionalPrice: 0 });
     }
   };
@@ -304,6 +304,16 @@ export default function ProductManagementPage() {
     updatedOptions[index] = {
       ...updatedOptions[index],
       isAvailable: currentValue === false ? true : false,
+    };
+    setSelectOptions(updatedOptions);
+  };
+
+  const toggleOptionSoldIndividually = (index: number) => {
+    const updatedOptions = [...selectOptions];
+    const currentValue = updatedOptions[index].soldIndividually;
+    updatedOptions[index] = {
+      ...updatedOptions[index],
+      soldIndividually: currentValue === false ? true : false,
     };
     setSelectOptions(updatedOptions);
   };
@@ -794,6 +804,7 @@ export default function ProductManagementPage() {
         onAddSelectOption={addSelectOption}
         onRemoveSelectOption={removeSelectOption}
         onToggleOptionAvailable={toggleOptionAvailable}
+        onToggleOptionSoldIndividually={toggleOptionSoldIndividually}
         onPackageConfigChange={setPackageConfig}
         onPackageOptionInputChange={updatePackageOptionInput}
         onAddPackageOption={addPackageOption}
@@ -842,6 +853,7 @@ export default function ProductManagementPage() {
         onAddSelectOption={addSelectOption}
         onRemoveSelectOption={removeSelectOption}
         onToggleOptionAvailable={toggleOptionAvailable}
+        onToggleOptionSoldIndividually={toggleOptionSoldIndividually}
         onPackageConfigChange={setPackageConfig}
         onPackageOptionInputChange={updatePackageOptionInput}
         onAddPackageOption={addPackageOption}

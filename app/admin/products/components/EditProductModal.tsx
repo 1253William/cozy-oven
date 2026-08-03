@@ -41,6 +41,7 @@ interface EditProductModalProps {
   onAddSelectOption: () => void;
   onRemoveSelectOption: (index: number) => void;
   onToggleOptionAvailable?: (index: number) => void;
+  onToggleOptionSoldIndividually?: (index: number) => void;
   onPackageConfigChange: (config: PackageConfig) => void;
   onPackageOptionInputChange: (field: keyof PackageOption, value: string | number | boolean) => void;
   onAddPackageOption: () => void;
@@ -86,6 +87,7 @@ export default function EditProductModal({
   onAddSelectOption,
   onRemoveSelectOption,
   onToggleOptionAvailable,
+  onToggleOptionSoldIndividually,
   onPackageConfigChange,
   onPackageOptionInputChange,
   onAddPackageOption,
@@ -141,6 +143,7 @@ export default function EditProductModal({
           onAddSelectOption={onAddSelectOption}
           onRemoveSelectOption={onRemoveSelectOption}
           onToggleOptionAvailable={onToggleOptionAvailable}
+          onToggleOptionSoldIndividually={onToggleOptionSoldIndividually}
           onPackageConfigChange={onPackageConfigChange}
           onPackageOptionInputChange={onPackageOptionInputChange}
           onAddPackageOption={onAddPackageOption}
