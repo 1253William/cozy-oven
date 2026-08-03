@@ -12,6 +12,7 @@ declare module "lucide-react" {
 
   export const Accessibility: LucideIcon;
   export const AlertCircle: LucideIcon;
+  export const AlertTriangle: LucideIcon;
   export const ArrowLeft: LucideIcon;
   export const ArrowRight: LucideIcon;
   export const Award: LucideIcon;
@@ -46,9 +47,11 @@ declare module "lucide-react" {
   export const MapPin: LucideIcon;
   export const Menu: LucideIcon;
   export const MessageCircle: LucideIcon;
+  export const MessageSquare: LucideIcon;
   export const Minus: LucideIcon;
   export const MoreVertical: LucideIcon;
   export const Package: LucideIcon;
+  export const Palette: LucideIcon;
   export const Phone: LucideIcon;
   export const Plus: LucideIcon;
   export const Quote: LucideIcon;
@@ -65,6 +68,7 @@ declare module "lucide-react" {
   export const Trash2: LucideIcon;
   export const TrendingDown: LucideIcon;
   export const TrendingUp: LucideIcon;
+  export const TriangleAlert: LucideIcon;
   export const Truck: LucideIcon;
   export const Upload: LucideIcon;
   export const User: LucideIcon;
