@@ -79,8 +79,13 @@ export default function NotificationsHubPage() {
             : response.data.messageKeys[0] || "order.confirmation";
       setSelectedKey(key);
       setDraft(response.data.effective[key]);
-    } catch {
-      setError("Could not load notification settings.");
+    } catch (err: any) {
+      const status = err?.response?.status;
+      setError(
+        status === 404
+          ? "Notification settings API not found (404). Redeploy the backend so /api/v1/dashboard/admin/notification-settings is live."
+          : "Could not load notification settings."
+      );
     } finally {
       setLoadingSettings(false);
     }
