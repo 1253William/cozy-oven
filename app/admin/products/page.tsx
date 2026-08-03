@@ -493,8 +493,13 @@ export default function ProductManagementPage() {
       setSelectedProduct(null);
       resetForm();
       await refetch();
-    } catch (error) {
-      console.error("Error updating product:", error);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Error updating product";
+      console.error("Error updating product:", message, error?.response?.data || error);
+      alert(message);
     }
   };
 
@@ -553,8 +558,13 @@ export default function ProductManagementPage() {
         productStatus: newStatus
       });
       await refetch();
-    } catch (error) {
-      console.error("Error toggling availability status:", error);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Error toggling availability";
+      console.error("Error toggling availability status:", message, error?.response?.data || error);
+      alert(message);
     }
   };
 
