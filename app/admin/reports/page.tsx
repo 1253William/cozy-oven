@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Truck,
   ShoppingBag,
-  AlertTriangle,
+  TriangleAlert,
 } from "lucide-react";
 import reportsService, {
   type FinanceSummary,
@@ -379,7 +379,7 @@ export default function ReportsPage() {
             {/* 2. Data quality banner */}
             {showQualityBanner ? (
               <div className="flex gap-3 rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0" />
                 <div>
                   <p className="font-semibold">Data quality note</p>
                   {dataQuality?.cogsCoverage && dataQuality.cogsCoverage.coveragePercent < 100 ? (
