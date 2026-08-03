@@ -7,7 +7,7 @@ const getApiBase = () =>
     process.env.API_BASE_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     (process.env.NODE_ENV === "production"
-      ? "https://cozy-oven-bakery-backend.onrender.com"
+      ? "https://cozy-oven-bakery-backend-t8x2.onrender.com"
       : "http://localhost:5000")
   ).replace(/\/$/, "");
 
