@@ -18,6 +18,7 @@ import { useSiteSettings } from "../context/SiteSettingsContext";
 const baseNavLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
+  { label: "Cozy Kart", href: "/cozy-kart" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

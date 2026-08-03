@@ -191,6 +191,22 @@ body {
   50% { transform: translateY(-14px) rotate(1deg); }
 }
 
+@keyframes cozy-kart-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cozy-kart-drift {
+  from { transform: scale(1.05) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-1.5%, -1%, 0); }
+}
+
 @keyframes review-scroll {
   from { transform: translateY(0); }
   to { transform: translateY(-50%); }

@@ -916,6 +916,7 @@ export const FALLBACK_SITE_SETTINGS: SiteSettings = {
     exploreLinks: [
       { label: "Home", href: "/" },
       { label: "Shop", href: "/shop" },
+      { label: "Cozy Kart", href: "/cozy-kart" },
       { label: "Our Story", href: "/about" },
       { label: "Contact", href: "/contact" },
     ],
