@@ -443,7 +443,6 @@ export default function HomeClient({
                           {item.name ? (
                             <p className="mt-3 text-sm text-[#5d6043]">
                               — {item.name}
-                              {item.verified ? " · Verified purchase" : ""}
                             </p>
                           ) : null}
                         </article>
@@ -651,7 +650,6 @@ export default function HomeClient({
                       {item.name ? (
                         <p className="mt-3 text-sm text-[#5d6043]">
                           — {item.name}
-                          {item.verified ? " · Verified purchase" : ""}
                         </p>
                       ) : null}
                     </article>

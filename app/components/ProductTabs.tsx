@@ -172,11 +172,6 @@ export default function ProductTabs({
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="font-semibold text-[#222222]">{review.displayName}</h4>
-                          {review.verified || review.source === "order" ? (
-                            <span className="rounded-full bg-[#5d6043]/10 px-2 py-0.5 text-xs text-[#5d6043]">
-                              Verified purchase
-                            </span>
-                          ) : null}
                         </div>
                         <p className="text-sm text-[#5d6043]">
                           {formatRelativeDate(review.createdAt)}
