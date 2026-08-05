@@ -16,10 +16,42 @@ export interface CampaignRecipient extends MarketingRecipient {
   sentAt?: string;
 }
 
+export interface CampaignTemplate {
+  _id: string;
+  name: string;
+  heroImageUrl?: string;
+  heroImagePublicId?: string;
+  headline: string;
+  body: string;
+  secondaryImageUrl?: string;
+  secondaryImagePublicId?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  footerNote?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type CampaignTemplateInput = {
+  name: string;
+  headline: string;
+  body: string;
+  heroImageUrl?: string;
+  heroImagePublicId?: string;
+  secondaryImageUrl?: string;
+  secondaryImagePublicId?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  footerNote?: string;
+  isActive?: boolean;
+};
+
 export interface Campaign {
   _id: string;
   subject: string;
   message?: string;
+  templateId?: string;
   status: "draft" | "sending" | "sent" | "failed";
   recipientCount?: number;
   recipients?: CampaignRecipient[];
@@ -41,9 +73,53 @@ export const marketingService = {
     return response.data as { success: boolean; count: number; data: MarketingRecipient[]; message?: string };
   },
 
+  getTemplates: async (includeArchived = false) => {
+    const query = includeArchived ? "?includeArchived=true" : "";
+    const response = await apiClient.get(`/api/v1/dashboard/marketing/templates${query}`);
+    return response.data as { success: boolean; data: CampaignTemplate[]; message?: string };
+  },
+
+  createTemplate: async (payload: CampaignTemplateInput) => {
+    const response = await apiClient.post("/api/v1/dashboard/marketing/templates", payload);
+    return response.data as { success: boolean; data: CampaignTemplate; message?: string };
+  },
+
+  updateTemplate: async (id: string, payload: Partial<CampaignTemplateInput>) => {
+    const response = await apiClient.patch(`/api/v1/dashboard/marketing/templates/${id}`, payload);
+    return response.data as { success: boolean; data: CampaignTemplate; message?: string };
+  },
+
+  archiveTemplate: async (id: string) => {
+    const response = await apiClient.delete(`/api/v1/dashboard/marketing/templates/${id}`);
+    return response.data as { success: boolean; data: CampaignTemplate; message?: string };
+  },
+
+  previewTemplate: async (payload: {
+    templateId?: string;
+    subject?: string;
+    message?: string;
+    customerName?: string;
+    name?: string;
+    headline?: string;
+    body?: string;
+    heroImageUrl?: string;
+    secondaryImageUrl?: string;
+    ctaLabel?: string;
+    ctaUrl?: string;
+    footerNote?: string;
+  }) => {
+    const response = await apiClient.post("/api/v1/dashboard/marketing/templates/preview", payload);
+    return response.data as {
+      success: boolean;
+      data: { subject: string; text: string; html: string };
+      message?: string;
+    };
+  },
+
   sendCampaign: async (payload: {
+    templateId: string;
     subject: string;
-    message: string;
+    message?: string;
     recipients: MarketingRecipient[];
   }) => {
     const response = await apiClient.post("/api/v1/dashboard/marketing/campaigns", payload);

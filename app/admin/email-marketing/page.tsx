@@ -1,28 +1,50 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
+import CmsImageField from "../website/CmsImageField";
 import marketingService, {
   Campaign,
+  CampaignTemplate,
+  CampaignTemplateInput,
   MarketingRecipient,
 } from "../../services/marketingService";
 import {
   CheckSquare,
+  Edit2,
   Loader2,
   Mail,
+  Palette,
+  Plus,
   RefreshCw,
   Search,
   Send,
   Square,
   Trash2,
   Users,
+  X,
 } from "lucide-react";
 
 type RecipientSourceFilter = "all" | "customers" | "subscribers";
 
 const recipientKey = (recipient: MarketingRecipient) => recipient.email.toLowerCase();
+
+const emptyTemplateForm = (): CampaignTemplateInput => ({
+  name: "",
+  headline: "",
+  body: "",
+  heroImageUrl: "",
+  secondaryImageUrl: "",
+  ctaLabel: "",
+  ctaUrl: "",
+  footerNote: "",
+});
+
+const field =
+  "w-full rounded-lg border border-[#b9aca2] px-4 py-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20";
 
 export default function EmailMarketingPage() {
   const router = useRouter();
@@ -31,17 +53,27 @@ export default function EmailMarketingPage() {
   const [recipients, setRecipients] = useState<MarketingRecipient[]>([]);
   const [selectedRecipients, setSelectedRecipients] = useState<MarketingRecipient[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [templates, setTemplates] = useState<CampaignTemplate[]>([]);
   const [sourceFilter, setSourceFilter] = useState<RecipientSourceFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [templateId, setTemplateId] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [manualEmails, setManualEmails] = useState("");
   const [invalidManualEmails, setInvalidManualEmails] = useState<string[]>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(true);
   const [loadingCampaigns, setLoadingCampaigns] = useState(true);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [sending, setSending] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showTemplateForm, setShowTemplateForm] = useState(false);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [templateForm, setTemplateForm] = useState<CampaignTemplateInput>(emptyTemplateForm());
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewSubject, setPreviewSubject] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "Admin") {
@@ -49,45 +81,21 @@ export default function EmailMarketingPage() {
     }
   }, [isAuthenticated, user, router]);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.role === "Admin") {
-      fetchRecipients();
-      fetchCampaigns();
+  const fetchTemplates = useCallback(async () => {
+    try {
+      setLoadingTemplates(true);
+      const response = await marketingService.getTemplates();
+      if (!response.success) throw new Error(response.message || "Failed to fetch templates");
+      const rows = response.data || [];
+      setTemplates(rows);
+      setTemplateId((current) => current || rows[0]?._id || "");
+    } catch (err) {
+      console.error("Fetch templates error:", err);
+      setTemplates([]);
+    } finally {
+      setLoadingTemplates(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const searchParams = new URLSearchParams(window.location.search);
-    const email = searchParams.get("email");
-    const name = searchParams.get("name") || "Customer";
-    if (!email) return;
-
-    const prefilledRecipient: MarketingRecipient = {
-      id: email,
-      name,
-      email,
-      source: "manual",
-    };
-
-    setSelectedRecipients((current) => {
-      if (current.some((recipient) => recipientKey(recipient) === recipientKey(prefilledRecipient))) {
-        return current;
-      }
-      return [...current, prefilledRecipient];
-    });
   }, []);
-
-  useEffect(() => {
-    if (error || success) {
-      const timer = setTimeout(() => {
-        setError(null);
-        setSuccess(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, success]);
 
   const fetchRecipients = async () => {
     try {
@@ -126,9 +134,94 @@ export default function EmailMarketingPage() {
   useEffect(() => {
     if (isAuthenticated && user?.role === "Admin") {
       fetchRecipients();
+      fetchCampaigns();
+      fetchTemplates();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const email = searchParams.get("email");
+    const name = searchParams.get("name") || "Customer";
+    if (!email) return;
+
+    const prefilledRecipient: MarketingRecipient = {
+      id: email,
+      name,
+      email,
+      source: "manual",
+    };
+
+    setSelectedRecipients((current) => {
+      if (current.some((recipient) => recipientKey(recipient) === recipientKey(prefilledRecipient))) {
+        return current;
+      }
+      return [...current, prefilledRecipient];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError(null);
+        setSuccess(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, success]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "Admin") {
+      fetchRecipients();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceFilter]);
+
+  const selectedTemplate = useMemo(
+    () => templates.find((template) => template._id === templateId) || null,
+    [templates, templateId]
+  );
+
+  useEffect(() => {
+    if (!selectedTemplate) return;
+    setSubject((current) => current || selectedTemplate.headline);
+    setMessage((current) => current || selectedTemplate.body);
+  }, [selectedTemplate]);
+
+  useEffect(() => {
+    if (!templateId) {
+      setPreviewHtml("");
+      setPreviewSubject("");
+      return;
+    }
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      try {
+        setPreviewLoading(true);
+        const response = await marketingService.previewTemplate({
+          templateId,
+          subject: subject || selectedTemplate?.headline,
+          message: message || selectedTemplate?.body,
+          customerName: "Anita",
+        });
+        if (!active) return;
+        if (response.success) {
+          setPreviewHtml(response.data.html);
+          setPreviewSubject(response.data.subject);
+        }
+      } catch (err) {
+        console.error("Preview error:", err);
+      } finally {
+        if (active) setPreviewLoading(false);
+      }
+    }, 400);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [templateId, subject, message, selectedTemplate?.headline, selectedTemplate?.body]);
 
   const filteredRecipients = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -206,12 +299,82 @@ export default function EmailMarketingPage() {
     setManualEmails("");
   };
 
-  const handleSendCampaign = async () => {
-    if (!subject.trim() || !message.trim()) {
-      setError("Subject and message are required");
+  const resetTemplateForm = () => {
+    setEditingTemplateId(null);
+    setTemplateForm(emptyTemplateForm());
+    setShowTemplateForm(false);
+  };
+
+  const beginEditTemplate = (template: CampaignTemplate) => {
+    setEditingTemplateId(template._id);
+    setTemplateForm({
+      name: template.name,
+      headline: template.headline,
+      body: template.body,
+      heroImageUrl: template.heroImageUrl || "",
+      secondaryImageUrl: template.secondaryImageUrl || "",
+      ctaLabel: template.ctaLabel || "",
+      ctaUrl: template.ctaUrl || "",
+      footerNote: template.footerNote || "",
+    });
+    setShowTemplateForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!templateForm.name.trim() || !templateForm.headline.trim() || !templateForm.body.trim()) {
+      setError("Template name, headline, and body are required");
       return;
     }
+    try {
+      setSavingTemplate(true);
+      setError(null);
+      const payload: CampaignTemplateInput = {
+        ...templateForm,
+        heroImageUrl: templateForm.heroImageUrl || undefined,
+        secondaryImageUrl: templateForm.secondaryImageUrl || undefined,
+        ctaLabel: templateForm.ctaLabel || undefined,
+        ctaUrl: templateForm.ctaUrl || undefined,
+        footerNote: templateForm.footerNote || undefined,
+      };
+      const response = editingTemplateId
+        ? await marketingService.updateTemplate(editingTemplateId, payload)
+        : await marketingService.createTemplate(payload);
+      if (!response.success) throw new Error(response.message || "Could not save template");
+      setSuccess(editingTemplateId ? "Template updated" : "Template created");
+      resetTemplateForm();
+      await fetchTemplates();
+      if (!editingTemplateId && response.data?._id) {
+        setTemplateId(response.data._id);
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || "Could not save template");
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
 
+  const handleArchiveTemplate = async (id: string) => {
+    if (!confirm("Archive this template? It will no longer be available for new campaigns.")) return;
+    try {
+      await marketingService.archiveTemplate(id);
+      if (templateId === id) setTemplateId("");
+      setSuccess("Template archived");
+      await fetchTemplates();
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Could not archive template");
+    }
+  };
+
+  const handleSendCampaign = async () => {
+    if (!templateId) {
+      setError("Select a campaign template");
+      return;
+    }
+    if (!subject.trim()) {
+      setError("Subject is required");
+      return;
+    }
     if (selectedRecipients.length === 0) {
       setError("Select at least one recipient");
       return;
@@ -226,8 +389,9 @@ export default function EmailMarketingPage() {
       setSending(true);
       setError(null);
       const response = await marketingService.sendCampaign({
+        templateId,
         subject,
-        message,
+        message: message.trim() || undefined,
         recipients: selectedRecipients,
       });
 
@@ -242,9 +406,9 @@ export default function EmailMarketingPage() {
       setMessage("");
       setSelectedRecipients([]);
       fetchCampaigns();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Send campaign error:", err);
-      setError("Failed to send campaign");
+      setError(err?.response?.data?.message || "Failed to send campaign");
     } finally {
       setSending(false);
     }
@@ -272,13 +436,14 @@ export default function EmailMarketingPage() {
           <div>
             <h1 className="text-2xl font-bold text-[#222222] sm:text-3xl">Email Marketing</h1>
             <p className="mt-1 text-sm text-[#5d6043]">
-              Send Resend campaigns to selected customers and subscribers.
+              Build image-ready templates, then send campaigns to customers and subscribers.
             </p>
           </div>
           <button
             onClick={() => {
               fetchRecipients();
               fetchCampaigns();
+              fetchTemplates();
             }}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#b9aca2] bg-[#faf9f5] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#faf9f5]"
           >
@@ -286,6 +451,196 @@ export default function EmailMarketingPage() {
             Refresh
           </button>
         </div>
+
+        <section className="rounded-lg bg-[#faf9f5] p-6 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-[#222222]">
+              <Palette className="h-5 w-5" />
+              Campaign templates
+            </h2>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingTemplateId(null);
+                setTemplateForm(emptyTemplateForm());
+                setShowTemplateForm(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] hover:bg-[#222222]"
+            >
+              <Plus className="h-4 w-4" />
+              New template
+            </button>
+          </div>
+
+          {showTemplateForm && (
+            <div className="mb-6 space-y-4 rounded-lg border border-[#b9aca2]/60 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-[#222222]">
+                  {editingTemplateId ? "Edit template" : "Create template"}
+                </h3>
+                <button type="button" onClick={resetTemplateForm} className="p-1 text-[#5d6043]">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="text-sm font-semibold text-[#5d6043]">
+                  Template name
+                  <input
+                    className={`${field} mt-1`}
+                    value={templateForm.name}
+                    onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                    placeholder="Weekend special"
+                  />
+                </label>
+                <label className="text-sm font-semibold text-[#5d6043]">
+                  Headline
+                  <input
+                    className={`${field} mt-1`}
+                    value={templateForm.headline}
+                    onChange={(e) => setTemplateForm({ ...templateForm, headline: e.target.value })}
+                    placeholder="Fresh from the oven this weekend"
+                  />
+                </label>
+              </div>
+              <label className="block text-sm font-semibold text-[#5d6043]">
+                Body
+                <textarea
+                  className={`${field} mt-1 resize-y`}
+                  rows={5}
+                  value={templateForm.body}
+                  onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })}
+                  placeholder={"Hello {{customerName}},\n\nThis weekend we're baking..."}
+                />
+                <span className="mt-1 block text-xs font-normal">Use {"{{customerName}}"} for personalization.</span>
+              </label>
+              <div className="grid gap-4 md:grid-cols-2">
+                <CmsImageField
+                  label="Hero image"
+                  value={templateForm.heroImageUrl}
+                  onChange={(url) => setTemplateForm({ ...templateForm, heroImageUrl: url })}
+                />
+                <CmsImageField
+                  label="Secondary image (optional)"
+                  value={templateForm.secondaryImageUrl}
+                  onChange={(url) => setTemplateForm({ ...templateForm, secondaryImageUrl: url })}
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="text-sm font-semibold text-[#5d6043]">
+                  CTA label
+                  <input
+                    className={`${field} mt-1`}
+                    value={templateForm.ctaLabel}
+                    onChange={(e) => setTemplateForm({ ...templateForm, ctaLabel: e.target.value })}
+                    placeholder="Order now"
+                  />
+                </label>
+                <label className="text-sm font-semibold text-[#5d6043]">
+                  CTA URL
+                  <input
+                    className={`${field} mt-1`}
+                    value={templateForm.ctaUrl}
+                    onChange={(e) => setTemplateForm({ ...templateForm, ctaUrl: e.target.value })}
+                    placeholder="https://cozyoven.store"
+                  />
+                </label>
+              </div>
+              <label className="block text-sm font-semibold text-[#5d6043]">
+                Footer note (optional)
+                <input
+                  className={`${field} mt-1`}
+                  value={templateForm.footerNote}
+                  onChange={(e) => setTemplateForm({ ...templateForm, footerNote: e.target.value })}
+                  placeholder="Reply to this email with questions."
+                />
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={savingTemplate}
+                  onClick={handleSaveTemplate}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] disabled:opacity-50"
+                >
+                  {savingTemplate ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {editingTemplateId ? "Save template" : "Create template"}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetTemplateForm}
+                  className="rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-semibold text-[#5d6043]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {loadingTemplates ? (
+            <div className="flex items-center gap-2 text-sm text-[#5d6043]">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading templates...
+            </div>
+          ) : templates.length === 0 ? (
+            <p className="text-sm text-[#5d6043]">
+              No templates yet. Create one with a hero image and headline before sending.
+            </p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {templates.map((template) => (
+                <article
+                  key={template._id}
+                  className={`overflow-hidden rounded-lg border bg-white ${
+                    templateId === template._id ? "border-[#5d6043]" : "border-[#b9aca2]/60"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTemplateId(template._id);
+                      setSubject(template.headline);
+                      setMessage(template.body);
+                    }}
+                    className="block w-full text-left"
+                  >
+                    <div className="relative h-28 bg-[#b9aca2]/30">
+                      {template.heroImageUrl ? (
+                        <Image
+                          src={template.heroImageUrl}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="240px"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="p-3">
+                      <p className="font-semibold text-[#222222]">{template.name}</p>
+                      <p className="mt-1 line-clamp-2 text-xs text-[#5d6043]">{template.headline}</p>
+                    </div>
+                  </button>
+                  <div className="flex border-t border-[#b9aca2]/40">
+                    <button
+                      type="button"
+                      title="Edit"
+                      onClick={() => beginEditTemplate(template)}
+                      className="flex-1 p-2 text-[#5d6043] hover:bg-[#faf9f5]"
+                    >
+                      <Edit2 className="mx-auto h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Archive"
+                      onClick={() => handleArchiveTemplate(template._id)}
+                      className="flex-1 p-2 text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="mx-auto h-4 w-4" />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
           <section className="rounded-lg bg-[#faf9f5] p-6 shadow-sm">
@@ -383,6 +738,29 @@ export default function EmailMarketingPage() {
                 Compose Campaign
               </h2>
               <div className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-[#5d6043]">Template</label>
+                  <select
+                    value={templateId}
+                    onChange={(event) => {
+                      const nextId = event.target.value;
+                      setTemplateId(nextId);
+                      const next = templates.find((item) => item._id === nextId);
+                      if (next) {
+                        setSubject(next.headline);
+                        setMessage(next.body);
+                      }
+                    }}
+                    className={field}
+                  >
+                    <option value="">Select a template</option>
+                    {templates.map((template) => (
+                      <option key={template._id} value={template._id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="rounded-lg border border-[#b9aca2]/60 bg-[#faf9f5] p-4">
                   <label className="mb-2 block text-sm font-semibold text-[#5d6043]">
                     Add manual recipients
@@ -392,7 +770,7 @@ export default function EmailMarketingPage() {
                     onChange={(event) => setManualEmails(event.target.value)}
                     rows={3}
                     placeholder="name@example.com, second@example.com"
-                    className="w-full resize-none rounded-lg border border-[#b9aca2] px-4 py-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20"
+                    className={`${field} resize-none`}
                   />
                   {invalidManualEmails.length > 0 && (
                     <p className="mt-2 text-xs text-red-600">
@@ -413,18 +791,38 @@ export default function EmailMarketingPage() {
                     value={subject}
                     onChange={(event) => setSubject(event.target.value)}
                     placeholder="Fresh treats from Cozy Oven"
-                    className="w-full rounded-lg border border-[#b9aca2] px-4 py-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20"
+                    className={field}
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-[#5d6043]">Message</label>
+                  <label className="mb-2 block text-sm font-semibold text-[#5d6043]">
+                    Body override (optional)
+                  </label>
                   <textarea
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    rows={9}
-                    placeholder="Write your message..."
-                    className="w-full resize-none rounded-lg border border-[#b9aca2] px-4 py-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20"
+                    rows={7}
+                    placeholder="Leave as template body, or override for this send..."
+                    className={`${field} resize-none`}
                   />
+                </div>
+                <div className="rounded-lg border border-[#b9aca2]/60 bg-white p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-[#222222]">Preview</p>
+                    {previewLoading ? <Loader2 className="h-4 w-4 animate-spin text-[#5d6043]" /> : null}
+                  </div>
+                  {previewSubject ? (
+                    <p className="mb-2 text-xs text-[#5d6043]">Subject: {previewSubject}</p>
+                  ) : null}
+                  {previewHtml ? (
+                    <iframe
+                      title="Campaign preview"
+                      srcDoc={previewHtml}
+                      className="h-72 w-full rounded border border-[#b9aca2]/40 bg-white"
+                    />
+                  ) : (
+                    <p className="text-sm text-[#5d6043]">Select a template to preview.</p>
+                  )}
                 </div>
                 <div className="rounded-lg bg-[#faf9f5] p-4 text-sm text-[#5d6043]">
                   Sending to <span className="font-bold">{selectedRecipients.length}</span> recipient
@@ -432,7 +830,7 @@ export default function EmailMarketingPage() {
                 </div>
                 <button
                   onClick={handleSendCampaign}
-                  disabled={sending || selectedRecipients.length === 0}
+                  disabled={sending || selectedRecipients.length === 0 || !templateId}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-3 font-semibold text-[#faf9f5] hover:bg-[#222222] disabled:opacity-50"
                 >
                   {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
@@ -467,7 +865,9 @@ export default function EmailMarketingPage() {
                       </div>
                       <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                         <div className="rounded bg-[#faf9f5] p-2">
-                          <p className="font-bold text-[#222222]">{campaign.recipientCount ?? campaign.recipients?.length ?? 0}</p>
+                          <p className="font-bold text-[#222222]">
+                            {campaign.recipientCount ?? campaign.recipients?.length ?? 0}
+                          </p>
                           <p className="text-[#5d6043]">Recipients</p>
                         </div>
                         <div className="rounded bg-green-50 p-2">
