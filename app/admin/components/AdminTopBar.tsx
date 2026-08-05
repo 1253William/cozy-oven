@@ -3,6 +3,7 @@
 import {
   Menu01Icon,
   Notification03Icon,
+  Search01Icon,
   SidebarLeft01Icon,
   UserCircleIcon,
 } from "@hugeicons/core-free-icons";
@@ -16,6 +17,7 @@ export type AdminTopBarProps = {
   collapsed: boolean;
   onToggleCollapse: () => void;
   onMobileMenuOpen: () => void;
+  onOpenCommandPalette: () => void;
   notificationCount: number;
   displayName: string;
 };
@@ -34,6 +36,7 @@ export default function AdminTopBar({
   collapsed,
   onToggleCollapse,
   onMobileMenuOpen,
+  onOpenCommandPalette,
   notificationCount,
   displayName,
 }: AdminTopBarProps) {
@@ -100,7 +103,21 @@ export default function AdminTopBar({
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
-          {/* Phase 4: command palette search button goes here */}
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[#5d6043] hover:bg-[#b9aca2] transition-colors"
+            aria-label="Open command palette"
+            title="Search (Ctrl+K)"
+          >
+            <AdminIcon icon={Search01Icon} size={18} />
+            <span className="hidden xl:inline text-sm text-[#5d6043]/70">
+              Search
+            </span>
+            <kbd className="hidden xl:inline rounded border border-[#b9aca2]/70 px-1.5 py-0.5 text-[10px] font-medium text-[#5d6043]/70">
+              ⌘K
+            </kbd>
+          </button>
 
           <Link
             href="/admin/notifications"

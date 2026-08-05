@@ -1,11 +1,17 @@
 "use client";
 
-import { ReactNode, useEffect, useState, useSyncExternalStore } from "react";
+import { ReactNode, useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import notificationService from "../../services/notificationService";
+import AdminCommandPalette from "./AdminCommandPalette";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopBar from "./AdminTopBar";
+import {
+  readFavorites,
+  toggleFavorite,
+  writeFavorites,
+} from "./navFavorites";
 import {
   getEffectiveCollapsed,
   nextSessionOverrideAfterToggle,
@@ -19,6 +25,7 @@ interface AdminLayoutProps {
 }
 
 const COLLAPSED_CHANGE_EVENT = "admin-sidebar-collapsed";
+const FAVORITES_CHANGE_EVENT = "admin-nav-favorites";
 
 function subscribeCollapsedPreference(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
@@ -37,17 +44,41 @@ function getCollapsedPreferenceServerSnapshot() {
   return false;
 }
 
+function subscribeFavorites(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(FAVORITES_CHANGE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(FAVORITES_CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function getFavoritesSnapshot() {
+  return JSON.stringify(readFavorites(window.localStorage));
+}
+
+function getFavoritesServerSnapshot() {
+  return "[]";
+}
+
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, isLoading, isAuthenticated } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const collapsedPreference = useSyncExternalStore(
     subscribeCollapsedPreference,
     getCollapsedPreferenceSnapshot,
     getCollapsedPreferenceServerSnapshot
   );
+  const favoritesJson = useSyncExternalStore(
+    subscribeFavorites,
+    getFavoritesSnapshot,
+    getFavoritesServerSnapshot
+  );
+  const favoriteHrefs: string[] = JSON.parse(favoritesJson);
   const [sessionOverride, setSessionOverride] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
 
@@ -90,6 +121,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return () => clearInterval(interval);
   }, [user]);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   const displayName = user?.fullName || "Admin";
   const displayEmail = user?.email || "";
 
@@ -110,6 +152,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       })
     );
   };
+
+  const handleToggleFavorite = useCallback((href: string) => {
+    const current = readFavorites(window.localStorage);
+    const { favorites: next, changed } = toggleFavorite(href, current);
+    if (!changed) return;
+    writeFavorites(next, window.localStorage);
+    window.dispatchEvent(new Event(FAVORITES_CHANGE_EVENT));
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -136,6 +186,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         displayName={displayName}
         displayEmail={displayEmail}
         onLogout={handleLogout}
+        favoriteHrefs={favoriteHrefs}
+        onToggleFavorite={handleToggleFavorite}
       />
 
       <div
@@ -148,12 +200,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           collapsed={collapsed}
           onToggleCollapse={handleToggleCollapse}
           onMobileMenuOpen={() => setIsSidebarOpen(true)}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           notificationCount={notificationCount}
           displayName={displayName}
         />
 
         <main className="p-6">{children}</main>
       </div>
+
+      <AdminCommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        favoriteHrefs={favoriteHrefs}
+        onToggleFavorite={handleToggleFavorite}
+      />
     </div>
   );
 }

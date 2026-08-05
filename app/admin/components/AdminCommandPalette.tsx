@@ -6,7 +6,7 @@ import {
   Cancel01Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import AdminIcon from "./AdminIcon";
 import { filterCommandPaletteItems } from "./commandPalette";
@@ -67,7 +67,7 @@ export default function AdminCommandPalette({
     router.push(href);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "ArrowDown") {
       event.preventDefault();
       if (results.length === 0) return;
