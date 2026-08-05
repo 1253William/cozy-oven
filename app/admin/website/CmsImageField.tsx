@@ -61,7 +61,7 @@ export default function CmsImageField({
       setShowLibrary(false);
     } catch (err) {
       console.error(err);
-      setError("Upload01Icon failed. Try a JPEG, PNG, or WebP under 5MB.");
+      setError("Upload failed. Try a JPEG, PNG, or WebP under 5MB.");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -97,7 +97,7 @@ export default function CmsImageField({
           ) : (
             <AdminIcon icon={Upload01Icon} size={16} />
           )}
-          {value ? "Replace image" : "Upload01Icon image"}
+          {value ? "Replace image" : "Upload image"}
           <input
             ref={inputRef}
             type="file"
@@ -145,7 +145,7 @@ export default function CmsImageField({
               </div>
             ) : libraryItems.length === 0 ? (
               <p className="rounded-xl border border-dashed border-[#b9aca2] px-4 py-10 text-center text-sm text-[#5d6043]">
-                No library images yet. Upload01Icon one and it will show up here next time.
+                No library images yet. Upload one and it will show up here next time.
               </p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -183,7 +183,7 @@ export default function CmsImageField({
                 ) : (
                   <AdminIcon icon={Upload01Icon} size={16} />
                 )}
-                Upload01Icon new
+                Upload new
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"

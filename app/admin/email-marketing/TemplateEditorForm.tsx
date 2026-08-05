@@ -58,6 +58,7 @@ export default function TemplateEditorForm({
           footerNote: form.footerNote || undefined,
           subject: form.headline,
           customerName: "Anita",
+          skinId: "oven_classic",
         });
         if (!active) return;
         if (response.success) {
@@ -68,11 +69,22 @@ export default function TemplateEditorForm({
         }
       } catch (err: unknown) {
         if (!active) return;
+        const status =
+          err && typeof err === "object" && "response" in err
+            ? (err as { response?: { status?: number; data?: { message?: string } } }).response
+                ?.status
+            : undefined;
         const message =
           err && typeof err === "object" && "response" in err
             ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
             : undefined;
-        setPreviewError(message || "Preview failed");
+        if (status === 404 || message === "Route not found") {
+          setPreviewError(
+            "Preview API is unavailable on this backend. Redeploy the bakery backend with marketing template routes, then try again."
+          );
+        } else {
+          setPreviewError(message || "Preview failed");
+        }
       } finally {
         if (active) setPreviewLoading(false);
       }

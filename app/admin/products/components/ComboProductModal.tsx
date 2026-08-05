@@ -187,7 +187,7 @@ export default function ComboProductModal({ show, onClose, onSaved, products }: 
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2 border border-[#b9aca2] rounded-lg cursor-pointer hover:bg-[#faf9f5]">
                   <AdminIcon icon={Upload01Icon} size={16} />
-                  {imageFile ? "Change image" : "Upload01Icon image"}
+                  {imageFile ? "Change image" : "Upload image"}
                   <input
                     type="file"
                     accept="image/*"
