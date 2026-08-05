@@ -129,8 +129,16 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-[rgba(34,34,34,0.1)] px-4 py-5 text-center text-xs text-[#5d6043]">
-        Copyright {new Date().getFullYear()} Cozy Oven. All rights reserved.
+      <div className="flex flex-col gap-2 border-t border-[rgba(34,34,34,0.1)] px-4 py-5 text-xs text-[#5d6043] sm:flex-row sm:items-center sm:justify-between">
+        <p>Copyright {new Date().getFullYear()} Cozy Oven. All rights reserved.</p>
+        <a
+          href="https://www.weareubic.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition hover:text-[#bd6325]"
+        >
+          Built by Ubic Media Agency
+        </a>
       </div>
     </footer>
   );
