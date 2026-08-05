@@ -100,7 +100,7 @@ export default function CustomersPage() {
           ``,
           `Name: ${customer.fullName}`,
           `Email: ${customer.email}`,
-          `Call02Icon: ${customer.phoneNumber}`,
+          `Phone: ${customer.phoneNumber}`,
           `Total Orders: ${orders.length}`,
           `Status: ${customer.isActive ? "Active" : "Inactive"}`,
           `Joined: ${new Date(customer.createdAt).toLocaleDateString()}`
@@ -181,10 +181,10 @@ export default function CustomersPage() {
           </div>
         )}
 
-        {/* Search01Icon and Filters - Better mobile layout with stacked inputs */}
+        {/* Search and Filters - Better mobile layout with stacked inputs */}
         <div className="bg-[#faf9f5] rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 border border-[#b9aca2]/40">
           <div className="flex flex-col gap-3 sm:gap-4">
-            {/* Search01Icon */}
+            {/* Search */}
             <div className="w-full relative">
               <AdminIcon icon={Search01Icon} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 sm:w-5 sm:h-5 text-[#b9aca2]" />
               <input
@@ -196,12 +196,12 @@ export default function CustomersPage() {
                     handleSearch()
                   }
                 }}
-                placeholder="Search01Icon by name, email, or phone..."
+                placeholder="Search by name, email, or phone..."
                 className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>
 
-            {/* Status FilterIcon */}
+            {/* Status Filter */}
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <AdminIcon icon={FilterIcon} size={16} className="sm:w-5 sm:h-5 text-[#b9aca2]" />
               <select
@@ -269,7 +269,7 @@ export default function CustomersPage() {
                   {/* Customer Details Grid */}
                   <div className="grid grid-cols-2 gap-3 mb-3 text-xs sm:text-sm">
                     <div>
-                      <p className="text-[#5d6043]">Call02Icon</p>
+                      <p className="text-[#5d6043]">Phone</p>
                       <p className="font-medium text-[#222222]">{customer.phoneNumber}</p>
                     </div>
                     <div>

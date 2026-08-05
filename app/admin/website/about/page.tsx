@@ -209,7 +209,7 @@ export default function AdminWebsiteAboutPage() {
       setSuccess("Saved");
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || "FloppyDiskIcon failed.");
+      setError(err?.response?.data?.message || "Save failed.");
     } finally {
       setSaving(false);
     }
@@ -483,7 +483,7 @@ export default function AdminWebsiteAboutPage() {
               ) : (
                 <AdminIcon icon={FloppyDiskIcon} size={16} />
               )}
-              FloppyDiskIcon
+              Save
             </button>
           </div>
         </div>

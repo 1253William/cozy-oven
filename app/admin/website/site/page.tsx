@@ -67,7 +67,7 @@ export default function AdminWebsiteSitePage() {
       setSuccess("Saved");
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || "FloppyDiskIcon failed.");
+      setError(err?.response?.data?.message || "Save failed.");
     } finally {
       setSaving(false);
     }
@@ -138,7 +138,7 @@ export default function AdminWebsiteSitePage() {
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition hover:bg-[#222222] disabled:opacity-60"
           >
             {saving ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" /> : <AdminIcon icon={FloppyDiskIcon} size={16} />}
-            FloppyDiskIcon
+            Save
           </button>
         </div>
 

@@ -196,7 +196,7 @@ export default function AdminFaqsPage() {
             className="mt-5 flex items-center gap-2 rounded-lg bg-[#5d6043] px-5 py-3 font-semibold text-[#faf9f5] disabled:opacity-60"
           >
             <AdminIcon icon={FloppyDiskIcon} size={16} />
-            {saving ? "Saving..." : editingId ? "FloppyDiskIcon changes" : "Add FAQ"}
+            {saving ? "Saving..." : editingId ? "Save changes" : "Add FAQ"}
           </button>
         </form>
 

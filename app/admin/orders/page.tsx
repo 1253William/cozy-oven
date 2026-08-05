@@ -300,10 +300,10 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Search01Icon and Filters */}
+        {/* Search and Filters */}
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search01Icon */}
+            {/* Search */}
             <div className="flex-1 relative">
               <AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
               <input
@@ -316,12 +316,12 @@ export default function OrdersPage() {
                     setAppliedSearch(searchQuery.trim());
                   }
                 }}
-                placeholder="Search01Icon by order ID, customer name, or email..."
+                placeholder="Search by order ID, customer name, or email..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>
 
-            {/* Status FilterIcon */}
+            {/* Status Filter */}
             <div className="flex items-center gap-2">
               <AdminIcon icon={FilterIcon} size={20} className="text-[#b9aca2]" />
               <select
@@ -340,7 +340,7 @@ export default function OrdersPage() {
               </select>
             </div>
 
-            {/* Payment Method FilterIcon */}
+            {/* Payment Method Filter */}
             <div className="flex items-center gap-2">
               <select
                 value={paymentMethodFilter}
@@ -368,7 +368,7 @@ export default function OrdersPage() {
                   setDiscountCodeFilter(event.target.value.toUpperCase());
                   setCurrentPage(1);
                 }}
-                placeholder="FilterIcon by code"
+                placeholder="Filter by code"
                 maxLength={32}
                 className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 uppercase focus:border-transparent focus:ring-2 focus:ring-[#5d6043]"
               />
@@ -533,7 +533,7 @@ export default function OrdersPage() {
                                 <button
                                   onClick={() => handleDownloadInvoice(order.orderId)}
                                   className="p-1 text-[#5d6043] hover:bg-[#b9aca2] rounded transition-colors"
-                                  title="Download01Icon Invoice"
+                                  title="Download Invoice"
                                 >
                                   <AdminIcon icon={Download01Icon} size={16} />
                                 </button>
@@ -553,7 +553,7 @@ export default function OrdersPage() {
                                   setNewStatus(order.status ?? "");
                                 }}
                                 className="p-1 text-[#5d6043] hover:bg-[#b9aca2] rounded transition-colors"
-                                title="Edit02Icon Status"
+                                title="Edit Status"
                               >
                                 <AdminIcon icon={Edit02Icon} size={16} />
                               </button>
@@ -699,7 +699,7 @@ export default function OrdersPage() {
                           className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] transition-colors"
                         >
                           <AdminIcon icon={Edit02Icon} size={16} />
-                          Edit02Icon Status
+                          Edit Status
                         </button>
                         <button
                           onClick={() => handleDeleteOrder(order.orderId)}

@@ -184,7 +184,7 @@ export default function ProductManagementPage() {
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
       const maxSize = 5 * 1024 * 1024; // 5MB
 
-      // FilterIcon valid files
+      // Filter valid files
       const validFiles = newFiles.filter(file => {
         if (!allowedTypes.includes(file.type)) {
           console.error(`Invalid image type for ${file.name}. Only JPEG, PNG, and WebP are allowed`);
@@ -376,7 +376,7 @@ export default function ProductManagementPage() {
       }
 
       if (!packageConfigIsValid()) {
-        console.error("Package01Icon products need enough available options for the required selection count");
+        console.error("Package products need enough available options for the required selection count");
         return;
       }
 
@@ -451,7 +451,7 @@ export default function ProductManagementPage() {
       }
 
       if (!packageConfigIsValid()) {
-        console.error("Package01Icon products need enough available options for the required selection count");
+        console.error("Package products need enough available options for the required selection count");
         return;
       }
 
@@ -637,10 +637,10 @@ export default function ProductManagementPage() {
           </div>
         )}
 
-        {/* Search01Icon and Filters */}
+        {/* Search and Filters */}
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search01Icon */}
+            {/* Search */}
             <div className="flex-1 relative">
               <AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
               <input
@@ -653,7 +653,7 @@ export default function ProductManagementPage() {
                     setAppliedSearch(searchQuery.trim());
                   }
                 }}
-                placeholder="Search01Icon products..."
+                placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>

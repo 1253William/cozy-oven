@@ -118,7 +118,7 @@ export default function CmsProductPicker({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search01Icon products"
+          placeholder="Search products"
           className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 text-sm"
         />
       </div>

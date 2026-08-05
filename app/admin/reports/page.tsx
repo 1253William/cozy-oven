@@ -283,7 +283,7 @@ export default function ReportsPage() {
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5d6043] px-4 py-2 text-[#5d6043] transition-colors hover:bg-[#f3efe8] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {exportingPdf ? <AdminIcon icon={Loading03Icon} size={20} className="animate-spin" /> : <AdminIcon icon={Download01Icon} size={20} />}
-              {exportingPdf ? "Exporting..." : "Download01Icon PDF"}
+              {exportingPdf ? "Exporting..." : "Download PDF"}
             </button>
           </div>
         </div>

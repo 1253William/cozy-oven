@@ -77,8 +77,12 @@ export default function ProductGrid({ products, onEdit, onDelete, onToggleAvaila
             <div className="flex items-center justify-between gap-2 mb-2">
               <p className="text-sm text-[#5d6043]">{product.productCategory}</p>
               {product.productType === "package" && (
-                <span className="text-xs font-semibold text-[#5d6043] bg-[#b9aca2] px-2 py-1 rounded-full">
-                  Package01Icon
+                <span
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#5d6043] bg-[#b9aca2] px-2 py-1 rounded-full"
+                  title="Package"
+                >
+                  <AdminIcon icon={Package01Icon} size={12} />
+                  Package
                 </span>
               )}
             </div>

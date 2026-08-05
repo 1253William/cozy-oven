@@ -320,7 +320,7 @@ export default function ProductForm({
         />
       </div>
 
-      {/* Image Upload01Icon */}
+      {/* Image Upload */}
       <div className="order-5">
         <label className="block text-sm font-semibold text-[#5d6043] mb-2">
           Product Images (Select multiple)
@@ -385,7 +385,7 @@ export default function ProductForm({
               if (newPreviews.length === 0) return null;
               return (
                 <>
-                  {isEdit && <p className="text-xs font-medium text-green-600 mb-2">New Images to Upload01Icon</p>}
+                  {isEdit && <p className="text-xs font-medium text-green-600 mb-2">New Images to Upload</p>}
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {newPreviews.map((preview, index) => {
                       const actualIndex = isEdit ? existingImageCount + index : index;

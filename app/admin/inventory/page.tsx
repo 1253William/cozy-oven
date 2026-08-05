@@ -141,7 +141,7 @@ export default function PurchasesPage() {
         </section>
 
         <section className="flex flex-wrap items-center justify-between gap-3">
-          <form onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }} className="relative w-full max-w-md"><AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-2.5 text-[#5d6043]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search01Icon item, reference, or category" className={`${field} pl-10`} /></form>
+          <form onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }} className="relative w-full max-w-md"><AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-2.5 text-[#5d6043]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search item, reference, or category" className={`${field} pl-10`} /></form>
           <div className="text-right"><p className="text-xs text-[#5d6043]">Visible purchase total</p><p className="text-xl font-semibold">GHS {total.toFixed(2)}</p></div>
         </section>
 

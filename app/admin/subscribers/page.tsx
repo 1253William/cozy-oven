@@ -67,7 +67,7 @@ export default function SubscribersPage() {
   };
 
   const handleSearch = () => {
-    // Search01Icon is handled client-side
+    // Search is handled client-side
   };
 
   const handleExportCSV = () => {
@@ -173,7 +173,7 @@ export default function SubscribersPage() {
           </div>
         </div>
 
-        {/* Search01Icon Bar */}
+        {/* Search Bar */}
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
           <div className="flex gap-3">
             <div className="flex-1 relative">
@@ -187,7 +187,7 @@ export default function SubscribersPage() {
                     handleSearch();
                   }
                 }}
-                placeholder="Search01Icon by name or email..."
+                placeholder="Search by name or email..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#bd6325] focus:border-transparent"
               />
             </div>

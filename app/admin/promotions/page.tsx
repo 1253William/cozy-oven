@@ -126,7 +126,7 @@ function PromotionFormModal({
         <div className="sticky top-0 flex items-center justify-between border-b border-[#b9aca2]/60 bg-[#faf9f5] p-5">
           <div>
             <h2 className="text-xl font-bold text-[#222222]">
-              {promotion ? "Edit02Icon Promotion" : "Create Promotion"}
+              {promotion ? "Edit Promotion" : "Create Promotion"}
             </h2>
             {hasApplications && (
               <p className="mt-1 text-xs text-[#5d6043]">
@@ -537,7 +537,7 @@ export default function PromotionsPage() {
             className="relative flex-1"
           >
             <AdminIcon icon={Search01Icon} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search01Icon code, promotion, or influencer" className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 focus:ring-2 focus:ring-[#5d6043]" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search code, promotion, or influencer" className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 focus:ring-2 focus:ring-[#5d6043]" />
           </form>
           <select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-lg border border-[#b9aca2] px-3 py-2 focus:ring-2 focus:ring-[#5d6043]">
             <option value="all">All statuses</option>
@@ -597,7 +597,7 @@ export default function PromotionsPage() {
                           <button type="button" onClick={() => void openStats(promotion)} className="rounded-md p-2 text-blue-700 hover:bg-blue-50" title="View statistics"><AdminIcon icon={ViewIcon} size={16} /></button>
                           {promotion.status !== "archived" && (
                             <>
-                              <button type="button" onClick={() => setEditing(promotion)} className="rounded-md p-2 text-[#5d6043] hover:bg-[#b9aca2]/30" title="Edit02Icon promotion"><AdminIcon icon={Edit02Icon} size={16} /></button>
+                              <button type="button" onClick={() => setEditing(promotion)} className="rounded-md p-2 text-[#5d6043] hover:bg-[#b9aca2]/30" title="Edit promotion"><AdminIcon icon={Edit02Icon} size={16} /></button>
                               <button type="button" onClick={() => void archive(promotion)} className="rounded-md p-2 text-red-700 hover:bg-red-50" title="Archive promotion"><AdminIcon icon={Delete02Icon} size={16} /></button>
                             </>
                           )}
@@ -622,7 +622,7 @@ export default function PromotionsPage() {
                   </div>
                   <div className="mt-4 flex justify-end gap-2 border-t border-[#b9aca2]/40 pt-3">
                     <button type="button" onClick={() => void openStats(promotion)} className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"><AdminIcon icon={ChartHistogramIcon} size={16} />Stats</button>
-                    {promotion.status !== "archived" && <button type="button" onClick={() => setEditing(promotion)} className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-white"><AdminIcon icon={Edit02Icon} size={16} />Edit02Icon</button>}
+                    {promotion.status !== "archived" && <button type="button" onClick={() => setEditing(promotion)} className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-white"><AdminIcon icon={Edit02Icon} size={16} />Edit</button>}
                   </div>
                 </div>
               ))}

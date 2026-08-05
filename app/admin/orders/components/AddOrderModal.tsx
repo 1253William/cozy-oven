@@ -349,7 +349,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                             type="search"
                             value={customerSearch}
                             onChange={(e) => setCustomerSearch(e.target.value)}
-                            placeholder="Search01Icon by name, email, or phone"
+                            placeholder="Search by name, email, or phone"
                             className="w-full rounded-lg border-0 bg-transparent py-2.5 pl-9 pr-10 focus:ring-2 focus:ring-[#5d6043]"
                           />
                           {isLoadingCustomers && (

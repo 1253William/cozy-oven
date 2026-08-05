@@ -241,7 +241,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-[#5d6043] mb-2">
-                      Call02Icon Number
+                      Phone Number
                     </label>
                     {isEditing ? (
                       <input
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                     className="flex items-center gap-2 px-6 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors disabled:opacity-60"
                   >
                     <AdminIcon icon={FloppyDiskIcon} size={16} />
-                    {saving ? "Saving..." : "FloppyDiskIcon Changes"}
+                    {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
               )}
