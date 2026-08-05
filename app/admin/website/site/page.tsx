@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  Add01Icon,
+  Delete02Icon,
+  FloppyDiskIcon,
+  Loading03Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Save, Trash2 } from "lucide-react";
 import AdminLayout from "../../components/AdminLayout";
 import WebsiteTabs from "../WebsiteTabs";
 import cmsService, {
@@ -60,7 +67,7 @@ export default function AdminWebsiteSitePage() {
       setSuccess("Saved");
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || "Save failed.");
+      setError(err?.response?.data?.message || "FloppyDiskIcon failed.");
     } finally {
       setSaving(false);
     }
@@ -130,8 +137,8 @@ export default function AdminWebsiteSitePage() {
             disabled={saving || loading}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition hover:bg-[#222222] disabled:opacity-60"
           >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Save
+            {saving ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" /> : <AdminIcon icon={FloppyDiskIcon} size={16} />}
+            FloppyDiskIcon
           </button>
         </div>
 
@@ -148,7 +155,7 @@ export default function AdminWebsiteSitePage() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
           </div>
         ) : (
           <form id="site-settings-form" onSubmit={handleSave} className="space-y-6">
@@ -288,7 +295,7 @@ export default function AdminWebsiteSitePage() {
                   onClick={addCampaign}
                   className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
                 >
-                  <Plus className="h-4 w-4" />
+                  <AdminIcon icon={Add01Icon} size={16} />
                   Add link
                 </button>
               </div>
@@ -356,7 +363,7 @@ export default function AdminWebsiteSitePage() {
                         onClick={() => removeCampaign(link.id)}
                         className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <AdminIcon icon={Delete02Icon} size={16} />
                         Remove
                       </button>
                     </div>

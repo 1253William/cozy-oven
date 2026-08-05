@@ -1,10 +1,22 @@
 "use client"
 
+import {
+  BanIcon,
+  Call02Icon,
+  CheckmarkCircle02Icon,
+  FilterIcon,
+  Loading03Icon,
+  Mail01Icon,
+  MoreVerticalIcon,
+  Search01Icon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import AdminLayout from "../components/AdminLayout"
 import { useAuth } from "../../context/AuthContext"
-import { Search, Filter, MoreVertical, Mail, Phone, Ban, CheckCircle, Eye, Loader2 } from "lucide-react"
 import customerService, { type Customer, type CustomerOverview } from "../../services/customerService"
 
 export default function CustomersPage() {
@@ -88,7 +100,7 @@ export default function CustomersPage() {
           ``,
           `Name: ${customer.fullName}`,
           `Email: ${customer.email}`,
-          `Phone: ${customer.phoneNumber}`,
+          `Call02Icon: ${customer.phoneNumber}`,
           `Total Orders: ${orders.length}`,
           `Status: ${customer.isActive ? "Active" : "Inactive"}`,
           `Joined: ${new Date(customer.createdAt).toLocaleDateString()}`
@@ -142,7 +154,7 @@ export default function CustomersPage() {
         {/* Stats Cards - Better responsive grid and text sizing */}
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
@@ -169,12 +181,12 @@ export default function CustomersPage() {
           </div>
         )}
 
-        {/* Search and Filters - Better mobile layout with stacked inputs */}
+        {/* Search01Icon and Filters - Better mobile layout with stacked inputs */}
         <div className="bg-[#faf9f5] rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 border border-[#b9aca2]/40">
           <div className="flex flex-col gap-3 sm:gap-4">
-            {/* Search */}
+            {/* Search01Icon */}
             <div className="w-full relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-[#b9aca2]" />
+              <AdminIcon icon={Search01Icon} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 sm:w-5 sm:h-5 text-[#b9aca2]" />
               <input
                 type="text"
                 value={searchQuery}
@@ -184,14 +196,14 @@ export default function CustomersPage() {
                     handleSearch()
                   }
                 }}
-                placeholder="Search by name, email, or phone..."
+                placeholder="Search01Icon by name, email, or phone..."
                 className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>
 
-            {/* Status Filter */}
+            {/* Status FilterIcon */}
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Filter className="w-4 sm:w-5 h-4 sm:h-5 text-[#b9aca2] shrink-0" />
+              <AdminIcon icon={FilterIcon} size={16} className="sm:w-5 sm:h-5 text-[#b9aca2]" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "inactive")}
@@ -211,7 +223,7 @@ export default function CustomersPage() {
           <div className="md:hidden space-y-3">
             {loading ? (
               <div className="text-center py-8">
-                <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin mx-auto" />
+                <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin mx-auto" />
               </div>
             ) : filteredCustomers.length === 0 ? (
               <div className="text-center py-8">
@@ -234,7 +246,7 @@ export default function CustomersPage() {
                       onClick={() => setSelectedCustomer(selectedCustomer === customer._id ? null : customer._id)}
                       className="p-1.5 hover:bg-[#b9aca2] rounded-lg shrink-0"
                     >
-                      <MoreVertical className="w-4 h-4 text-[#b9aca2]" />
+                      <AdminIcon icon={MoreVerticalIcon} size={16} className="text-[#b9aca2]" />
                     </button>
                   </div>
 
@@ -246,9 +258,9 @@ export default function CustomersPage() {
                       }`}
                     >
                       {customer.isActive ? (
-                        <CheckCircle className="w-3 h-3 mr-1" />
+                        <AdminIcon icon={CheckmarkCircle02Icon} size={12} className="mr-1" />
                       ) : (
-                        <Ban className="w-3 h-3 mr-1" />
+                        <AdminIcon icon={BanIcon} size={12} className="mr-1" />
                       )}
                       {customer.isActive ? "Active" : "Inactive"}
                     </span>
@@ -257,7 +269,7 @@ export default function CustomersPage() {
                   {/* Customer Details Grid */}
                   <div className="grid grid-cols-2 gap-3 mb-3 text-xs sm:text-sm">
                     <div>
-                      <p className="text-[#5d6043]">Phone</p>
+                      <p className="text-[#5d6043]">Call02Icon</p>
                       <p className="font-medium text-[#222222]">{customer.phoneNumber}</p>
                     </div>
                     <div>
@@ -281,21 +293,21 @@ export default function CustomersPage() {
                         onClick={() => customer._id && handleViewDetails(customer._id)}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5] rounded-lg"
                       >
-                        <Eye className="w-4 h-4" />
+                        <AdminIcon icon={ViewIcon} size={16} />
                         View Details
                       </button>
                       <button 
                         onClick={() => { if (customer.email) handleSendEmail(customer.email); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5] rounded-lg"
                       >
-                        <Mail className="w-4 h-4" />
+                        <AdminIcon icon={Mail01Icon} size={16} />
                         Send Email
                       </button>
                       <button 
                         onClick={() => customer._id && handleDeactivate(customer._id, customer.fullName || "this customer")}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
                       >
-                        <Ban className="w-4 h-4" />
+                        <AdminIcon icon={BanIcon} size={16} />
                         Toggle Status
                       </button>
                     </div>
@@ -338,7 +350,7 @@ export default function CustomersPage() {
                   {loading ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-8 text-center">
-                        <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin mx-auto" />
+                        <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin mx-auto" />
                       </td>
                     </tr>
                   ) : filteredCustomers.length === 0 ? (
@@ -363,11 +375,11 @@ export default function CustomersPage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-[#222222]">
                             <div className="flex items-center gap-2 mb-1">
-                              <Mail className="w-4 h-4 text-[#b9aca2]" />
+                              <AdminIcon icon={Mail01Icon} size={16} className="text-[#b9aca2]" />
                               <span>{customer.email}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4 text-[#b9aca2]" />
+                              <AdminIcon icon={Call02Icon} size={16} className="text-[#b9aca2]" />
                               <span>{customer.phoneNumber}</span>
                             </div>
                           </div>
@@ -387,9 +399,9 @@ export default function CustomersPage() {
                             }`}
                           >
                             {customer.isActive ? (
-                              <CheckCircle className="w-3 h-3 mr-1" />
+                              <AdminIcon icon={CheckmarkCircle02Icon} size={12} className="mr-1" />
                             ) : (
-                              <Ban className="w-3 h-3 mr-1" />
+                              <AdminIcon icon={BanIcon} size={12} className="mr-1" />
                             )}
                             {customer.isActive ? "Active" : "Inactive"}
                           </span>
@@ -403,7 +415,7 @@ export default function CustomersPage() {
                               onClick={() => setSelectedCustomer(selectedCustomer === customer._id ? null : customer._id)}
                               className="p-1 rounded-lg hover:bg-[#b9aca2]"
                             >
-                              <MoreVertical className="w-5 h-5 text-[#b9aca2]" />
+                              <AdminIcon icon={MoreVerticalIcon} size={20} className="text-[#b9aca2]" />
                             </button>
 
                             {selectedCustomer === customer._id && (
@@ -412,21 +424,21 @@ export default function CustomersPage() {
                                   onClick={() => { if (customer._id) handleViewDetails(customer._id); }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5] rounded-t-lg"
                                 >
-                                  <Eye className="w-4 h-4" />
+                                  <AdminIcon icon={ViewIcon} size={16} />
                                   View Details
                                 </button>
                                 <button 
                                   onClick={() => { if (customer.email) handleSendEmail(customer.email); }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5]"
                                 >
-                                  <Mail className="w-4 h-4" />
+                                  <AdminIcon icon={Mail01Icon} size={16} />
                                   Send Email
                                 </button>
                                 <button 
                                   onClick={() => { if (customer._id) handleDeactivate(customer._id, customer.fullName || "this customer"); }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
                                 >
-                                  <Ban className="w-4 h-4" />
+                                  <AdminIcon icon={BanIcon} size={16} />
                                   Toggle Status
                                 </button>
                               </div>

@@ -1,8 +1,15 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Loading03Icon,
+  Search01Icon,
+  Upload01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Loader2, Search, Upload, X } from "lucide-react";
 import cmsService, { type CmsMediaItem } from "../../services/cmsService";
 
 type CmsImageFieldProps = {
@@ -54,7 +61,7 @@ export default function CmsImageField({
       setShowLibrary(false);
     } catch (err) {
       console.error(err);
-      setError("Upload failed. Try a JPEG, PNG, or WebP under 5MB.");
+      setError("Upload01Icon failed. Try a JPEG, PNG, or WebP under 5MB.");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -74,7 +81,7 @@ export default function CmsImageField({
             className="absolute right-2 top-2 min-h-10 min-w-10 rounded-full bg-red-600 p-1.5 text-[#faf9f5] shadow"
             aria-label="Remove image"
           >
-            <X className="h-4 w-4" />
+            <AdminIcon icon={Cancel01Icon} size={16} />
           </button>
         </div>
       ) : (
@@ -86,11 +93,11 @@ export default function CmsImageField({
       <div className="flex flex-wrap items-center gap-2">
         <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]">
           {uploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
           ) : (
-            <Upload className="h-4 w-4" />
+            <AdminIcon icon={Upload01Icon} size={16} />
           )}
-          {value ? "Replace image" : "Upload image"}
+          {value ? "Replace image" : "Upload01Icon image"}
           <input
             ref={inputRef}
             type="file"
@@ -105,7 +112,7 @@ export default function CmsImageField({
           onClick={() => setShowLibrary(true)}
           className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
         >
-          <Search className="h-4 w-4" />
+          <AdminIcon icon={Search01Icon} size={16} />
           Choose from library
         </button>
       </div>
@@ -128,17 +135,17 @@ export default function CmsImageField({
                 className="rounded-lg p-2 hover:bg-[#eeeae0]"
                 aria-label="Close"
               >
-                <X className="h-5 w-5" />
+                <AdminIcon icon={Cancel01Icon} size={20} />
               </button>
             </div>
 
             {libraryLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-7 w-7 animate-spin text-[#5d6043]" />
+                <AdminIcon icon={Loading03Icon} size={28} className="animate-spin text-[#5d6043]" />
               </div>
             ) : libraryItems.length === 0 ? (
               <p className="rounded-xl border border-dashed border-[#b9aca2] px-4 py-10 text-center text-sm text-[#5d6043]">
-                No library images yet. Upload one and it will show up here next time.
+                No library images yet. Upload01Icon one and it will show up here next time.
               </p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -172,11 +179,11 @@ export default function CmsImageField({
             <div className="mt-4 flex flex-wrap gap-2">
               <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]">
                 {uploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
                 ) : (
-                  <Upload className="h-4 w-4" />
+                  <AdminIcon icon={Upload01Icon} size={16} />
                 )}
-                Upload new
+                Upload01Icon new
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"

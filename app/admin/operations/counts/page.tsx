@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  AlertCircleIcon,
+  CheckmarkCircle02Icon,
+  Loading03Icon,
+  Refresh01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { AlertCircle, CheckCircle, Loader2, RefreshCw } from "lucide-react";
 import AdminLayout from "../../components/AdminLayout";
 import { operationsService } from "../../../services/operationsService";
 
@@ -146,20 +153,20 @@ export default function InventoryReviewPage() {
             <h1 className="text-2xl font-bold">Inventory Review</h1>
             <p className="text-sm text-[#5d6043]">Compare expected stock with the quantities physically present.</p>
           </div>
-          <button onClick={load} disabled={loading} title="Refresh stock" className="rounded-md border border-[#b9aca2] p-2 disabled:opacity-50"><RefreshCw size={18} /></button>
+          <button onClick={load} disabled={loading} title="Refresh stock" className="rounded-md border border-[#b9aca2] p-2 disabled:opacity-50"><AdminIcon icon={Refresh01Icon} size={18} /></button>
         </header>
 
         <section className="border-y border-[#b9aca2]/60 bg-white/60 px-4 py-4">
-          <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" /><div className="text-sm text-[#5d6043]"><p className="font-semibold text-[#222]">Review finished goods and tracked supplies.</p><p>Enter what is physically available now. Posting the review adjusts stock by the difference for loaves, yogurt, packaging cards, boxes, and any cost item marked for stock tracking.</p></div></div>
+          <div className="flex gap-3"><AdminIcon icon={AlertCircleIcon} size={20} className="mt-0.5 text-[#5d6043]" /><div className="text-sm text-[#5d6043]"><p className="font-semibold text-[#222]">Review finished goods and tracked supplies.</p><p>Enter what is physically available now. Posting the review adjusts stock by the difference for loaves, yogurt, packaging cards, boxes, and any cost item marked for stock tracking.</p></div></div>
         </section>
 
-        {loading ? <p className="flex items-center gap-2 text-sm text-[#5d6043]"><Loader2 className="animate-spin" size={17} />Loading stock...</p> : stock.length === 0 ? <p className="text-sm text-[#5d6043]">There is no stock to review. Record production, purchases, or an opening balance first.</p> : <form onSubmit={submit} className="space-y-4">
+        {loading ? <p className="flex items-center gap-2 text-sm text-[#5d6043]"><AdminIcon icon={Loading03Icon} size={17} className="animate-spin" />Loading stock...</p> : stock.length === 0 ? <p className="text-sm text-[#5d6043]">There is no stock to review. Record production, purchases, or an opening balance first.</p> : <form onSubmit={submit} className="space-y-4">
           <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-sm"><thead><tr className="border-b text-left"><th className="py-3">Item</th><th>Type</th><th>Expected</th><th className="w-36">Counted</th><th>Variance</th></tr></thead><tbody>{stock.map((row) => {
             const variance = Number(counts[row.id] ?? row.onHand) - Number(row.onHand);
             return <tr key={row.id} className="border-b"><td className="py-3 font-medium">{rowName(row)}<span className="block text-xs font-normal text-[#5d6043]">{rowDetail(row)}</span></td><td>{row.stockType === "supply" ? "Supply" : "Finished good"}</td><td>{row.onHand}</td><td><input aria-label={`Counted quantity for ${rowName(row)}`} className="w-28 rounded-md border border-[#b9aca2] px-3 py-2" type="number" min="0" step="any" value={counts[row.id] ?? String(row.onHand)} onChange={(event) => setCounts({ ...counts, [row.id]: event.target.value })} required /></td><td className={variance < 0 ? "font-semibold text-red-700" : variance > 0 ? "font-semibold text-green-700" : "text-[#5d6043]"}>{variance > 0 ? `+${variance}` : variance}</td></tr>;
           })}</tbody></table></div>
           <label className="block text-sm font-medium">Review notes (optional)<textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} className="mt-1 w-full max-w-2xl rounded-md border border-[#b9aca2] px-3 py-2" placeholder="Reason for discrepancies or review context" /></label>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#b9aca2]/60 pt-4"><div className="text-sm"><p><strong>{changedLines.length}</strong> balances will change</p><p className="text-[#5d6043]">Net quantity adjustment: {netVariance > 0 ? `+${netVariance}` : netVariance}</p></div><button disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-5 py-2 text-white disabled:opacity-60"><CheckCircle size={18} />Post inventory review</button></div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#b9aca2]/60 pt-4"><div className="text-sm"><p><strong>{changedLines.length}</strong> balances will change</p><p className="text-[#5d6043]">Net quantity adjustment: {netVariance > 0 ? `+${netVariance}` : netVariance}</p></div><button disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-5 py-2 text-white disabled:opacity-60"><AdminIcon icon={CheckmarkCircle02Icon} size={18} />Post inventory review</button></div>
         </form>}
         {message && <p className="text-sm text-[#5d6043]">{message}</p>}
 

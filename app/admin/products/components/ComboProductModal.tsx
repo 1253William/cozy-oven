@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Upload01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useState } from "react";
-import { X, Plus, Trash2, Upload } from "lucide-react";
 import type { ComboOption, ComboProduct } from "../../../services/comboService";
 import comboService from "../../../services/comboService";
 import type { Product } from "../../../services/productService";
@@ -147,7 +154,7 @@ export default function ComboProductModal({ show, onClose, onSaved, products }: 
             </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#b9aca2]">
-            <X className="w-5 h-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 
@@ -179,8 +186,8 @@ export default function ComboProductModal({ show, onClose, onSaved, products }: 
               </label>
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2 border border-[#b9aca2] rounded-lg cursor-pointer hover:bg-[#faf9f5]">
-                  <Upload className="w-4 h-4" />
-                  {imageFile ? "Change image" : "Upload image"}
+                  <AdminIcon icon={Upload01Icon} size={16} />
+                  {imageFile ? "Change image" : "Upload01Icon image"}
                   <input
                     type="file"
                     accept="image/*"
@@ -312,7 +319,7 @@ export default function ComboProductModal({ show, onClose, onSaved, products }: 
                   onClick={handleAddOption}
                   className="inline-flex items-center justify-center px-4 py-2 bg-[#b9aca2] rounded-lg hover:bg-[#b9aca2]"
                 >
-                  <Plus className="w-5 h-5" />
+                  <AdminIcon icon={Add01Icon} size={20} />
                 </button>
               </div>
 
@@ -352,7 +359,7 @@ export default function ComboProductModal({ show, onClose, onSaved, products }: 
                           onClick={() => handleRemoveOption(opt.id)}
                           className="p-1 rounded-full hover:bg-red-50 text-red-600"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <AdminIcon icon={Delete02Icon} size={16} />
                         </button>
                       </div>
                     </div>

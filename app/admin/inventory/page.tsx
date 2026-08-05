@@ -1,8 +1,18 @@
 "use client";
 
+import {
+  Add01Icon,
+  AlertCircleIcon,
+  Cancel01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  PencilEdit02Icon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, Edit2, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
 import { CostItem, costingService } from "../../services/costingService";
 import inventoryService, { InventoryItem, PurchaseInput } from "../../services/inventoryService";
@@ -117,12 +127,12 @@ export default function PurchasesPage() {
       <main className="space-y-6 p-4 md:p-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div><h1 className="text-2xl font-bold">Purchases</h1><p className="text-sm text-[#5d6043]">Supplier transactions and procurement cash outflow.</p></div>
-          <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white"><Plus size={18} />Record purchase</button>
+          <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white"><AdminIcon icon={Add01Icon} size={18} />Record purchase</button>
         </header>
 
         <section className="border-y border-[#b9aca2]/60 bg-white/60 px-4 py-4">
           <div className="flex gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" />
+            <AdminIcon icon={AlertCircleIcon} size={20} className="mt-0.5 text-[#5d6043]" />
             <div className="grid gap-3 text-sm text-[#5d6043] md:grid-cols-2">
               <div><p className="font-semibold text-[#222]">Record here</p><p>Supplier purchases of flour, sugar, boxes, equipment, and other supplies. This preserves purchase date, vendor, payment method, and cash spent.</p></div>
               <div><p className="font-semibold text-[#222]">Costing follow-up</p><p>Link a purchase to a stock-tracked <Link href="/admin/cost-items" className="font-semibold underline">Cost Item</Link> when it should increase supply stock and update that item&apos;s recipe rate. Leave it unlinked for equipment or financial-only purchases.</p></div>
@@ -131,14 +141,14 @@ export default function PurchasesPage() {
         </section>
 
         <section className="flex flex-wrap items-center justify-between gap-3">
-          <form onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }} className="relative w-full max-w-md"><Search className="absolute left-3 top-2.5 h-5 w-5 text-[#5d6043]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search item, reference, or category" className={`${field} pl-10`} /></form>
+          <form onSubmit={(event) => { event.preventDefault(); setAppliedSearch(search.trim()); }} className="relative w-full max-w-md"><AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-2.5 text-[#5d6043]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search01Icon item, reference, or category" className={`${field} pl-10`} /></form>
           <div className="text-right"><p className="text-xs text-[#5d6043]">Visible purchase total</p><p className="text-xl font-semibold">GHS {total.toFixed(2)}</p></div>
         </section>
 
         {error && <p className="text-sm text-red-700">{error}</p>}
-        {loading ? <p className="flex items-center gap-2 text-sm text-[#5d6043]"><Loader2 className="animate-spin" size={17} />Loading purchases...</p> : rows.length === 0 ? <p className="text-sm text-[#5d6043]">No purchases found.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-sm"><thead><tr className="border-b text-left"><th className="py-3">Purchase date</th><th>Item</th><th>Category</th><th>Supplier</th><th>Quantity</th><th>Unit price</th><th>Payment</th><th className="text-right">Total</th><th /></tr></thead><tbody>{rows.map((row) => <tr key={row._id} className="border-b"><td className="py-3">{new Date(row.purchasedAt || row.createdAt || Date.now()).toLocaleDateString("en-GB")}</td><td className="font-medium">{row.itemName}<span className="block text-xs font-normal text-[#5d6043]">{row.purchasePurpose}</span></td><td>{row.itemCategory}</td><td>{row.vendorName}</td><td>{row.quantityPurchased}</td><td>GHS {Number(row.costPrice).toFixed(2)}</td><td>{paymentLabels[row.paymentMethod || ""] || "—"}{row.paymentReference && <span className="block text-xs text-[#5d6043]">{row.paymentReference}</span>}</td><td className="text-right font-semibold">GHS {Number(row.totalCost).toFixed(2)}</td><td><div className="flex justify-end"><button title="Edit purchase" onClick={() => edit(row)} className="p-2"><Edit2 size={17} /></button><button title="Delete purchase" onClick={async () => { if (confirm("Delete this purchase?")) { await inventoryService.deleteInventory(row._id); await load(); } }} className="p-2 text-red-700"><Trash2 size={17} /></button></div></td></tr>)}</tbody></table></div>}
+        {loading ? <p className="flex items-center gap-2 text-sm text-[#5d6043]"><AdminIcon icon={Loading03Icon} size={17} className="animate-spin" />Loading purchases...</p> : rows.length === 0 ? <p className="text-sm text-[#5d6043]">No purchases found.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-sm"><thead><tr className="border-b text-left"><th className="py-3">Purchase date</th><th>Item</th><th>Category</th><th>Supplier</th><th>Quantity</th><th>Unit price</th><th>Payment</th><th className="text-right">Total</th><th /></tr></thead><tbody>{rows.map((row) => <tr key={row._id} className="border-b"><td className="py-3">{new Date(row.purchasedAt || row.createdAt || Date.now()).toLocaleDateString("en-GB")}</td><td className="font-medium">{row.itemName}<span className="block text-xs font-normal text-[#5d6043]">{row.purchasePurpose}</span></td><td>{row.itemCategory}</td><td>{row.vendorName}</td><td>{row.quantityPurchased}</td><td>GHS {Number(row.costPrice).toFixed(2)}</td><td>{paymentLabels[row.paymentMethod || ""] || "—"}{row.paymentReference && <span className="block text-xs text-[#5d6043]">{row.paymentReference}</span>}</td><td className="text-right font-semibold">GHS {Number(row.totalCost).toFixed(2)}</td><td><div className="flex justify-end"><button title="Edit purchase" onClick={() => edit(row)} className="p-2"><AdminIcon icon={PencilEdit02Icon} size={17} /></button><button title="Delete purchase" onClick={async () => { if (confirm("Delete this purchase?")) { await inventoryService.deleteInventory(row._id); await load(); } }} className="p-2 text-red-700"><AdminIcon icon={Delete02Icon} size={17} /></button></div></td></tr>)}</tbody></table></div>}
 
-        {showForm && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><div><h2 className="text-xl font-semibold">{editingId ? "Edit purchase" : "Record purchase"}</h2><p className="text-sm text-[#5d6043]">Cost price is the price of one purchased unit.</p></div><button title="Close" onClick={reset} className="p-2"><X /></button></div><form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-2">
+        {showForm && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><div><h2 className="text-xl font-semibold">{editingId ? "Edit purchase" : "Record purchase"}</h2><p className="text-sm text-[#5d6043]">Cost price is the price of one purchased unit.</p></div><button title="Close" onClick={reset} className="p-2"><AdminIcon icon={Cancel01Icon} size={20} /></button></div><form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-2">
           <label className="text-sm font-medium">Item name<input className={`${field} mt-1`} value={form.itemName} onChange={(event) => setForm({ ...form, itemName: event.target.value })} required /></label>
           <label className="text-sm font-medium">Category<select className={`${field} mt-1`} value={form.itemCategory} onChange={(event) => setForm({ ...form, itemCategory: event.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
           <label className="text-sm font-medium">Linked supply stock item<select className={`${field} mt-1`} value={form.costItemId || ""} onChange={(event) => {

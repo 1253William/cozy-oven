@@ -1,21 +1,23 @@
 "use client";
 
+import {
+  Call02Icon,
+  Cancel01Icon,
+  FloppyDiskIcon,
+  Mail01Icon,
+  PencilEdit02Icon,
+  SquareLock02Icon,
+  UserCircleIcon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
 import accountService from "../../services/accountService";
-import {
-  UserCircle,
-  Mail,
-  Phone,
-  Edit2,
-  Save,
-  X,
-  Lock,
-  Eye,
-  EyeOff,
-} from "lucide-react";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, updateUser } = useAuth();
@@ -167,7 +169,7 @@ export default function ProfilePage() {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 mb-6">
               <div className="flex items-end gap-4">
                 <div className="w-32 h-32 bg-[#faf9f5] rounded-full border-4 border-[#faf9f5] shadow-lg flex items-center justify-center">
-                  <UserCircle className="w-28 h-28 text-[#b9aca2]" />
+                  <AdminIcon icon={UserCircleIcon} size={112} className="text-[#b9aca2]" />
                 </div>
                 <div className="mb-2">
                   <h2 className="text-2xl font-bold text-[#222222]">{profileData.fullName}</h2>
@@ -179,7 +181,7 @@ export default function ProfilePage() {
                   onClick={() => setIsEditing(true)}
                   className="mt-4 sm:mt-0 flex items-center gap-2 px-4 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors"
                 >
-                  <Edit2 className="w-4 h-4" />
+                  <AdminIcon icon={PencilEdit02Icon} size={16} />
                   Edit Profile
                 </button>
               )}
@@ -209,7 +211,7 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div className="flex items-center gap-2 px-4 py-2 bg-[#faf9f5] rounded-lg">
-                        <UserCircle className="w-5 h-5 text-[#b9aca2]" />
+                        <AdminIcon icon={UserCircleIcon} size={20} className="text-[#b9aca2]" />
                         <span className="text-[#222222]">{profileData.fullName}</span>
                       </div>
                     )}
@@ -231,7 +233,7 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div className="flex items-center gap-2 px-4 py-2 bg-[#faf9f5] rounded-lg">
-                        <Mail className="w-5 h-5 text-[#b9aca2]" />
+                        <AdminIcon icon={Mail01Icon} size={20} className="text-[#b9aca2]" />
                         <span className="text-[#222222]">{profileData.email}</span>
                       </div>
                     )}
@@ -239,7 +241,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-[#5d6043] mb-2">
-                      Phone Number
+                      Call02Icon Number
                     </label>
                     {isEditing ? (
                       <input
@@ -253,7 +255,7 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div className="flex items-center gap-2 px-4 py-2 bg-[#faf9f5] rounded-lg">
-                        <Phone className="w-5 h-5 text-[#b9aca2]" />
+                        <AdminIcon icon={Call02Icon} size={20} className="text-[#b9aca2]" />
                         <span className="text-[#222222]">
                           {profileData.phoneNumber || "Not provided"}
                         </span>
@@ -264,7 +266,7 @@ export default function ProfilePage() {
                   <div>
                     <label className="block text-sm font-medium text-[#5d6043] mb-2">Role</label>
                     <div className="flex items-center gap-2 px-4 py-2 bg-[#faf9f5] rounded-lg">
-                      <UserCircle className="w-5 h-5 text-[#b9aca2]" />
+                      <AdminIcon icon={UserCircleIcon} size={20} className="text-[#b9aca2]" />
                       <span className="text-[#222222]">{profileData.role}</span>
                     </div>
                   </div>
@@ -279,7 +281,7 @@ export default function ProfilePage() {
                     onClick={handleCancelEdit}
                     className="flex items-center gap-2 px-6 py-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] transition-colors"
                   >
-                    <X className="w-4 h-4" />
+                    <AdminIcon icon={Cancel01Icon} size={16} />
                     Cancel
                   </button>
                   <button
@@ -287,8 +289,8 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="flex items-center gap-2 px-6 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors disabled:opacity-60"
                   >
-                    <Save className="w-4 h-4" />
-                    {saving ? "Saving..." : "Save Changes"}
+                    <AdminIcon icon={FloppyDiskIcon} size={16} />
+                    {saving ? "Saving..." : "FloppyDiskIcon Changes"}
                   </button>
                 </div>
               )}
@@ -308,7 +310,7 @@ export default function ProfilePage() {
                 onClick={() => setShowPasswordForm(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-[#b9aca2] text-[#5d6043] rounded-lg hover:bg-[#b9aca2] transition-colors"
               >
-                <Lock className="w-4 h-4" />
+                <AdminIcon icon={SquareLock02Icon} size={16} />
                 Change Password
               </button>
             )}
@@ -336,9 +338,9 @@ export default function ProfilePage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#b9aca2] hover:text-[#5d6043]"
                   >
                     {showCurrentPassword ? (
-                      <EyeOff className="w-5 h-5" />
+                      <AdminIcon icon={ViewOffSlashIcon} size={20} />
                     ) : (
-                      <Eye className="w-5 h-5" />
+                      <AdminIcon icon={ViewIcon} size={20} />
                     )}
                   </button>
                 </div>
@@ -364,9 +366,9 @@ export default function ProfilePage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#b9aca2] hover:text-[#5d6043]"
                   >
                     {showNewPassword ? (
-                      <EyeOff className="w-5 h-5" />
+                      <AdminIcon icon={ViewOffSlashIcon} size={20} />
                     ) : (
-                      <Eye className="w-5 h-5" />
+                      <AdminIcon icon={ViewIcon} size={20} />
                     )}
                   </button>
                 </div>

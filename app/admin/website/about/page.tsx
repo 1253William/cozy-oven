@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import {
-  Edit2,
-  Eye,
-  EyeOff,
-  Loader2,
-  Plus,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  FloppyDiskIcon,
+  Loading03Icon,
+  PencilEdit02Icon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
+import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
@@ -207,7 +209,7 @@ export default function AdminWebsiteAboutPage() {
       setSuccess("Saved");
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || "Save failed.");
+      setError(err?.response?.data?.message || "FloppyDiskIcon failed.");
     } finally {
       setSaving(false);
     }
@@ -459,7 +461,7 @@ export default function AdminWebsiteAboutPage() {
               onClick={() => setDraftPreview({ mode: "page" })}
               className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
             >
-              <Eye className="h-4 w-4" />
+              <AdminIcon icon={ViewIcon} size={16} />
               Preview
             </button>
             <button
@@ -467,7 +469,7 @@ export default function AdminWebsiteAboutPage() {
               onClick={() => setShowCatalog((prev) => !prev)}
               className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
             >
-              <Plus className="h-4 w-4" />
+              <AdminIcon icon={Add01Icon} size={16} />
               Add section
             </button>
             <button
@@ -477,11 +479,11 @@ export default function AdminWebsiteAboutPage() {
               className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm text-[#faf9f5] disabled:opacity-60"
             >
               {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
               ) : (
-                <Save className="h-4 w-4" />
+                <AdminIcon icon={FloppyDiskIcon} size={16} />
               )}
-              Save
+              FloppyDiskIcon
             </button>
           </div>
         </div>
@@ -507,7 +509,7 @@ export default function AdminWebsiteAboutPage() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
           </div>
         ) : sorted.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#b9aca2] bg-[#faf9f5] px-6 py-12 text-center text-[#5d6043]">
@@ -564,9 +566,9 @@ export default function AdminWebsiteAboutPage() {
                       aria-label="Toggle"
                     >
                       {section.enabled ? (
-                        <Eye className="h-4 w-4" />
+                        <AdminIcon icon={ViewIcon} size={16} />
                       ) : (
-                        <EyeOff className="h-4 w-4" />
+                        <AdminIcon icon={ViewOffSlashIcon} size={16} />
                       )}
                     </button>
                     <button
@@ -575,7 +577,7 @@ export default function AdminWebsiteAboutPage() {
                       className="min-h-10 min-w-10 rounded-lg border border-[#b9aca2] p-2 text-[#5d6043]"
                       aria-label="Edit"
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <AdminIcon icon={PencilEdit02Icon} size={16} />
                     </button>
                     <button
                       type="button"
@@ -583,7 +585,7 @@ export default function AdminWebsiteAboutPage() {
                       className="min-h-10 min-w-10 rounded-lg border border-red-200 p-2 text-red-700"
                       aria-label="Remove"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <AdminIcon icon={Delete02Icon} size={16} />
                     </button>
                   </div>
                 </div>
@@ -602,7 +604,7 @@ export default function AdminWebsiteAboutPage() {
                         }}
                         className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
                       >
-                        <X className="h-4 w-4" />
+                        <AdminIcon icon={Cancel01Icon} size={16} />
                         Cancel
                       </button>
                       <button
@@ -615,7 +617,7 @@ export default function AdminWebsiteAboutPage() {
                         }
                         className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
                       >
-                        <Eye className="h-4 w-4" />
+                        <AdminIcon icon={ViewIcon} size={16} />
                         Preview
                       </button>
                       <button

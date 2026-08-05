@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  FloppyDiskIcon,
+  PencilEdit02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useState } from "react";
-import { Edit2, Plus, Save, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
 import faqService, { Faq, FaqInput } from "../../services/faqService";
 
@@ -126,12 +134,12 @@ export default function AdminFaqsPage() {
             </h2>
             {editingId ? (
               <button type="button" onClick={resetForm} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-                <X className="h-4 w-4" />
+                <AdminIcon icon={Cancel01Icon} size={16} />
                 Cancel edit
               </button>
             ) : (
               <span className="flex items-center gap-2 text-sm text-[#5d6043]">
-                <Plus className="h-4 w-4" />
+                <AdminIcon icon={Add01Icon} size={16} />
                 New homepage question
               </span>
             )}
@@ -187,8 +195,8 @@ export default function AdminFaqsPage() {
             disabled={saving}
             className="mt-5 flex items-center gap-2 rounded-lg bg-[#5d6043] px-5 py-3 font-semibold text-[#faf9f5] disabled:opacity-60"
           >
-            <Save className="h-4 w-4" />
-            {saving ? "Saving..." : editingId ? "Save changes" : "Add FAQ"}
+            <AdminIcon icon={FloppyDiskIcon} size={16} />
+            {saving ? "Saving..." : editingId ? "FloppyDiskIcon changes" : "Add FAQ"}
           </button>
         </form>
 
@@ -232,7 +240,7 @@ export default function AdminFaqsPage() {
                         className="rounded-lg border px-3 py-2 text-sm"
                         aria-label="Edit FAQ"
                       >
-                        <Edit2 className="h-4 w-4" />
+                        <AdminIcon icon={PencilEdit02Icon} size={16} />
                       </button>
                       <button
                         type="button"
@@ -240,7 +248,7 @@ export default function AdminFaqsPage() {
                         className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700"
                         aria-label="Delete FAQ"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <AdminIcon icon={Delete02Icon} size={16} />
                       </button>
                     </div>
                   </div>

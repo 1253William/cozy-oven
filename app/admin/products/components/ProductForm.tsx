@@ -1,4 +1,10 @@
-import { X, Upload, Plus, Trash2 } from "lucide-react";
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Upload01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
 import Image from "next/image";
 import { CostItem } from "../../../services/costingService";
 import { PackageConfig, PackageGroup, PackageOption, Product, SelectOption } from "../../../services/productService";
@@ -314,14 +320,14 @@ export default function ProductForm({
         />
       </div>
 
-      {/* Image Upload */}
+      {/* Image Upload01Icon */}
       <div className="order-5">
         <label className="block text-sm font-semibold text-[#5d6043] mb-2">
           Product Images (Select multiple)
         </label>
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 px-4 py-2 border border-[#b9aca2] rounded-lg cursor-pointer hover:bg-[#faf9f5]">
-            <Upload className="w-4 h-4" />
+            <AdminIcon icon={Upload01Icon} size={16} />
             {isEdit ? "Add More Images" : "Choose Images"}
             <input
               type="file"
@@ -358,7 +364,7 @@ export default function ProductForm({
                           className="absolute top-1 right-1 p-1 bg-red-500 text-[#faf9f5] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                           aria-label="Remove image"
                         >
-                          <X className="w-4 h-4" />
+                          <AdminIcon icon={Cancel01Icon} size={16} />
                         </button>
                         {index === 0 && (
                           <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-[#faf9f5] text-[10px] py-1 text-center font-bold">
@@ -379,7 +385,7 @@ export default function ProductForm({
               if (newPreviews.length === 0) return null;
               return (
                 <>
-                  {isEdit && <p className="text-xs font-medium text-green-600 mb-2">New Images to Upload</p>}
+                  {isEdit && <p className="text-xs font-medium text-green-600 mb-2">New Images to Upload01Icon</p>}
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {newPreviews.map((preview, index) => {
                       const actualIndex = isEdit ? existingImageCount + index : index;
@@ -397,7 +403,7 @@ export default function ProductForm({
                             className="absolute top-1 right-1 p-1 bg-red-500 text-[#faf9f5] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                             aria-label="Remove image"
                           >
-                            <X className="w-4 h-4" />
+                            <AdminIcon icon={Cancel01Icon} size={16} />
                           </button>
                           {!isEdit && index === 0 && (
                             <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-[#faf9f5] text-[10px] py-1 text-center font-bold">
@@ -442,7 +448,7 @@ export default function ProductForm({
               onClick={onAddSelectOption}
               className="px-4 py-2 bg-[#b9aca2] rounded-lg hover:bg-[#b9aca2]"
             >
-              <Plus className="w-5 h-5" />
+              <AdminIcon icon={Add01Icon} size={20} />
             </button>
           </div>
           {selectOptions.map((option, index) => (
@@ -475,7 +481,7 @@ export default function ProductForm({
                   onClick={() => onRemoveSelectOption(index)}
                   className="text-red-600 hover:bg-red-50 p-1 rounded"
                 >
-                  <X className="w-4 h-4" />
+                  <AdminIcon icon={Cancel01Icon} size={16} />
                 </button>
               </div>
               {onToggleOptionSoldIndividually && (
@@ -616,7 +622,7 @@ export default function ProductForm({
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                     title="Remove group"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <AdminIcon icon={Delete02Icon} size={16} />
                   </button>
                 </div>
 
@@ -738,7 +744,7 @@ export default function ProductForm({
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                           title="Remove component"
                         >
-                          <X className="w-4 h-4" />
+                          <AdminIcon icon={Cancel01Icon} size={16} />
                         </button>
                       </div>
                     );
@@ -748,7 +754,7 @@ export default function ProductForm({
                     onClick={() => addOptionToGroup(groupIndex)}
                     className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5]"
                   >
-                    <Plus className="w-4 h-4" />
+                    <AdminIcon icon={Add01Icon} size={16} />
                     Add option
                   </button>
                 </div>

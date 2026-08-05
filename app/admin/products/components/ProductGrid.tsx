@@ -1,4 +1,9 @@
-import { Edit2, Trash2, Package } from "lucide-react";
+import {
+  Delete02Icon,
+  Package01Icon,
+  PencilEdit02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
 import Image from "next/image";
 import { Product } from "../../../services/productService";
 import { useState, useEffect, useMemo } from "react";
@@ -73,7 +78,7 @@ export default function ProductGrid({ products, onEdit, onDelete, onToggleAvaila
               <p className="text-sm text-[#5d6043]">{product.productCategory}</p>
               {product.productType === "package" && (
                 <span className="text-xs font-semibold text-[#5d6043] bg-[#b9aca2] px-2 py-1 rounded-full">
-                  Package
+                  Package01Icon
                 </span>
               )}
             </div>
@@ -118,7 +123,7 @@ export default function ProductGrid({ products, onEdit, onDelete, onToggleAvaila
                 onClick={() => onEdit(product)}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] transition-colors"
               >
-                <Edit2 className="w-4 h-4" />
+                <AdminIcon icon={PencilEdit02Icon} size={16} />
                 Edit
               </button>
      
@@ -126,7 +131,7 @@ export default function ProductGrid({ products, onEdit, onDelete, onToggleAvaila
                 onClick={() => onDelete?.(product)}
                 className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
+                <AdminIcon icon={Delete02Icon} size={16} />
               </button>
  
             </div>

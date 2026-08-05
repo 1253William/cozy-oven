@@ -1,6 +1,11 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import {
+  Add01Icon,
+  Delete02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import productService, { Product } from "../../../services/productService";
@@ -151,7 +156,7 @@ export default function ProductionPage() {
                     disabled={items.length === 1}
                     className="rounded-md border border-[#b9aca2] p-2 text-red-700 disabled:opacity-40"
                   >
-                    <Trash2 size={18} />
+                    <AdminIcon icon={Delete02Icon} size={18} />
                   </button>
                 </div>
               );
@@ -164,7 +169,7 @@ export default function ProductionPage() {
               onClick={() => setItems((current) => [...current, { ...emptyLine }])}
               className="inline-flex items-center gap-2 rounded-md border border-[#b9aca2] px-4 py-2"
             >
-              <Plus size={18} /> Add line
+              <AdminIcon icon={Add01Icon} size={18} /> Add line
             </button>
             <button disabled={saving} className="bg-[#5d6043] text-white rounded-md px-4 py-2 disabled:opacity-60">
               Record production

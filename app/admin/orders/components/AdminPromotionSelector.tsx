@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Loading03Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
-import { Check, Loader2, X } from "lucide-react";
 import type { OrderItem } from "../../../services/orderService";
 import promotionService, {
   type Promotion,
@@ -80,7 +86,7 @@ export default function AdminPromotionSelector({
       <div className="rounded-lg border border-green-200 bg-green-50 p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex gap-2">
-            <Check className="mt-0.5 h-4 w-4 text-green-700" />
+            <AdminIcon icon={Tick02Icon} size={16} className="mt-0.5 text-green-700" />
             <div>
               <p className="text-sm font-semibold text-green-900">
                 {quote.promotion.code} applied
@@ -101,7 +107,7 @@ export default function AdminPromotionSelector({
             aria-label="Remove promotion"
             title="Remove promotion"
           >
-            <X className="h-4 w-4" />
+            <AdminIcon icon={Cancel01Icon} size={16} />
           </button>
         </div>
       </div>
@@ -115,7 +121,7 @@ export default function AdminPromotionSelector({
       </label>
       <div className="flex gap-2">
         <div className="relative min-w-0 flex-1">
-          <Check className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]" />
+          <AdminIcon icon={Tick02Icon} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5d6043]" />
           <input
             list="active-promotion-codes"
             value={code}
@@ -146,7 +152,7 @@ export default function AdminPromotionSelector({
           disabled={applying || !code.trim() || items.length === 0}
           className="inline-flex min-w-[76px] items-center justify-center rounded-lg bg-[#222222] px-3 py-2 text-sm font-semibold text-white hover:bg-[#5d6043] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
+          {applying ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" /> : "Apply"}
         </button>
       </div>
       {error && <p className="mt-2 text-xs text-red-700">{error}</p>}

@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  CreditCardIcon,
+  Loading03Icon,
+  Package01Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useState, useEffect } from "react";
-import { X, Package, User, CreditCard, Loader2 } from "lucide-react";
 import { orderService } from "../../../services/orderService";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -283,7 +291,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full hover:bg-[#b9aca2] transition z-10"
           >
-            <X className="w-5 h-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
 
           <div className="p-8">
@@ -295,7 +303,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
             {/* Error and Loading States */}
             {loading && (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
+                <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin" />
               </div>
             )}
 
@@ -331,7 +339,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 {/* Customer Information */}
                 <div className="p-4 bg-[#faf9f5] rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
-                    <User className="w-5 h-5 text-[#5d6043]" />
+                    <AdminIcon icon={UserIcon} size={20} className="text-[#5d6043]" />
                     <h4 className="text-sm font-semibold text-[#222222]">Customer Information</h4>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -364,7 +372,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 {/* Order Items */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Package className="w-5 h-5 text-[#5d6043]" />
+                    <AdminIcon icon={Package01Icon} size={20} className="text-[#5d6043]" />
                     <h4 className="text-sm font-semibold text-[#222222]">Order Items</h4>
                   </div>
                   
@@ -393,7 +401,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <Package className="w-8 h-8 text-[#b9aca2]" />
+                              <AdminIcon icon={Package01Icon} size={32} className="text-[#b9aca2]" />
                             </div>
                           )}
                         </div>
@@ -520,7 +528,7 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                 {/* Payment Information */}
                 <div className="p-4 bg-[#faf9f5] rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
-                    <CreditCard className="w-5 h-5 text-[#5d6043]" />
+                    <AdminIcon icon={CreditCardIcon} size={20} className="text-[#5d6043]" />
                     <h4 className="text-sm font-semibold text-[#222222]">Payment Information</h4>
                   </div>
                   <div className="grid grid-cols-2 gap-4">

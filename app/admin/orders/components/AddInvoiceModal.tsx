@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  Package01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useState } from "react";
-import { X, Plus, Trash2, Loader2, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { orderService } from "../../../services/orderService";
 import useCustomerProducts from "../../../hooks/useCustomerProducts";
@@ -237,7 +245,7 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
                   <p className="text-sm text-[#5d6043]">Generate a GHS invoice with a Paystack payment link.</p>
                 </div>
                 <button onClick={onClose} className="rounded-full p-2 transition-colors hover:bg-[#b9aca2]">
-                  <X className="h-5 w-5" />
+                  <AdminIcon icon={Cancel01Icon} size={20} />
                 </button>
               </div>
 
@@ -343,7 +351,7 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
                       onClick={handleAddItem}
                       className="flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition-colors hover:bg-[#222222]"
                     >
-                      <Plus className="h-4 w-4" />
+                      <AdminIcon icon={Add01Icon} size={16} />
                       Add
                     </button>
                   </div>
@@ -384,7 +392,7 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
                             onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
                             className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <AdminIcon icon={Delete02Icon} size={16} />
                           </button>
                         </div>
                       ))}
@@ -463,12 +471,12 @@ export default function AddInvoiceModal({ isOpen, onClose, onSuccess }: AddInvoi
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
                         Creating...
                       </>
                     ) : (
                       <>
-                        <Package className="h-4 w-4" />
+                        <AdminIcon icon={Package01Icon} size={16} />
                         Create & Download
                       </>
                     )}

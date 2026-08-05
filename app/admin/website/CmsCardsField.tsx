@@ -1,6 +1,11 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import {
+  Add01Icon,
+  Delete02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import CmsImageField from "./CmsImageField";
 import type { CmsSectionCard } from "../../services/cmsService";
 
@@ -161,7 +166,7 @@ export default function CmsCardsField({
           disabled={cards.length >= MAX_CARDS}
           className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0] disabled:opacity-40"
         >
-          <Plus className="h-4 w-4" />
+          <AdminIcon icon={Add01Icon} size={16} />
           Add {meta.itemLabel}
         </button>
       </div>
@@ -206,7 +211,7 @@ export default function CmsCardsField({
                     className="min-h-10 min-w-10 rounded-lg border border-red-200 p-2 text-red-700"
                     aria-label="Remove"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <AdminIcon icon={Delete02Icon} size={16} />
                   </button>
                 </div>
               </div>

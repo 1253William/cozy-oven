@@ -1,7 +1,12 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Loading03Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, X } from "lucide-react";
 import CmsPageSectionsRenderer from "../../components/cms/CmsPageSectionsRenderer";
 import type { CmsPageSection } from "../../services/cmsService";
 import { PAGE_SECTION_LABELS } from "../../services/cmsService";
@@ -140,14 +145,14 @@ export default function CmsDraftPreviewModal({
             className="rounded-lg p-2 hover:bg-[#eeeae0]"
             aria-label="Close preview"
           >
-            <X className="h-5 w-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 
         <div className="overflow-y-auto">
           {loading ? (
             <div className="flex justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+              <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
             </div>
           ) : singleSection ? (
             <div className="editorial-shell bg-[#faf9f5]">

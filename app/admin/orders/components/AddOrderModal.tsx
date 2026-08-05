@@ -1,7 +1,16 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  Search01Icon,
+  UserIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useEffect, useState } from "react";
-import { X, Plus, Trash2, Loader2, Search, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { orderService } from "../../../services/orderService";
 import useCustomerProducts from "../../../hooks/useCustomerProducts";
@@ -295,7 +304,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                   onClick={onClose}
                   className="p-2 hover:bg-[#b9aca2] rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <AdminIcon icon={Cancel01Icon} size={20} />
                 </button>
               </div>
 
@@ -316,7 +325,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                     {selectedCustomerLabel ? (
                       <div className="flex items-center justify-between gap-3 rounded-lg border border-[#5d6043]/30 bg-[#eeeae0] px-4 py-3">
                         <div className="flex min-w-0 items-center gap-3">
-                          <User className="h-5 w-5 shrink-0 text-[#5d6043]" />
+                          <AdminIcon icon={UserIcon} size={20} className="text-[#5d6043]" />
                           <div className="min-w-0">
                             <p className="truncate font-medium text-[#222222]">{selectedCustomerLabel}</p>
                             <p className="text-xs text-[#5d6043]">
@@ -335,16 +344,16 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                     ) : (
                       <div className="rounded-lg border border-[#b9aca2]/70 bg-white">
                         <div className="relative">
-                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]" />
+                          <AdminIcon icon={Search01Icon} size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#5d6043]" />
                           <input
                             type="search"
                             value={customerSearch}
                             onChange={(e) => setCustomerSearch(e.target.value)}
-                            placeholder="Search by name, email, or phone"
+                            placeholder="Search01Icon by name, email, or phone"
                             className="w-full rounded-lg border-0 bg-transparent py-2.5 pl-9 pr-10 focus:ring-2 focus:ring-[#5d6043]"
                           />
                           {isLoadingCustomers && (
-                            <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-[#5d6043]" />
+                            <AdminIcon icon={Loading03Icon} size={16} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-[#5d6043]" />
                           )}
                         </div>
                         <div className="max-h-48 overflow-y-auto border-t border-[#b9aca2]/50">
@@ -366,7 +375,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                                 onClick={() => handleSelectCustomer(customer)}
                                 className="flex w-full items-center gap-3 border-b border-[#b9aca2]/40 px-4 py-3 text-left last:border-b-0 hover:bg-[#faf9f5]"
                               >
-                                <User className="h-4 w-4 shrink-0 text-[#5d6043]" />
+                                <AdminIcon icon={UserIcon} size={16} className="text-[#5d6043]" />
                                 <span className="min-w-0">
                                   <span className="block truncate text-sm font-medium text-[#222222]">
                                     {customer.fullName || "Unnamed customer"}
@@ -524,7 +533,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                           onClick={handleAddItem}
                           className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors"
                         >
-                          <Plus className="w-4 h-4" />
+                          <AdminIcon icon={Add01Icon} size={16} />
                           Add
                         </button>
                       </div>
@@ -566,7 +575,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                             onClick={() => handleRemoveItem(index)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <AdminIcon icon={Delete02Icon} size={16} />
                           </button>
                         </div>
                       ))}
@@ -685,7 +694,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
                         Creating...
                       </>
                     ) : (

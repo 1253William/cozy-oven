@@ -1,7 +1,12 @@
 "use client";
 
+import {
+  Add01Icon,
+  MinusSignIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
 import { useMemo, useState } from "react";
-import { Minus, Plus } from "lucide-react";
 import type { PackageGroup, Product } from "../../../services/productService";
 
 export interface PackageSelection {
@@ -208,7 +213,7 @@ export default function PackageSelectionEditor({
                             aria-label={`Remove ${option.label}`}
                             className="flex h-8 w-8 items-center justify-center rounded-full border border-[#b9aca2] disabled:opacity-40"
                           >
-                            <Minus className="h-4 w-4" />
+                            <AdminIcon icon={MinusSignIcon} size={16} />
                           </button>
                           <span className="w-8 text-center font-semibold text-[#222222]">{optionCount}</span>
                           <button
@@ -221,7 +226,7 @@ export default function PackageSelectionEditor({
                             aria-label={`Add ${option.label}`}
                             className="flex h-8 w-8 items-center justify-center rounded-full border border-[#b9aca2] disabled:opacity-40"
                           >
-                            <Plus className="h-4 w-4" />
+                            <AdminIcon icon={Add01Icon} size={16} />
                           </button>
                         </div>
                       )}

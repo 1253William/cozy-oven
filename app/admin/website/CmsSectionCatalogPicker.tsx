@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  Loading03Icon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Loader2, Plus, X } from "lucide-react";
 import CmsPageSectionsRenderer from "../../components/cms/CmsPageSectionsRenderer";
 import {
   PAGE_SECTION_BLURBS,
@@ -117,7 +124,7 @@ export default function CmsSectionCatalogPicker({
             className="inline-flex min-h-10 items-center gap-1 rounded-lg px-3 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
             aria-label="Close catalog"
           >
-            <X className="h-4 w-4" />
+            <AdminIcon icon={Cancel01Icon} size={16} />
             Close
           </button>
         </div>
@@ -158,7 +165,7 @@ export default function CmsSectionCatalogPicker({
           <div className="flex min-h-0 min-w-0 flex-col">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#b9aca2]/30 bg-[#faf9f5] px-4 py-2.5 sm:px-5">
               <div className="flex min-w-0 items-center gap-2 text-sm text-[#5d6043]">
-                <Eye className="h-4 w-4 shrink-0" />
+                <AdminIcon icon={ViewIcon} size={16} />
                 <span className="truncate">
                   Demo preview · {PAGE_SECTION_LABELS[selectedType]}
                 </span>
@@ -168,7 +175,7 @@ export default function CmsSectionCatalogPicker({
                 onClick={() => onSelect(selectedType)}
                 className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-medium text-[#faf9f5] hover:bg-[#4a4d36]"
               >
-                <Plus className="h-4 w-4" />
+                <AdminIcon icon={Add01Icon} size={16} />
                 Add this section
               </button>
             </div>
@@ -176,7 +183,7 @@ export default function CmsSectionCatalogPicker({
             <div className="min-h-0 flex-1 overflow-y-auto bg-[#faf9f5]">
               {loadingProducts ? (
                 <div className="flex justify-center py-20">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+                  <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
                 </div>
               ) : (
                 <div className="editorial-shell pointer-events-none">

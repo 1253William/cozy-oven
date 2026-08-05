@@ -1,9 +1,13 @@
 "use client";
 
+import {
+  Loading03Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../../../components/AdminIcon";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import AdminLayout from "../../../../components/AdminLayout";
 import CmsPageSectionsRenderer from "../../../../../components/cms/CmsPageSectionsRenderer";
 import cmsService, { CmsPage } from "../../../../../services/cmsService";
@@ -78,7 +82,7 @@ export default function CmsPagePreviewPage() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+          <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
         </div>
       ) : error || !page ? (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

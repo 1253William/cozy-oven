@@ -1,9 +1,27 @@
 "use client";
 
+import {
+  Add01Icon,
+  Cancel01Icon,
+  CheckmarkSquare02Icon,
+  Delete02Icon,
+  Loading03Icon,
+  Mail01Icon,
+  PaintBoardIcon,
+  PencilEdit02Icon,
+  Refresh01Icon,
+  Search01Icon,
+  SentIcon,
+  SquareIcon,
+  UserMultiple02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AdminLayout from "../components/AdminLayout";
+import AdminPageHeader from "../components/AdminPageHeader";
 import { useAuth } from "../../context/AuthContext";
 import CmsImageField from "../website/CmsImageField";
 import marketingService, {
@@ -12,21 +30,6 @@ import marketingService, {
   CampaignTemplateInput,
   MarketingRecipient,
 } from "../../services/marketingService";
-import {
-  CheckSquare,
-  Edit2,
-  Loader2,
-  Mail,
-  Palette,
-  Plus,
-  RefreshCw,
-  Search,
-  Send,
-  Square,
-  Trash2,
-  Users,
-  X,
-} from "lucide-react";
 
 type RecipientSourceFilter = "all" | "customers" | "subscribers";
 
@@ -381,7 +384,7 @@ export default function EmailMarketingPage() {
     }
 
     const confirmed = window.confirm(
-      `Send this campaign to ${selectedRecipients.length} recipient${selectedRecipients.length === 1 ? "" : "s"}?`
+      `SentIcon this campaign to ${selectedRecipients.length} recipient${selectedRecipients.length === 1 ? "" : "s"}?`
     );
     if (!confirmed) return;
 
@@ -407,7 +410,7 @@ export default function EmailMarketingPage() {
       setSelectedRecipients([]);
       fetchCampaigns();
     } catch (err: any) {
-      console.error("Send campaign error:", err);
+      console.error("SentIcon campaign error:", err);
       setError(err?.response?.data?.message || "Failed to send campaign");
     } finally {
       setSending(false);
@@ -432,30 +435,33 @@ export default function EmailMarketingPage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#222222] sm:text-3xl">Email Marketing</h1>
-            <p className="mt-1 text-sm text-[#5d6043]">
-              Build image-ready templates, then send campaigns to customers and subscribers.
+        <AdminPageHeader
+          title="Email Marketing"
+          description={
+            <p className="text-sm">
+              Build image-ready templates, then send campaigns to customers and
+              subscribers.
             </p>
-          </div>
-          <button
-            onClick={() => {
-              fetchRecipients();
-              fetchCampaigns();
-              fetchTemplates();
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#b9aca2] bg-[#faf9f5] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#faf9f5]"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </button>
-        </div>
+          }
+          actions={
+            <button
+              onClick={() => {
+                fetchRecipients();
+                fetchCampaigns();
+                fetchTemplates();
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#b9aca2] bg-[#faf9f5] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#faf9f5]"
+            >
+              <AdminIcon icon={Refresh01Icon} size={16} />
+              Refresh
+            </button>
+          }
+        />
 
         <section className="rounded-lg bg-[#faf9f5] p-6 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 text-lg font-bold text-[#222222]">
-              <Palette className="h-5 w-5" />
+              <AdminIcon icon={PaintBoardIcon} size={20} />
               Campaign templates
             </h2>
             <button
@@ -467,7 +473,7 @@ export default function EmailMarketingPage() {
               }}
               className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] hover:bg-[#222222]"
             >
-              <Plus className="h-4 w-4" />
+              <AdminIcon icon={Add01Icon} size={16} />
               New template
             </button>
           </div>
@@ -479,7 +485,7 @@ export default function EmailMarketingPage() {
                   {editingTemplateId ? "Edit template" : "Create template"}
                 </h3>
                 <button type="button" onClick={resetTemplateForm} className="p-1 text-[#5d6043]">
-                  <X className="h-5 w-5" />
+                  <AdminIcon icon={Cancel01Icon} size={20} />
                 </button>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -561,7 +567,7 @@ export default function EmailMarketingPage() {
                   onClick={handleSaveTemplate}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] disabled:opacity-50"
                 >
-                  {savingTemplate ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {savingTemplate ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" /> : null}
                   {editingTemplateId ? "Save template" : "Create template"}
                 </button>
                 <button
@@ -577,7 +583,7 @@ export default function EmailMarketingPage() {
 
           {loadingTemplates ? (
             <div className="flex items-center gap-2 text-sm text-[#5d6043]">
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
               Loading templates...
             </div>
           ) : templates.length === 0 ? (
@@ -625,7 +631,7 @@ export default function EmailMarketingPage() {
                       onClick={() => beginEditTemplate(template)}
                       className="flex-1 p-2 text-[#5d6043] hover:bg-[#faf9f5]"
                     >
-                      <Edit2 className="mx-auto h-4 w-4" />
+                      <AdminIcon icon={PencilEdit02Icon} size={16} className="mx-auto" />
                     </button>
                     <button
                       type="button"
@@ -633,7 +639,7 @@ export default function EmailMarketingPage() {
                       onClick={() => handleArchiveTemplate(template._id)}
                       className="flex-1 p-2 text-red-700 hover:bg-red-50"
                     >
-                      <Trash2 className="mx-auto h-4 w-4" />
+                      <AdminIcon icon={Delete02Icon} size={16} className="mx-auto" />
                     </button>
                   </div>
                 </article>
@@ -647,7 +653,7 @@ export default function EmailMarketingPage() {
             <div className="mb-5 flex flex-col gap-4">
               <div className="min-w-0">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-[#222222]">
-                  <Users className="h-5 w-5" />
+                  <AdminIcon icon={UserMultiple02Icon} size={20} />
                   Recipients
                 </h2>
                 <p className="text-sm text-[#5d6043]">
@@ -665,11 +671,11 @@ export default function EmailMarketingPage() {
                   <option value="subscribers">Subscribers only</option>
                 </select>
                 <div className="relative min-w-0">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b9aca2]" />
+                  <AdminIcon icon={Search01Icon} size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
                   <input
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search recipients..."
+                    placeholder="Search01Icon recipients..."
                     className="w-full min-w-0 rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20"
                   />
                 </div>
@@ -682,7 +688,7 @@ export default function EmailMarketingPage() {
                 disabled={filteredRecipients.length === 0}
                 className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] hover:bg-[#222222] disabled:opacity-50"
               >
-                {allFilteredSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                {allFilteredSelected ? <AdminIcon icon={CheckmarkSquare02Icon} size={16} /> : <AdminIcon icon={SquareIcon} size={16} />}
                 {allFilteredSelected ? "Unselect visible" : "Select visible"}
               </button>
               <button
@@ -690,7 +696,7 @@ export default function EmailMarketingPage() {
                 disabled={selectedRecipients.length === 0}
                 className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#faf9f5] disabled:opacity-50"
               >
-                <Trash2 className="h-4 w-4" />
+                <AdminIcon icon={Delete02Icon} size={16} />
                 Clear selected
               </button>
             </div>
@@ -698,7 +704,7 @@ export default function EmailMarketingPage() {
             <div className="max-h-[520px] overflow-y-auto rounded-lg border border-[#b9aca2]/60">
               {loadingRecipients ? (
                 <div className="flex items-center justify-center gap-2 p-10 text-[#5d6043]">
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <AdminIcon icon={Loading03Icon} size={20} className="animate-spin" />
                   Loading recipients...
                 </div>
               ) : filteredRecipients.length === 0 ? (
@@ -713,9 +719,9 @@ export default function EmailMarketingPage() {
                       className="flex w-full items-center gap-3 border-b border-[#b9aca2]/40 px-4 py-3 text-left last:border-b-0 hover:bg-[#faf9f5]"
                     >
                       {isSelected ? (
-                        <CheckSquare className="h-5 w-5 text-[#5d6043]" />
+                        <AdminIcon icon={CheckmarkSquare02Icon} size={20} className="text-[#5d6043]" />
                       ) : (
-                        <Square className="h-5 w-5 text-[#b9aca2]" />
+                        <AdminIcon icon={SquareIcon} size={20} className="text-[#b9aca2]" />
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-[#222222]">{recipient.name}</p>
@@ -734,7 +740,7 @@ export default function EmailMarketingPage() {
           <section className="space-y-6">
             <div className="rounded-lg bg-[#faf9f5] p-6 shadow-sm">
               <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-[#222222]">
-                <Mail className="h-5 w-5" />
+                <AdminIcon icon={Mail01Icon} size={20} />
                 Compose Campaign
               </h2>
               <div className="space-y-4">
@@ -809,7 +815,7 @@ export default function EmailMarketingPage() {
                 <div className="rounded-lg border border-[#b9aca2]/60 bg-white p-3">
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-sm font-semibold text-[#222222]">Preview</p>
-                    {previewLoading ? <Loader2 className="h-4 w-4 animate-spin text-[#5d6043]" /> : null}
+                    {previewLoading ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin text-[#5d6043]" /> : null}
                   </div>
                   {previewSubject ? (
                     <p className="mb-2 text-xs text-[#5d6043]">Subject: {previewSubject}</p>
@@ -833,8 +839,8 @@ export default function EmailMarketingPage() {
                   disabled={sending || selectedRecipients.length === 0 || !templateId}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-3 font-semibold text-[#faf9f5] hover:bg-[#222222] disabled:opacity-50"
                 >
-                  {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                  {sending ? "Sending..." : "Send Campaign"}
+                  {sending ? <AdminIcon icon={Loading03Icon} size={20} className="animate-spin" /> : <AdminIcon icon={SentIcon} size={20} />}
+                  {sending ? "Sending..." : "SentIcon Campaign"}
                 </button>
               </div>
             </div>
@@ -843,7 +849,7 @@ export default function EmailMarketingPage() {
               <h2 className="mb-4 text-lg font-bold text-[#222222]">Campaign History</h2>
               {loadingCampaigns ? (
                 <div className="flex items-center gap-2 text-sm text-[#5d6043]">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
                   Loading campaigns...
                 </div>
               ) : campaigns.length === 0 ? (

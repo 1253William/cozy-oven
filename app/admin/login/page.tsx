@@ -1,8 +1,15 @@
 "use client";
 
+import {
+  Mail01Icon,
+  SquareLock02Icon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginFormData } from "../../schemas/authSchema";
@@ -77,7 +84,7 @@ export default function AdminLoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-[#b9aca2]" />
+                  <AdminIcon icon={Mail01Icon} size={20} className="text-[#b9aca2]" />
                 </div>
                 <input
                   type="email"
@@ -98,7 +105,7 @@ export default function AdminLoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-[#b9aca2]" />
+                  <AdminIcon icon={SquareLock02Icon} size={20} className="text-[#b9aca2]" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -112,9 +119,9 @@ export default function AdminLoginPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-[#b9aca2] hover:text-[#5d6043]" />
+                    <AdminIcon icon={ViewOffSlashIcon} size={20} className="text-[#b9aca2] hover:text-[#5d6043]" />
                   ) : (
-                    <Eye className="h-5 w-5 text-[#b9aca2] hover:text-[#5d6043]" />
+                    <AdminIcon icon={ViewIcon} size={20} className="text-[#b9aca2] hover:text-[#5d6043]" />
                   )}
                 </button>
               </div>

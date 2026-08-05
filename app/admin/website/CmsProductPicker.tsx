@@ -1,8 +1,14 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Loading03Icon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Loader2, Search, X } from "lucide-react";
 import productService, { Product } from "../../services/productService";
 
 type CmsProductPickerProps = {
@@ -98,7 +104,7 @@ export default function CmsProductPicker({
                 ) : null}
               </span>
               {product.productName}
-              <X className="h-3.5 w-3.5 text-[#5d6043]" />
+              <AdminIcon icon={Cancel01Icon} size={12} className="h-3.5 w-3.5 text-[#5d6043]" />
             </button>
           ))}
         </div>
@@ -107,12 +113,12 @@ export default function CmsProductPicker({
       )}
 
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5d6043]/70" />
+        <AdminIcon icon={Search01Icon} size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#5d6043]/70" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search products"
+          placeholder="Search01Icon products"
           className="w-full rounded-lg border border-[#b9aca2] py-2 pl-9 pr-3 text-sm"
         />
       </div>
@@ -120,7 +126,7 @@ export default function CmsProductPicker({
       <div className="max-h-56 overflow-y-auto rounded-xl border border-[#b9aca2]/70 bg-white">
         {loading ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={20} className="animate-spin text-[#5d6043]" />
           </div>
         ) : filtered.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-[#5d6043]">No products found</p>

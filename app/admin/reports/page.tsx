@@ -1,20 +1,22 @@
 "use client";
 
+import {
+  Alert02Icon,
+  AnalyticsDownIcon,
+  AnalyticsUpIcon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  DeliveryTruck01Icon,
+  Download01Icon,
+  Loading03Icon,
+  ShoppingBag01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
-import {
-  Download,
-  TrendingUp,
-  TrendingDown,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Truck,
-  ShoppingBag,
-  TriangleAlert,
-} from "lucide-react";
 import reportsService, {
   type FinanceSummary,
   type SalesByCategory,
@@ -59,14 +61,16 @@ function ChangeBadge({
     return <span className="text-xs text-[#5d6043]">{label}: —</span>;
   }
   const up = value >= 0;
-  const Icon = up ? TrendingUp : TrendingDown;
   return (
     <span
       className={`mt-1 inline-flex items-center gap-1 text-xs font-medium ${
         up ? "text-green-700" : "text-red-700"
       }`}
     >
-      <Icon className="h-3.5 w-3.5" />
+      <AdminIcon
+        icon={up ? AnalyticsUpIcon : AnalyticsDownIcon}
+        size={14}
+      />
       {up ? "+" : ""}
       {value}% {label}
     </span>
@@ -269,7 +273,7 @@ export default function ReportsPage() {
               disabled={exporting || loading}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition-colors hover:bg-[#222222] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+              {exporting ? <AdminIcon icon={Loading03Icon} size={20} className="animate-spin" /> : <AdminIcon icon={Download01Icon} size={20} />}
               {exporting ? "Exporting..." : "Export CSV"}
             </button>
             <button
@@ -278,8 +282,8 @@ export default function ReportsPage() {
               disabled={exportingPdf || loading}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#5d6043] px-4 py-2 text-[#5d6043] transition-colors hover:bg-[#f3efe8] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {exportingPdf ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-              {exportingPdf ? "Exporting..." : "Download PDF"}
+              {exportingPdf ? <AdminIcon icon={Loading03Icon} size={20} className="animate-spin" /> : <AdminIcon icon={Download01Icon} size={20} />}
+              {exportingPdf ? "Exporting..." : "Download01Icon PDF"}
             </button>
           </div>
         </div>
@@ -318,7 +322,7 @@ export default function ReportsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
           </div>
         ) : (
           <>
@@ -379,7 +383,7 @@ export default function ReportsPage() {
             {/* 2. Data quality banner */}
             {showQualityBanner ? (
               <div className="flex gap-3 rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0" />
+                <AdminIcon icon={Alert02Icon} size={20} className="mt-0.5" />
                 <div>
                   <p className="font-semibold">Data quality note</p>
                   {dataQuality?.cogsCoverage && dataQuality.cogsCoverage.coveragePercent < 100 ? (
@@ -600,7 +604,7 @@ export default function ReportsPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between rounded-lg border border-[rgba(34,34,34,0.08)] px-3 py-3">
                       <div className="flex items-center gap-2 text-sm text-[#5d6043]">
-                        <Truck className="h-4 w-4" />
+                        <AdminIcon icon={DeliveryTruck01Icon} size={16} />
                         Delivery
                       </div>
                       <div className="text-right text-sm">
@@ -614,7 +618,7 @@ export default function ReportsPage() {
                     </div>
                     <div className="flex items-center justify-between rounded-lg border border-[rgba(34,34,34,0.08)] px-3 py-3">
                       <div className="flex items-center gap-2 text-sm text-[#5d6043]">
-                        <ShoppingBag className="h-4 w-4" />
+                        <AdminIcon icon={ShoppingBag01Icon} size={16} />
                         Pickup
                       </div>
                       <div className="text-right text-sm">
@@ -785,7 +789,7 @@ export default function ReportsPage() {
                       disabled={customersPage === 1 || loading}
                       className="rounded-lg border border-[#b9aca2] p-2 hover:bg-[#faf9f5] disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <ChevronLeft className="h-4 w-4" />
+                      <AdminIcon icon={ArrowLeft01Icon} size={16} />
                     </button>
                     <span className="text-sm text-[#5d6043]">
                       Page {customersPage} of {customersMeta.totalPages}
@@ -798,7 +802,7 @@ export default function ReportsPage() {
                       disabled={customersPage === customersMeta.totalPages || loading}
                       className="rounded-lg border border-[#b9aca2] p-2 hover:bg-[#faf9f5] disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <ChevronRight className="h-4 w-4" />
+                      <AdminIcon icon={ArrowRight01Icon} size={16} />
                     </button>
                   </div>
                 )}

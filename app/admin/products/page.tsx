@@ -1,18 +1,21 @@
 "use client";
 
+import {
+  Add01Icon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  FilterIcon,
+  Loading03Icon,
+  Package01Icon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
+import AdminPageHeader from "../components/AdminPageHeader";
 import { useAuth } from "../../context/AuthContext";
-import {
-  Search,
-  Filter,
-  Plus,
-  Package,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-} from "lucide-react";
 import productService, { PackageConfig, PackageOption, Product, SelectOption } from "../../services/productService";
 import { CostItem, costingService } from "../../services/costingService";
 // import ComboProductModal from "./components/ComboProductModal";
@@ -181,7 +184,7 @@ export default function ProductManagementPage() {
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
       const maxSize = 5 * 1024 * 1024; // 5MB
 
-      // Filter valid files
+      // FilterIcon valid files
       const validFiles = newFiles.filter(file => {
         if (!allowedTypes.includes(file.type)) {
           console.error(`Invalid image type for ${file.name}. Only JPEG, PNG, and WebP are allowed`);
@@ -373,7 +376,7 @@ export default function ProductManagementPage() {
       }
 
       if (!packageConfigIsValid()) {
-        console.error("Package products need enough available options for the required selection count");
+        console.error("Package01Icon products need enough available options for the required selection count");
         return;
       }
 
@@ -448,7 +451,7 @@ export default function ProductManagementPage() {
       }
 
       if (!packageConfigIsValid()) {
-        console.error("Package products need enough available options for the required selection count");
+        console.error("Package01Icon products need enough available options for the required selection count");
         return;
       }
 
@@ -594,31 +597,20 @@ export default function ProductManagementPage() {
       )}
 
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-[#222222]">Product Management</h1>
-            <p className="text-[#5d6043] mt-1">Manage your products and categories</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {/* <button
-              onClick={() => setShowComboModal(true)}
-              className="flex items-center gap-2 px-4 py-2 border border-[#5d6043] text-[#5d6043] rounded-lg hover:bg-[#faf9f5] transition-colors"
-              disabled={loading || actionLoading}
-            >
-              <Plus className="w-5 h-5" />
-              Create Combo
-            </button> */}
+        <AdminPageHeader
+          title="Product Management"
+          description="Manage your products and categories"
+          actions={
             <button
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#5d6043] text-[#faf9f5] rounded-lg hover:bg-[#222222] transition-colors"
               disabled={loading || actionLoading}
             >
-              <Plus className="w-5 h-5" />
+              <AdminIcon icon={Add01Icon} size={20} />
               Add Product
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Categories - Only show if there are categories with products */}
         {categories.length > 0 && (
@@ -636,7 +628,7 @@ export default function ProductManagementPage() {
                   }`}
                 >
                   <div className="w-12 h-12 bg-[#5d6043] rounded-full flex items-center justify-center mb-3">
-                    <Package className="w-6 h-6 text-[#faf9f5]" />
+                    <AdminIcon icon={Package01Icon} size={24} className="text-[#faf9f5]" />
                   </div>
                   <h3 className="font-semibold text-[#222222] text-sm">{category}</h3>
                 </div>
@@ -645,12 +637,12 @@ export default function ProductManagementPage() {
           </div>
         )}
 
-        {/* Search and Filters */}
+        {/* Search01Icon and Filters */}
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
+            {/* Search01Icon */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b9aca2]" />
+              <AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
               <input
                 type="text"
                 value={searchQuery}
@@ -661,14 +653,14 @@ export default function ProductManagementPage() {
                     setAppliedSearch(searchQuery.trim());
                   }
                 }}
-                placeholder="Search products..."
+                placeholder="Search01Icon products..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#5d6043] focus:border-transparent"
               />
             </div>
 
             {/* Sort By */}
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#b9aca2]" />
+              <AdminIcon icon={FilterIcon} size={20} className="text-[#b9aca2]" />
               <select
                 value={sortBy}
                 onChange={(e) =>
@@ -697,7 +689,7 @@ export default function ProductManagementPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin" />
           </div>
         )}
 
@@ -709,7 +701,7 @@ export default function ProductManagementPage() {
             {/* Empty State */}
             {filteredProducts.length === 0 && !loading && (
               <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 p-12 text-center">
-                <Package className="w-16 h-16 text-[#b9aca2] mx-auto mb-4" />
+                <AdminIcon icon={Package01Icon} size={64} className="text-[#b9aca2] mx-auto mb-4" />
                 <p className="text-[#5d6043]">No products found</p>
               </div>
             )}
@@ -722,7 +714,7 @@ export default function ProductManagementPage() {
                   disabled={currentPage === 1}
                   className="p-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <AdminIcon icon={ArrowLeft01Icon} size={20} />
                 </button>
                 <span className="text-sm text-[#5d6043]">
                   Page {currentPage} of {pagination.totalPages}
@@ -732,7 +724,7 @@ export default function ProductManagementPage() {
                   disabled={currentPage === pagination.totalPages}
                   className="p-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <AdminIcon icon={ArrowRight01Icon} size={20} />
                 </button>
               </div>
             )}

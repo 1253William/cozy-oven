@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Add01Icon,
+  AlertCircleIcon,
+  Cancel01Icon,
+  Delete02Icon,
+  PencilEdit02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { AlertCircle, Edit2, Plus, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
 import { CostCategory, CostItem, costingService } from "../../services/costingService";
 
@@ -129,7 +137,7 @@ export default function CostItemsPage() {
 
         <section className="border-y border-[#b9aca2]/60 bg-white/60 px-4 py-4">
           <div className="flex gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#5d6043]" />
+            <AdminIcon icon={AlertCircleIcon} size={20} className="mt-0.5 text-[#5d6043]" />
             <div className="text-sm text-[#5d6043]">
               <p className="font-semibold text-[#222]">Add costs that can be measured per product or batch.</p>
               <p>Use ingredients, packaging, decorating materials, and direct baking labour. Put rent, general electricity, marketing, and administration under Overhead Costs. Record the supplier transaction separately under Purchases.</p>
@@ -150,9 +158,9 @@ export default function CostItemsPage() {
           {form.tracksStock && !editing && <label className="text-sm font-medium">Opening stock<input className={`${field} mt-1`} type="number" min="0" step="any" value={form.openingStock} onChange={(e) => setForm({ ...form, openingStock: e.target.value })} placeholder={`Quantity in ${form.unit}`} /></label>}
           <div className="flex items-end justify-between gap-3 rounded-md border border-[#b9aca2]/60 px-3 py-2">
             <div><p className="text-xs text-[#5d6043]">Calculated rate</p><p className="font-semibold">GHS {derivedRate.toFixed(6)} / {form.unit}</p></div>
-            <button disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white disabled:opacity-60">{editing ? <Edit2 size={17} /> : <Plus size={17} />}{editing ? "Update" : "Add"}</button>
+            <button disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#5d6043] px-4 py-2 text-white disabled:opacity-60">{editing ? <AdminIcon icon={PencilEdit02Icon} size={17} /> : <AdminIcon icon={Add01Icon} size={17} />}{editing ? "Update" : "Add"}</button>
           </div>
-          {editing && <button type="button" onClick={reset} className="inline-flex w-fit items-center gap-2 text-sm text-[#5d6043]"><X size={16} />Cancel editing</button>}
+          {editing && <button type="button" onClick={reset} className="inline-flex w-fit items-center gap-2 text-sm text-[#5d6043]"><AdminIcon icon={Cancel01Icon} size={16} />Cancel editing</button>}
         </form>
 
         {message && <p className="text-sm text-red-700">{message}</p>}
@@ -165,12 +173,12 @@ export default function CostItemsPage() {
               <td>{item.purchaseBatch.quantity} {item.unit} · GHS {Number(item.purchaseBatch.cost).toFixed(2)}</td>
               <td>GHS {item.costPerUnit.toFixed(6)} / {item.unit}</td>
               <td>{new Date(item.lastUpdated).toLocaleDateString("en-GB")}</td>
-              <td><div className="flex justify-end gap-1"><button title="Price history" onClick={() => showHistory(item)} className="p-2"><AlertCircle size={17} /></button><button title="Edit cost item" onClick={() => beginEdit(item)} className="p-2"><Edit2 size={17} /></button><button title="Archive cost item" onClick={async () => { if (confirm(`Archive ${item.name}?`)) { await costingService.archiveItem(item._id); await load(); } }} className="p-2 text-red-700"><Trash2 size={17} /></button></div></td>
+              <td><div className="flex justify-end gap-1"><button title="Price history" onClick={() => showHistory(item)} className="p-2"><AdminIcon icon={AlertCircleIcon} size={17} /></button><button title="Edit cost item" onClick={() => beginEdit(item)} className="p-2"><AdminIcon icon={PencilEdit02Icon} size={17} /></button><button title="Archive cost item" onClick={async () => { if (confirm(`Archive ${item.name}?`)) { await costingService.archiveItem(item._id); await load(); } }} className="p-2 text-red-700"><AdminIcon icon={Delete02Icon} size={17} /></button></div></td>
             </tr>)}</tbody>
           </table>
         </div>
 
-        {history && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[80vh] w-full max-w-xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><h2 className="text-lg font-semibold">{historyName} price history</h2><button title="Close" onClick={() => setHistory(null)} className="p-2"><X /></button></div><div className="mt-4 space-y-2">{history.length ? history.map((row) => <div key={row._id} className="flex justify-between border-b py-2 text-sm"><span>{new Date(row.effectiveFrom).toLocaleDateString("en-GB")}</span><span>GHS {Number(row.costPerUnit).toFixed(6)} / unit</span></div>) : <p className="text-sm text-[#5d6043]">No history available.</p>}</div></section></div>}
+        {history && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"><section className="max-h-[80vh] w-full max-w-xl overflow-auto rounded-md bg-[#faf9f5] p-5"><div className="flex items-center justify-between"><h2 className="text-lg font-semibold">{historyName} price history</h2><button title="Close" onClick={() => setHistory(null)} className="p-2"><AdminIcon icon={Cancel01Icon} size={20} /></button></div><div className="mt-4 space-y-2">{history.length ? history.map((row) => <div key={row._id} className="flex justify-between border-b py-2 text-sm"><span>{new Date(row.effectiveFrom).toLocaleDateString("en-GB")}</span><span>GHS {Number(row.costPerUnit).toFixed(6)} / unit</span></div>) : <p className="text-sm text-[#5d6043]">No history available.</p>}</div></section></div>}
       </main>
     </AdminLayout>
   );

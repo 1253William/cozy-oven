@@ -1,11 +1,12 @@
 import {
-  Eye,
-  Package,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Truck,
-} from "lucide-react";
+  CancelCircleIcon,
+  CheckmarkCircle02Icon,
+  Clock01Icon,
+  DeliveryTruck01Icon,
+  Package01Icon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
 
 interface Order {
   id: string;
@@ -43,15 +44,15 @@ const getStatusColor = (status: string) => {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "pending":
-      return <Clock className="w-4 h-4" />;
+      return <AdminIcon icon={Clock01Icon} size={16} />;
     case "processing":
-      return <Package className="w-4 h-4" />;
+      return <AdminIcon icon={Package01Icon} size={16} />;
     case "shipped":
-      return <Truck className="w-4 h-4" />;
+      return <AdminIcon icon={DeliveryTruck01Icon} size={16} />;
     case "delivered":
-      return <CheckCircle className="w-4 h-4" />;
+      return <AdminIcon icon={CheckmarkCircle02Icon} size={16} />;
     case "cancelled":
-      return <XCircle className="w-4 h-4" />;
+      return <AdminIcon icon={CancelCircleIcon} size={16} />;
     default:
       return null;
   }
@@ -114,7 +115,7 @@ export default function OrderCards({ orders, onViewOrder }: OrderCardsProps) {
             onClick={() => onViewOrder(order)}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-[#b9aca2] rounded-lg hover:bg-[#faf9f5] transition-colors"
           >
-            <Eye className="w-4 h-4" />
+            <AdminIcon icon={ViewIcon} size={16} />
             View Details
           </button>
         </div>

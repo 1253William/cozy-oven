@@ -1,7 +1,12 @@
 "use client";
 
+import {
+  Add01Icon,
+  Delete02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import Image from "next/image";
-import { Plus, Trash2 } from "lucide-react";
 import CmsImageField from "./CmsImageField";
 
 const MAX_GALLERY = 6;
@@ -48,7 +53,7 @@ export default function CmsGalleryField({
           disabled={urls.length >= MAX_GALLERY}
           className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0] disabled:opacity-40"
         >
-          <Plus className="h-4 w-4" />
+          <AdminIcon icon={Add01Icon} size={16} />
           Add image
         </button>
       </div>
@@ -74,7 +79,7 @@ export default function CmsGalleryField({
                   className="min-h-10 min-w-10 rounded-lg border border-red-200 p-2 text-red-700"
                   aria-label="Remove photo"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <AdminIcon icon={Delete02Icon} size={16} />
                 </button>
               </div>
               {url ? (

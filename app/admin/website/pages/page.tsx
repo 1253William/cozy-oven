@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import {
-  Edit2,
-  Eye,
-  EyeOff,
-  Loader2,
-  Plus,
-  Trash2,
-  X,
-} from "lucide-react";
+  Add01Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  PencilEdit02Icon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
+
+import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
+import AdminPageHeader from "../../components/AdminPageHeader";
 import WebsiteTabs from "../WebsiteTabs";
 import CmsImageField from "../CmsImageField";
 import CmsProductPicker from "../CmsProductPicker";
@@ -720,22 +723,24 @@ export default function AdminWebsitePagesPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-[#222222]">Website</h1>
-            <div className="mt-3">
+        <AdminPageHeader
+          title="Website"
+          description={
+            <div className="mt-2">
               <WebsiteTabs />
             </div>
-          </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition hover:bg-[#222222]"
-          >
-            <Plus className="h-4 w-4" />
-            New page
-          </button>
-        </div>
+          }
+          actions={
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-[#faf9f5] transition hover:bg-[#222222]"
+            >
+              <AdminIcon icon={Add01Icon} size={16} />
+              New page
+            </button>
+          }
+        />
 
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -750,7 +755,7 @@ export default function AdminWebsitePagesPage() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
           </div>
         ) : sorted.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#b9aca2] bg-[#faf9f5] px-6 py-12 text-center text-[#5d6043]">
@@ -795,7 +800,7 @@ export default function AdminWebsitePagesPage() {
                     onClick={() => openPreview(page)}
                     className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
                   >
-                    <Eye className="h-4 w-4" />
+                    <AdminIcon icon={ViewIcon} size={16} />
                     Preview
                   </button>
                   <button
@@ -810,7 +815,7 @@ export default function AdminWebsitePagesPage() {
                     onClick={() => openEdit(page)}
                     className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
                   >
-                    <Edit2 className="h-4 w-4" />
+                    <AdminIcon icon={PencilEdit02Icon} size={16} />
                     Edit
                   </button>
                   <button
@@ -818,7 +823,7 @@ export default function AdminWebsitePagesPage() {
                     onClick={() => handleDelete(page)}
                     className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 hover:bg-red-50"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <AdminIcon icon={Delete02Icon} size={16} />
                   </button>
                 </div>
               </div>
@@ -840,7 +845,7 @@ export default function AdminWebsitePagesPage() {
                   onClick={() => setDraftPreview({ mode: "page" })}
                   className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
                 >
-                  <Eye className="h-4 w-4" />
+                  <AdminIcon icon={ViewIcon} size={16} />
                   Preview page
                 </button>
                 <button
@@ -848,7 +853,7 @@ export default function AdminWebsitePagesPage() {
                   onClick={() => setShowForm(false)}
                   className="rounded-lg p-2 hover:bg-[#eeeae0]"
                 >
-                  <X className="h-5 w-5" />
+                  <AdminIcon icon={Cancel01Icon} size={20} />
                 </button>
               </div>
             </div>
@@ -960,7 +965,7 @@ export default function AdminWebsitePagesPage() {
                       onClick={() => setDraftPreview({ mode: "page" })}
                       className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] hover:bg-[#eeeae0]"
                     >
-                      <Eye className="h-4 w-4" />
+                      <AdminIcon icon={ViewIcon} size={16} />
                       Preview page
                     </button>
                     <button
@@ -968,7 +973,7 @@ export default function AdminWebsitePagesPage() {
                       onClick={() => setShowCatalog((prev) => !prev)}
                       className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5]"
                     >
-                      <Plus className="h-4 w-4" />
+                      <AdminIcon icon={Add01Icon} size={16} />
                       Add section
                     </button>
                   </div>
@@ -1039,9 +1044,9 @@ export default function AdminWebsitePagesPage() {
                             title={section.enabled ? "Hide on page" : "Show on page"}
                           >
                             {section.enabled ? (
-                              <Eye className="h-4 w-4" />
+                              <AdminIcon icon={ViewIcon} size={16} />
                             ) : (
-                              <EyeOff className="h-4 w-4" />
+                              <AdminIcon icon={ViewOffSlashIcon} size={16} />
                             )}
                           </button>
                           <button
@@ -1050,7 +1055,7 @@ export default function AdminWebsitePagesPage() {
                             className="rounded-lg border border-[#b9aca2] p-2 text-[#5d6043]"
                             aria-label="Edit"
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <AdminIcon icon={PencilEdit02Icon} size={16} />
                           </button>
                           <button
                             type="button"
@@ -1058,7 +1063,7 @@ export default function AdminWebsitePagesPage() {
                             className="rounded-lg border border-red-200 p-2 text-red-700"
                             aria-label="Remove"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <AdminIcon icon={Delete02Icon} size={16} />
                           </button>
                         </div>
                       </div>
@@ -1089,7 +1094,7 @@ export default function AdminWebsitePagesPage() {
                               }
                               className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043]"
                             >
-                              <Eye className="h-4 w-4" />
+                              <AdminIcon icon={ViewIcon} size={16} />
                               Preview
                             </button>
                             <button
@@ -1120,7 +1125,7 @@ export default function AdminWebsitePagesPage() {
                   onClick={() => setDraftPreview({ mode: "page" })}
                   className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm text-[#5d6043]"
                 >
-                  <Eye className="h-4 w-4" />
+                  <AdminIcon icon={ViewIcon} size={16} />
                   Preview
                 </button>
                 <button
@@ -1128,7 +1133,7 @@ export default function AdminWebsitePagesPage() {
                   disabled={saving}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm text-[#faf9f5] disabled:opacity-60"
                 >
-                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {saving && <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />}
                   Save
                 </button>
               </div>
@@ -1179,13 +1184,13 @@ export default function AdminWebsitePagesPage() {
                 onClick={() => setHistoryPage(null)}
                 className="rounded-lg p-2 hover:bg-[#eeeae0]"
               >
-                <X className="h-5 w-5" />
+                <AdminIcon icon={Cancel01Icon} size={20} />
               </button>
             </div>
 
             {historyLoading ? (
               <div className="flex justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-[#5d6043]" />
+                <AdminIcon icon={Loading03Icon} size={24} className="animate-spin text-[#5d6043]" />
               </div>
             ) : versions.length === 0 ? (
               <p className="rounded-xl border border-dashed border-[#b9aca2] px-4 py-8 text-center text-sm text-[#5d6043]">
@@ -1217,7 +1222,7 @@ export default function AdminWebsitePagesPage() {
                       className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-[#faf9f5] disabled:opacity-60"
                     >
                       {restoringId === version.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
                       ) : null}
                       Restore
                     </button>

@@ -1,10 +1,18 @@
 "use client";
 
+import {
+  Download01Icon,
+  Loading03Icon,
+  Mail01Icon,
+  Search01Icon,
+  UserAdd01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import { useAuth } from "../../context/AuthContext";
-import { Search, Mail, Loader2, Download, UserPlus } from "lucide-react";
 import subscriberService, { type Subscriber } from "../../services/subscriberService";
 
 export default function SubscribersPage() {
@@ -59,7 +67,7 @@ export default function SubscribersPage() {
   };
 
   const handleSearch = () => {
-    // Search is handled client-side
+    // Search01Icon is handled client-side
   };
 
   const handleExportCSV = () => {
@@ -144,7 +152,7 @@ export default function SubscribersPage() {
               className="flex items-center gap-2 px-4 py-2 bg-[#bd6325] text-[#faf9f5] rounded-lg hover:bg-[#bd6325] transition-colors"
               disabled={loading || filteredSubscribers.length === 0}
             >
-              <Download className="w-4 h-4" />
+              <AdminIcon icon={Download01Icon} size={16} />
               <span className="hidden sm:inline">Export CSV</span>
             </button>
           </div>
@@ -154,7 +162,7 @@ export default function SubscribersPage() {
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-6 border border-[#b9aca2]/40">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-[#bd6325]/10 rounded-full flex items-center justify-center">
-              <Mail className="w-6 h-6 text-[#bd6325]" />
+              <AdminIcon icon={Mail01Icon} size={24} className="text-[#bd6325]" />
             </div>
             <div>
               <p className="text-sm text-[#5d6043] font-medium">Total Subscribers</p>
@@ -165,11 +173,11 @@ export default function SubscribersPage() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Search01Icon Bar */}
         <div className="bg-[#faf9f5] rounded-xl shadow-sm p-4 border border-[#b9aca2]/40">
           <div className="flex gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b9aca2]" />
+              <AdminIcon icon={Search01Icon} size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b9aca2]" />
               <input
                 type="text"
                 value={searchQuery}
@@ -179,7 +187,7 @@ export default function SubscribersPage() {
                     handleSearch();
                   }
                 }}
-                placeholder="Search by name or email..."
+                placeholder="Search01Icon by name or email..."
                 className="w-full pl-10 pr-4 py-2 border border-[#b9aca2] rounded-lg focus:ring-2 focus:ring-[#bd6325] focus:border-transparent"
               />
             </div>
@@ -189,7 +197,7 @@ export default function SubscribersPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#bd6325] animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={32} className="text-[#bd6325] animate-spin" />
           </div>
         )}
 
@@ -198,7 +206,7 @@ export default function SubscribersPage() {
           <div className="bg-[#faf9f5] rounded-xl shadow-sm border border-[#b9aca2]/40 overflow-hidden">
             {filteredSubscribers.length === 0 ? (
               <div className="text-center py-12">
-                <Mail className="w-12 h-12 text-[#b9aca2] mx-auto mb-4" />
+                <AdminIcon icon={Mail01Icon} size={48} className="text-[#b9aca2] mx-auto mb-4" />
                 <p className="text-[#5d6043]">
                   {searchQuery
                     ? "No subscribers found matching your search."
@@ -216,7 +224,7 @@ export default function SubscribersPage() {
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <div className="w-10 h-10 bg-[#bd6325]/10 rounded-full flex items-center justify-center">
-                          <UserPlus className="w-5 h-5 text-[#bd6325]" />
+                          <AdminIcon icon={UserAdd01Icon} size={20} className="text-[#bd6325]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-[#222222] truncate">
@@ -228,7 +236,7 @@ export default function SubscribersPage() {
                             }
                             className="mt-1 text-xs text-[#bd6325] hover:text-[#bd6325] flex items-center gap-1"
                           >
-                            <Mail className="w-3 h-3" />
+                            <AdminIcon icon={Mail01Icon} size={12} />
                             <span className="truncate">{subscriber.email}</span>
                           </button>
                         </div>
@@ -275,7 +283,7 @@ export default function SubscribersPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 bg-[#bd6325]/10 rounded-full flex items-center justify-center">
-                                <UserPlus className="w-5 h-5 text-[#bd6325]" />
+                                <AdminIcon icon={UserAdd01Icon} size={20} className="text-[#bd6325]" />
                               </div>
                               <span className="text-sm font-medium text-[#222222]">
                                 {subscriber.fullName}
@@ -287,7 +295,7 @@ export default function SubscribersPage() {
                               href={`/admin/email-marketing?email=${encodeURIComponent(subscriber.email)}&name=${encodeURIComponent(subscriber.fullName)}`}
                               className="text-sm text-[#bd6325] hover:underline flex items-center gap-2"
                             >
-                              <Mail className="w-4 h-4" />
+                              <AdminIcon icon={Mail01Icon} size={16} />
                               {subscriber.email}
                             </a>
                           </td>

@@ -1,7 +1,12 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Loading03Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useMemo, useState } from "react";
-import { Loader2, X } from "lucide-react";
 
 export type PublishChecklistItem = {
   id: string;
@@ -47,7 +52,7 @@ export default function PublishChecklistModal({
             className="rounded-lg p-2 hover:bg-[#eeeae0]"
             aria-label="Close"
           >
-            <X className="h-5 w-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 
@@ -95,7 +100,7 @@ export default function PublishChecklistModal({
             onClick={onConfirm}
             className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm text-[#faf9f5] disabled:opacity-50"
           >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {busy ? <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" /> : null}
             {confirmLabel}
           </button>
         </div>

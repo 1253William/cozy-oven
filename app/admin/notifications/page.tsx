@@ -1,5 +1,21 @@
 "use client";
 
+import {
+  AlertCircleIcon,
+  AnalyticsUpIcon,
+  Clock01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  Mail01Icon,
+  Message01Icon,
+  Notification03Icon,
+  Package01Icon,
+  PaintBoardIcon,
+  ShoppingCart01Icon,
+  TickDouble02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
@@ -12,20 +28,6 @@ import notificationSettingsService, {
   type NotificationSettingsData,
   type TemplateId,
 } from "../../services/notificationSettingsService";
-import {
-  AlertCircle,
-  Bell,
-  CheckCheck,
-  Clock,
-  Loader2,
-  Mail,
-  MessageSquare,
-  Package,
-  Palette,
-  ShoppingCart,
-  Trash2,
-  TrendingUp,
-} from "lucide-react";
 
 type HubTab = "templates" | "email" | "sms" | "inbox";
 
@@ -234,25 +236,25 @@ export default function NotificationsHubPage() {
   const getNotificationIcon = (type?: string) => {
     switch (String(type ?? "")) {
       case "order":
-        return ShoppingCart;
+        return ShoppingCart01Icon;
       case "inventory":
-        return AlertCircle;
+        return AlertCircleIcon;
       case "package":
-        return Package;
+        return Package01Icon;
       case "sales":
-        return TrendingUp;
+        return AnalyticsUpIcon;
       default:
-        return Bell;
+        return Notification03Icon;
     }
   };
 
   if (!isAuthenticated || user?.role !== "Admin") return null;
 
-  const tabs: { id: HubTab; label: string; icon: typeof Palette }[] = [
-    { id: "templates", label: "Templates", icon: Palette },
-    { id: "email", label: "Email", icon: Mail },
-    { id: "sms", label: "SMS", icon: MessageSquare },
-    { id: "inbox", label: "Inbox", icon: Bell },
+  const tabs: { id: HubTab; label: string; icon: typeof PaintBoardIcon }[] = [
+    { id: "templates", label: "Templates", icon: PaintBoardIcon },
+    { id: "email", label: "Email", icon: Mail01Icon },
+    { id: "sms", label: "SMS", icon: Message01Icon },
+    { id: "inbox", label: "Inbox", icon: Notification03Icon },
   ];
 
   const smsKeys = settings?.smsMessageKeys || [];
@@ -268,25 +270,22 @@ export default function NotificationsHubPage() {
         </header>
 
         <div className="flex flex-wrap gap-2 border-b border-[#b9aca2]/50 pb-3">
-          {tabs.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTab(item.id)}
-                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  tab === item.id
-                    ? "bg-[#5d6043] text-[#faf9f5]"
-                    : "bg-[#b9aca2]/40 text-[#5d6043] hover:bg-[#b9aca2]/60"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-                {item.id === "inbox" && unreadCount > 0 ? ` (${unreadCount})` : ""}
-              </button>
-            );
-          })}
+          {tabs.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setTab(item.id)}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                tab === item.id
+                  ? "bg-[#5d6043] text-[#faf9f5]"
+                  : "bg-[#b9aca2]/40 text-[#5d6043] hover:bg-[#b9aca2]/60"
+              }`}
+            >
+              <AdminIcon icon={item.icon} size={16} />
+              {item.label}
+              {item.id === "inbox" && unreadCount > 0 ? ` (${unreadCount})` : ""}
+            </button>
+          ))}
         </div>
 
         {error && <p className="text-sm text-red-700">{error}</p>}
@@ -294,7 +293,7 @@ export default function NotificationsHubPage() {
 
         {loadingSettings && tab !== "inbox" ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+            <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
           </div>
         ) : null}
 
@@ -348,7 +347,7 @@ export default function NotificationsHubPage() {
               <p className="mb-2 text-xs text-[#5d6043]">Preview · {previewSubject || "—"}</p>
               {previewLoading ? (
                 <div className="flex h-[480px] items-center justify-center">
-                  <Loader2 className="animate-spin text-[#5d6043]" />
+                  <AdminIcon icon={Loading03Icon} size={20} className="animate-spin text-[#5d6043]" />
                 </div>
               ) : (
                 <iframe
@@ -435,7 +434,7 @@ export default function NotificationsHubPage() {
               </p>
               {previewLoading ? (
                 <div className="flex h-[480px] items-center justify-center">
-                  <Loader2 className="animate-spin text-[#5d6043]" />
+                  <AdminIcon icon={Loading03Icon} size={20} className="animate-spin text-[#5d6043]" />
                 </div>
               ) : (
                 <iframe
@@ -539,7 +538,7 @@ export default function NotificationsHubPage() {
                   }}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm text-[#faf9f5]"
                 >
-                  <CheckCheck className="h-4 w-4" />
+                  <AdminIcon icon={TickDouble02Icon} size={16} />
                   Mark all read
                 </button>
               )}
@@ -548,14 +547,14 @@ export default function NotificationsHubPage() {
             <div className="overflow-hidden rounded-xl border border-[#b9aca2]/40 bg-[#faf9f5]">
               {loadingInbox ? (
                 <div className="flex justify-center p-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#5d6043]" />
+                  <AdminIcon icon={Loading03Icon} size={32} className="animate-spin text-[#5d6043]" />
                 </div>
               ) : displayedNotifications.length === 0 ? (
                 <div className="p-12 text-center text-[#5d6043]">No notifications</div>
               ) : (
                 <div className="divide-y divide-[#b9aca2]/40">
                   {displayedNotifications.map((notification, idx) => {
-                    const Icon = getNotificationIcon(notification.type);
+                    const icon = getNotificationIcon(notification.type);
                     return (
                       <div
                         key={notification._id || `n-${idx}`}
@@ -563,7 +562,7 @@ export default function NotificationsHubPage() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#b9aca2]/40 text-[#5d6043]">
-                            <Icon className="h-5 w-5" />
+                            <AdminIcon icon={icon} size={20} />
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-start justify-between gap-2">
@@ -571,7 +570,7 @@ export default function NotificationsHubPage() {
                                 {String(notification.type || "system")}
                               </h3>
                               <span className="flex items-center gap-1 text-xs text-[#5d6043]">
-                                <Clock className="h-3 w-3" />
+                                <AdminIcon icon={Clock01Icon} size={12} />
                                 {getTimeAgo(notification.createdAt)}
                               </span>
                             </div>
@@ -597,7 +596,7 @@ export default function NotificationsHubPage() {
                                   fetchInbox();
                                 }}
                               >
-                                <Trash2 className="h-3 w-3" />
+                                <AdminIcon icon={Delete02Icon} size={12} />
                                 Delete
                               </button>
                             </div>

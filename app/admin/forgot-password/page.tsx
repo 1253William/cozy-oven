@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Key01Icon,
+  Mail01Icon,
+  SquareLock02Icon,
+  ViewIcon,
+  ViewOffSlashIcon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail, KeyRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -131,9 +139,9 @@ export default function AdminForgotPasswordPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-[#5d6043] rounded-full mb-4">
-              {currentStep === "email" && <Mail className="w-8 h-8 text-[#faf9f5]" />}
-              {currentStep === "verify-otp" && <KeyRound className="w-8 h-8 text-[#faf9f5]" />}
-              {currentStep === "reset-password" && <Lock className="w-8 h-8 text-[#faf9f5]" />}
+              {currentStep === "email" && <AdminIcon icon={Mail01Icon} size={32} className="text-[#faf9f5]" />}
+              {currentStep === "verify-otp" && <AdminIcon icon={Key01Icon} size={32} className="text-[#faf9f5]" />}
+              {currentStep === "reset-password" && <AdminIcon icon={SquareLock02Icon} size={32} className="text-[#faf9f5]" />}
             </div>
             <h1 className="text-3xl font-bold text-[#222222] mb-2">
               {currentStep === "email" && "Reset Password"}
@@ -168,7 +176,7 @@ export default function AdminForgotPasswordPage() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-[#b9aca2]" />
+                    <AdminIcon icon={Mail01Icon} size={20} className="text-[#b9aca2]" />
                   </div>
                   <input
                     type="email"
@@ -246,7 +254,7 @@ export default function AdminForgotPasswordPage() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-[#b9aca2]" />
+                    <AdminIcon icon={SquareLock02Icon} size={20} className="text-[#b9aca2]" />
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -260,9 +268,9 @@ export default function AdminForgotPasswordPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-[#b9aca2] hover:text-[#5d6043]" />
+                      <AdminIcon icon={ViewOffSlashIcon} size={20} className="text-[#b9aca2] hover:text-[#5d6043]" />
                     ) : (
-                      <Eye className="h-5 w-5 text-[#b9aca2] hover:text-[#5d6043]" />
+                      <AdminIcon icon={ViewIcon} size={20} className="text-[#b9aca2] hover:text-[#5d6043]" />
                     )}
                   </button>
                 </div>

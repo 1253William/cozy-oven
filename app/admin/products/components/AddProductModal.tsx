@@ -1,4 +1,7 @@
-import { X } from "lucide-react";
+import {
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
 import ProductForm from "./ProductForm";
 import { CostItem } from "../../../services/costingService";
 import { PackageConfig, PackageOption, Product, SelectOption } from "../../../services/productService";
@@ -98,7 +101,7 @@ export default function AddProductModal({
         <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#faf9f5] z-10 pb-4">
           <h2 className="text-2xl font-bold text-[#222222]">Add New Product</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#b9aca2]">
-            <X className="w-5 h-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 

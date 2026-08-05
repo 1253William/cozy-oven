@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  Cancel01Icon,
+  Delete02Icon,
+  Loading03Icon,
+  StarIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect, useState } from "react";
-import { Check, Loader2, Star, Trash2, X } from "lucide-react";
 import AdminLayout from "../components/AdminLayout";
 import reviewService, { Review, ReviewStatus } from "../../services/reviewService";
 
@@ -104,7 +112,7 @@ export default function AdminReviewsPage() {
 
         {loading ? (
           <div className="flex items-center gap-2 text-[#5d6043]">
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={16} className="animate-spin" />
             Loading reviews…
           </div>
         ) : reviews.length === 0 ? (
@@ -134,7 +142,7 @@ export default function AdminReviewsPage() {
                       </div>
                       <div className="mt-1 flex items-center gap-1 text-amber-500">
                         {Array.from({ length: review.rating }).map((_, index) => (
-                          <Star key={index} className="h-3.5 w-3.5 fill-current" />
+                          <AdminIcon icon={StarIcon} size={12} className="h-3.5 w-3.5 fill-current" key={index} />
                         ))}
                       </div>
                       <p className="mt-1 text-xs text-[#5d6043]">{formatDate(review.createdAt)}</p>
@@ -148,7 +156,7 @@ export default function AdminReviewsPage() {
                           onClick={() => handleStatus(review.id, "approved")}
                           className="inline-flex items-center gap-1 rounded-lg bg-[#5d6043] px-3 py-2 text-sm text-white disabled:opacity-60"
                         >
-                          <Check className="h-4 w-4" />
+                          <AdminIcon icon={Tick02Icon} size={16} />
                           {review.status === "pending" ? "Approve" : "Show"}
                         </button>
                       ) : null}
@@ -159,7 +167,7 @@ export default function AdminReviewsPage() {
                           onClick={() => handleStatus(review.id, "rejected")}
                           className="inline-flex items-center gap-1 rounded-lg border border-[#b9aca2] px-3 py-2 text-sm text-[#5d6043] disabled:opacity-60"
                         >
-                          <X className="h-4 w-4" />
+                          <AdminIcon icon={Cancel01Icon} size={16} />
                           Hide
                         </button>
                       ) : null}
@@ -169,7 +177,7 @@ export default function AdminReviewsPage() {
                         onClick={() => handleDelete(review.id)}
                         className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700 disabled:opacity-60"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <AdminIcon icon={Delete02Icon} size={16} />
                         Delete
                       </button>
                     </div>

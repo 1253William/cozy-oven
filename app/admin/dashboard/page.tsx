@@ -1,16 +1,19 @@
 "use client";
 
+import {
+  AnalyticsUpIcon,
+  ArrowRight01Icon,
+  Award01Icon,
+  Loading03Icon,
+  Package01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../components/AdminIcon";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
+import AdminPageHeader from "../components/AdminPageHeader";
 import { useAuth } from "../../context/AuthContext";
-import {
-  TrendingUp,
-  Award,
-  ArrowRight,
-  Package,
-  Loader2,
-} from "lucide-react";
 import Image from "next/image";
 import { useDashboardOverview, usePopularProducts } from "../../hooks/useDashboard";
 
@@ -37,16 +40,15 @@ export default function AdminDashboardPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-[#222222]">Dashboard</h1>
-          <p className="text-[#5d6043] mt-1">Welcome back, {user?.fullName}</p>
-        </div>
+        <AdminPageHeader
+          title="Dashboard"
+          description={`Welcome back, ${user?.fullName}`}
+        />
 
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#5d6043] animate-spin" />
+            <AdminIcon icon={Loading03Icon} size={32} className="text-[#5d6043] animate-spin" />
           </div>
         )}
 
@@ -86,7 +88,7 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-blue-600" />
+                    <AdminIcon icon={AnalyticsUpIcon} size={24} className="text-blue-600" />
                   </div>
                 </div>
               </div>
@@ -104,7 +106,7 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Award className="w-6 h-6 text-orange-600" />
+                    <AdminIcon icon={Award01Icon} size={24} className="text-orange-600" />
                   </div>
                 </div>
               </div>
@@ -122,7 +124,7 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <Award className="w-6 h-6 text-yellow-600" />
+                    <AdminIcon icon={Award01Icon} size={24} className="text-yellow-600" />
                   </div>
                 </div>
               </div>
@@ -155,7 +157,7 @@ export default function AdminDashboardPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Package className="w-16 h-16 text-[#b9aca2]" />
+                        <AdminIcon icon={Package01Icon} size={64} className="text-[#b9aca2]" />
                       </div>
                     )}
                   </div>
@@ -195,7 +197,7 @@ export default function AdminDashboardPage() {
                   className="flex items-center gap-2 text-[#5d6043] font-medium hover:underline"
                 >
                   See All
-                  <ArrowRight className="w-4 h-4" />
+                  <AdminIcon icon={ArrowRight01Icon} size={16} />
                 </button>
               </div>
 
@@ -229,7 +231,7 @@ export default function AdminDashboardPage() {
               {/* Show placeholder if no products */}
               {popularProducts.length === 0 && (
                 <div className="text-center py-8 text-[#5d6043]">
-                  <Package className="w-12 h-12 mx-auto mb-2 text-[#b9aca2]" />
+                  <AdminIcon icon={Package01Icon} size={48} className="mx-auto mb-2 text-[#b9aca2]" />
                   <p>No popular products data available</p>
                 </div>
               )}

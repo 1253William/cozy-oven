@@ -1,4 +1,7 @@
-import { X } from "lucide-react";
+import {
+  Cancel01Icon,
+} from "@hugeicons/core-free-icons";
+import AdminIcon from "../../components/AdminIcon";
 import ProductForm from "./ProductForm";
 import { CostItem } from "../../../services/costingService";
 import { PackageConfig, PackageOption, Product, SelectOption } from "../../../services/productService";
@@ -105,7 +108,7 @@ export default function EditProductModal({
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[#b9aca2]"
           >
-            <X className="w-5 h-5" />
+            <AdminIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 
