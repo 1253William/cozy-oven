@@ -9,6 +9,7 @@ import AdminPageHeader from "../components/AdminPageHeader";
 import { useAuth } from "../../context/AuthContext";
 import marketingService, {
   Campaign,
+  CampaignSkin,
   CampaignTemplate,
   CampaignTemplateInput,
   MarketingRecipient,
@@ -18,10 +19,12 @@ import CampaignHistoryPanel from "./CampaignHistoryPanel";
 import ComposeCampaignPanel from "./ComposeCampaignPanel";
 import ComposeStepIndicator from "./ComposeStepIndicator";
 import MarketingTabs from "./MarketingTabs";
+import SkinSelectStep from "./SkinSelectStep";
 import TemplateEditorForm from "./TemplateEditorForm";
 import TemplateLibraryPanel from "./TemplateLibraryPanel";
 import TemplateSelectStep from "./TemplateSelectStep";
 import {
+  DEFAULT_SKIN_ID,
   emptyTemplateForm,
   parseComposeStep,
   parseMarketingTab,
@@ -58,6 +61,8 @@ function EmailMarketingPageInner() {
   const [selectedRecipients, setSelectedRecipients] = useState<MarketingRecipient[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [templates, setTemplates] = useState<CampaignTemplate[]>([]);
+  const [skins, setSkins] = useState<CampaignSkin[]>([]);
+  const [skinId, setSkinId] = useState(DEFAULT_SKIN_ID);
   const [sourceFilter, setSourceFilter] = useState<RecipientSourceFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [templateId, setTemplateId] = useState("");
@@ -68,6 +73,7 @@ function EmailMarketingPageInner() {
   const [loadingRecipients, setLoadingRecipients] = useState(true);
   const [loadingCampaigns, setLoadingCampaigns] = useState(true);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [loadingSkins, setLoadingSkins] = useState(true);
   const [sending, setSending] = useState(false);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,13 +163,29 @@ function EmailMarketingPageInner() {
     }
   }, []);
 
+  const fetchSkins = useCallback(async () => {
+    try {
+      setLoadingSkins(true);
+      const response = await marketingService.getSkins();
+      if (!response.success) throw new Error(response.message || "Failed to fetch skins");
+      setSkins(response.data || []);
+      setSkinId((current) => current || response.defaultSkinId || DEFAULT_SKIN_ID);
+    } catch (err) {
+      console.error("Fetch skins error:", err);
+      setSkins([]);
+    } finally {
+      setLoadingSkins(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated && user?.role === "Admin") {
       fetchRecipients();
       fetchCampaigns();
       fetchTemplates();
+      fetchSkins();
     }
-  }, [isAuthenticated, user, fetchRecipients, fetchCampaigns, fetchTemplates]);
+  }, [isAuthenticated, user, fetchRecipients, fetchCampaigns, fetchTemplates, fetchSkins]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -224,6 +246,7 @@ function EmailMarketingPageInner() {
           subject: subject || selectedTemplate?.headline,
           message: message || selectedTemplate?.body,
           customerName: "Anita",
+          skinId,
         });
         if (!active) return;
         if (response.success) {
@@ -240,7 +263,7 @@ function EmailMarketingPageInner() {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [tab, step, templateId, subject, message, selectedTemplate?.headline, selectedTemplate?.body]);
+  }, [tab, step, templateId, skinId, subject, message, selectedTemplate?.headline, selectedTemplate?.body]);
 
   const filteredRecipients = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -452,6 +475,7 @@ function EmailMarketingPageInner() {
         templateId,
         subject,
         message: message.trim() || undefined,
+        skinId,
         recipients: selectedRecipients,
       });
 
@@ -481,6 +505,13 @@ function EmailMarketingPageInner() {
 
   const canGoAudienceNext = selectedRecipients.length > 0;
   const canGoTemplateNext = Boolean(templateId);
+  const canGoSkinNext = Boolean(skinId);
+
+  const skinNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    skins.forEach((skin) => map.set(skin.id, skin.name));
+    return map;
+  }, [skins]);
 
   const headerActions =
     tab === "templates" ? (
@@ -499,6 +530,7 @@ function EmailMarketingPageInner() {
           fetchRecipients();
           fetchCampaigns();
           fetchTemplates();
+          fetchSkins();
         }}
         className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#b9aca2] bg-[#faf9f5] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#eeeae0]"
       >
@@ -530,7 +562,7 @@ function EmailMarketingPageInner() {
           description={
             <p className="text-sm">
               {tab === "compose"
-                ? "Pick your audience, choose a template, then compose and send."
+                ? "Audience → content template → skin → compose and send."
                 : tab === "templates"
                   ? "Build image-ready campaign templates with live preview."
                   : "Review past campaign sends and delivery counts."}
@@ -576,6 +608,15 @@ function EmailMarketingPageInner() {
               />
             ) : null}
 
+            {step === "skin" ? (
+              <SkinSelectStep
+                skins={skins}
+                loading={loadingSkins}
+                skinId={skinId}
+                onSelect={setSkinId}
+              />
+            ) : null}
+
             {step === "compose" ? (
               <ComposeCampaignPanel
                 selectedTemplate={selectedTemplate}
@@ -598,7 +639,13 @@ function EmailMarketingPageInner() {
                   <button
                     type="button"
                     onClick={() =>
-                      setStep(step === "compose" ? "template" : "audience")
+                      setStep(
+                        step === "compose"
+                          ? "skin"
+                          : step === "skin"
+                            ? "template"
+                            : "audience"
+                      )
                     }
                     className="inline-flex items-center gap-2 rounded-lg border border-[#b9aca2] px-4 py-2 text-sm font-semibold text-[#5d6043] hover:bg-[#eeeae0]"
                   >
@@ -627,6 +674,17 @@ function EmailMarketingPageInner() {
                   <button
                     type="button"
                     disabled={!canGoTemplateNext}
+                    onClick={() => setStep("skin")}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] hover:bg-[#222222] disabled:opacity-50"
+                  >
+                    Next: Skin
+                    <AdminIcon icon={ArrowRight01Icon} size={16} />
+                  </button>
+                ) : null}
+                {step === "skin" ? (
+                  <button
+                    type="button"
+                    disabled={!canGoSkinNext}
                     onClick={() => setStep("compose")}
                     className="inline-flex items-center gap-2 rounded-lg bg-[#5d6043] px-4 py-2 text-sm font-semibold text-[#faf9f5] hover:bg-[#222222] disabled:opacity-50"
                   >
@@ -663,7 +721,11 @@ function EmailMarketingPageInner() {
         ) : null}
 
         {tab === "history" ? (
-          <CampaignHistoryPanel campaigns={campaigns} loading={loadingCampaigns} />
+          <CampaignHistoryPanel
+            campaigns={campaigns}
+            loading={loadingCampaigns}
+            skinNameById={skinNameById}
+          />
         ) : null}
       </div>
     </AdminLayout>

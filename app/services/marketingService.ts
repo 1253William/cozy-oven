@@ -52,6 +52,7 @@ export interface Campaign {
   subject: string;
   message?: string;
   templateId?: string;
+  skinId?: string;
   status: "draft" | "sending" | "sent" | "failed";
   recipientCount?: number;
   recipients?: CampaignRecipient[];
@@ -59,6 +60,14 @@ export interface Campaign {
   failedCount: number;
   sentAt?: string;
   createdAt: string;
+}
+
+export interface CampaignSkin {
+  id: string;
+  name: string;
+  blurb: string;
+  themes: string[];
+  swatch: string[];
 }
 
 export const marketingService = {
@@ -71,6 +80,16 @@ export const marketingService = {
       `/api/v1/dashboard/marketing/recipients${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
     );
     return response.data as { success: boolean; count: number; data: MarketingRecipient[]; message?: string };
+  },
+
+  getSkins: async () => {
+    const response = await apiClient.get("/api/v1/dashboard/marketing/skins");
+    return response.data as {
+      success: boolean;
+      data: CampaignSkin[];
+      defaultSkinId?: string;
+      message?: string;
+    };
   },
 
   getTemplates: async (includeArchived = false) => {
@@ -99,6 +118,7 @@ export const marketingService = {
     subject?: string;
     message?: string;
     customerName?: string;
+    skinId?: string;
     name?: string;
     headline?: string;
     body?: string;
@@ -111,7 +131,7 @@ export const marketingService = {
     const response = await apiClient.post("/api/v1/dashboard/marketing/templates/preview", payload);
     return response.data as {
       success: boolean;
-      data: { subject: string; text: string; html: string };
+      data: { subject: string; text: string; html: string; skinId?: string };
       message?: string;
     };
   },
@@ -120,6 +140,7 @@ export const marketingService = {
     templateId: string;
     subject: string;
     message?: string;
+    skinId?: string;
     recipients: MarketingRecipient[];
   }) => {
     const response = await apiClient.post("/api/v1/dashboard/marketing/campaigns", payload);

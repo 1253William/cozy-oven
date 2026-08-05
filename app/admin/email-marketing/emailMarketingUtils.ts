@@ -1,8 +1,10 @@
 import type { CampaignTemplateInput, MarketingRecipient } from "../../services/marketingService";
 
 export type MarketingTab = "compose" | "templates" | "history";
-export type ComposeStep = "audience" | "template" | "compose";
+export type ComposeStep = "audience" | "template" | "skin" | "compose";
 export type RecipientSourceFilter = "all" | "customers" | "subscribers";
+
+export const DEFAULT_SKIN_ID = "oven_classic";
 
 export const field =
   "w-full rounded-lg border border-[#b9aca2] px-4 py-3 text-sm focus:border-[#5d6043] focus:outline-none focus:ring-2 focus:ring-[#5d6043]/20";
@@ -26,14 +28,17 @@ export const parseMarketingTab = (value: string | null | undefined): MarketingTa
 };
 
 export const parseComposeStep = (value: string | null | undefined): ComposeStep => {
-  if (value === "template" || value === "compose" || value === "audience") return value;
+  if (value === "template" || value === "skin" || value === "compose" || value === "audience") {
+    return value;
+  }
   return "audience";
 };
 
 export const COMPOSE_STEPS: { id: ComposeStep; label: string; number: number }[] = [
   { id: "audience", label: "Audience", number: 1 },
   { id: "template", label: "Template", number: 2 },
-  { id: "compose", label: "Compose", number: 3 },
+  { id: "skin", label: "Skin", number: 3 },
+  { id: "compose", label: "Compose", number: 4 },
 ];
 
 export const validateCtaPair = (ctaLabel?: string, ctaUrl?: string): string | null => {

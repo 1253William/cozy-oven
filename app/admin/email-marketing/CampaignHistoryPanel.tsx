@@ -7,11 +7,13 @@ import type { Campaign } from "../../services/marketingService";
 type CampaignHistoryPanelProps = {
   campaigns: Campaign[];
   loading: boolean;
+  skinNameById?: Map<string, string>;
 };
 
 export default function CampaignHistoryPanel({
   campaigns,
   loading,
+  skinNameById,
 }: CampaignHistoryPanelProps) {
   return (
     <section className="rounded-lg bg-[#faf9f5] p-6 shadow-sm">
@@ -36,6 +38,9 @@ export default function CampaignHistoryPanel({
                   <p className="truncate font-semibold text-[#222222]">{campaign.subject}</p>
                   <p className="text-xs text-[#5d6043]">
                     {new Date(campaign.createdAt).toLocaleString()}
+                    {campaign.skinId
+                      ? ` · ${skinNameById?.get(campaign.skinId) || campaign.skinId}`
+                      : ""}
                   </p>
                 </div>
                 <span className="rounded-full bg-[#b9aca2]/50 px-2 py-1 text-xs capitalize text-[#5d6043]">
