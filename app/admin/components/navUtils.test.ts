@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildInitialOpenSections,
   findActiveNavItem,
   groupNavBySection,
   isNavActive,
+  parseStoredOpenSections,
   shouldShowSectionLabel,
 } from "./navUtils";
 import type { AdminNavItem } from "./navConfig";
@@ -104,5 +106,54 @@ describe("findActiveNavItem", () => {
 
   it("returns undefined when nothing matches", () => {
     expect(findActiveNavItem(sampleItems, "/admin/unknown")).toBeUndefined();
+  });
+});
+
+describe("buildInitialOpenSections", () => {
+  it("keeps single-item sections open and defaults multi-item to closed", () => {
+    const groups = groupNavBySection(sampleItems);
+    const open = buildInitialOpenSections(groups, "/admin/dashboard", {});
+    expect(open.Overview).toBe(true);
+    expect(open.Sales).toBe(false);
+    // Operations has only one item in sample → always expanded
+    expect(open.Operations).toBe(true);
+  });
+
+  it("opens the section containing the active route", () => {
+    const groups = groupNavBySection(sampleItems);
+    const open = buildInitialOpenSections(groups, "/admin/orders", {});
+    expect(open.Sales).toBe(true);
+  });
+
+  it("restores manually opened sections from storage", () => {
+    const multi: AdminNavItem[] = [
+      ...sampleItems,
+      {
+        section: "Operations",
+        name: "Stock",
+        href: "/admin/operations/stock",
+        icon: stubIcon,
+      },
+    ];
+    const groups = groupNavBySection(multi);
+    const open = buildInitialOpenSections(groups, "/admin/dashboard", {
+      Operations: true,
+    });
+    expect(open.Operations).toBe(true);
+    expect(open.Sales).toBe(false);
+  });
+});
+
+describe("parseStoredOpenSections", () => {
+  it("returns empty object for invalid JSON", () => {
+    expect(parseStoredOpenSections(null)).toEqual({});
+    expect(parseStoredOpenSections("{")).toEqual({});
+    expect(parseStoredOpenSections("[]")).toEqual({});
+  });
+
+  it("keeps only boolean values", () => {
+    expect(
+      parseStoredOpenSections(JSON.stringify({ Sales: true, Ops: "yes" }))
+    ).toEqual({ Sales: true });
   });
 });

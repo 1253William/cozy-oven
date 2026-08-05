@@ -11,6 +11,7 @@ import {
   HelpCircleIcon,
   InboxIcon,
   MailSend01Icon,
+  ChartHistogramIcon,
   MoneyBag01Icon,
   Notification03Icon,
   PackageReceiveIcon,
@@ -129,6 +130,12 @@ export const menuItems: AdminNavItem[] = [
     name: "Email Marketing",
     icon: MailSend01Icon,
     href: "/admin/email-marketing",
+  },
+  {
+    section: "Content",
+    name: "Email Management",
+    icon: ChartHistogramIcon,
+    href: "/admin/email-management",
   },
   {
     section: "Content",

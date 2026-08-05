@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  ArrowDown01Icon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  ArrowUp01Icon,
   Bookmark01Icon,
   BookmarkOff01Icon,
   Cancel01Icon,
@@ -10,7 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import AdminIcon from "./AdminIcon";
 
-import { Fragment } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { menuItems } from "./navConfig";
@@ -19,7 +21,15 @@ import {
   MAX_NAV_FAVORITES,
   resolveFavoriteItems,
 } from "./navFavorites";
-import { isNavActive, shouldShowSectionLabel } from "./navUtils";
+import {
+  buildInitialOpenSections,
+  groupNavBySection,
+  isNavActive,
+  isSingleItemSection,
+  NAV_SECTIONS_STORAGE_KEY,
+  parseStoredOpenSections,
+  sectionContainsActive,
+} from "./navUtils";
 
 export type AdminSidebarProps = {
   pathname: string;
@@ -178,6 +188,62 @@ function NavList({
 }) {
   const favoriteItems = resolveFavoriteItems(menuItems, favoriteHrefs);
   const atFavoriteLimit = favoriteHrefs.length >= MAX_NAV_FAVORITES;
+  const groups = useMemo(() => groupNavBySection(menuItems), []);
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    () => {
+      if (typeof window === "undefined") {
+        return buildInitialOpenSections(groups, pathname, {});
+      }
+      const stored = parseStoredOpenSections(
+        window.localStorage.getItem(NAV_SECTIONS_STORAGE_KEY)
+      );
+      return buildInitialOpenSections(groups, pathname, stored);
+    }
+  );
+
+  // Keep the active route's section expanded when navigating.
+  useEffect(() => {
+    setOpenSections((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const group of groups) {
+        if (isSingleItemSection(group)) {
+          if (!next[group.section]) {
+            next[group.section] = true;
+            changed = true;
+          }
+          continue;
+        }
+        if (sectionContainsActive(group, pathname) && !next[group.section]) {
+          next[group.section] = true;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [pathname, groups]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        NAV_SECTIONS_STORAGE_KEY,
+        JSON.stringify(openSections)
+      );
+    } catch {
+      // ignore quota / private mode
+    }
+  }, [openSections]);
+
+  const toggleSection = (section: string, forceOpen?: boolean) => {
+    const group = groups.find((g) => g.section === section);
+    if (group && isSingleItemSection(group)) return;
+
+    setOpenSections((prev) => {
+      const nextOpen = forceOpen ?? !prev[section];
+      return { ...prev, [section]: nextOpen };
+    });
+  };
 
   return (
     <ul className="space-y-2">
@@ -211,29 +277,72 @@ function NavList({
         </>
       )}
 
-      {menuItems.map((item, index) => {
-        const favorited = isFavorite(item.href, favoriteHrefs);
+      {groups.map((group, groupIndex) => {
+        const isOpen =
+          isSingleItemSection(group) || openSections[group.section] === true;
+        const hasActive = sectionContainsActive(group, pathname);
 
         return (
-          <Fragment key={item.name}>
-            {shouldShowSectionLabel(menuItems, index) && !collapsed && (
-              <li className={index === 0 ? "px-4 pb-1" : "px-4 pb-1 pt-4"}>
-                <span className="text-xs font-semibold uppercase text-[#5d6043]/70">
-                  {item.section}
-                </span>
-              </li>
-            )}
-            <NavLinkItem
-              item={item}
-              pathname={pathname}
-              collapsed={collapsed}
-              notificationCount={notificationCount}
-              favorited={favorited}
-              atFavoriteLimit={atFavoriteLimit}
-              onToggleFavorite={onToggleFavorite}
-              onNavigate={onNavigate}
-              showPin
-            />
+          <Fragment key={group.section}>
+            <li className={groupIndex === 0 ? "" : "pt-2"}>
+              <button
+                type="button"
+                onClick={() => toggleSection(group.section)}
+                disabled={isSingleItemSection(group)}
+                aria-expanded={isOpen}
+                title={collapsed ? group.section : undefined}
+                className={`flex w-full items-center rounded-lg text-[#5d6043] transition-colors ${
+                  collapsed
+                    ? "justify-center px-2 py-2 hover:bg-[#b9aca2]/40"
+                    : "justify-between px-4 py-2 hover:bg-[#b9aca2]/30"
+                } ${hasActive ? "font-semibold" : ""} ${
+                  isSingleItemSection(group) ? "cursor-default" : ""
+                }`}
+              >
+                {collapsed ? (
+                  <span className="relative group/section">
+                    <span className="text-[10px] font-bold uppercase tracking-wide">
+                      {group.section.slice(0, 3)}
+                    </span>
+                    <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#222222] px-2 py-1 text-xs font-medium text-[#faf9f5] opacity-0 shadow-sm transition-opacity group-hover/section:opacity-100">
+                      {group.section}
+                      {isOpen ? " · open" : " · closed"}
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[#5d6043]/80">
+                      {group.section}
+                    </span>
+                    {!isSingleItemSection(group) && (
+                      <AdminIcon
+                        icon={isOpen ? ArrowUp01Icon : ArrowDown01Icon}
+                        size={14}
+                      />
+                    )}
+                  </>
+                )}
+              </button>
+            </li>
+
+            {isOpen &&
+              group.items.map((item) => {
+                const favorited = isFavorite(item.href, favoriteHrefs);
+                return (
+                  <NavLinkItem
+                    key={item.name}
+                    item={item}
+                    pathname={pathname}
+                    collapsed={collapsed}
+                    notificationCount={notificationCount}
+                    favorited={favorited}
+                    atFavoriteLimit={atFavoriteLimit}
+                    onToggleFavorite={onToggleFavorite}
+                    onNavigate={onNavigate}
+                    showPin
+                  />
+                );
+              })}
           </Fragment>
         );
       })}
