@@ -15,6 +15,40 @@ import emailDeliveryService, {
 
 type CategoryFilter = "" | EmailDeliveryCategory;
 
+/** Admin-friendly labels for internal message keys. */
+const MESSAGE_KEY_LABELS: Record<string, string> = {
+  "order.confirmation": "Order confirmation",
+  "order.admin_paid": "New paid order (admin)",
+  "order.admin_momo_pending": "MoMo payment pending (admin)",
+  "order.momo_received": "MoMo payment received",
+  "order.momo_rejected": "MoMo payment rejected",
+  "order.deleted": "Order deleted",
+  "order.status.pending": "Order pending",
+  "order.status.preparing": "Order preparing",
+  "order.status.on-delivery": "Out for delivery",
+  "order.status.delivered": "Order delivered",
+  "order.status.cancelled": "Order cancelled",
+  "auth.welcome": "Welcome email",
+  "auth.password_reset_otp": "Password reset code",
+  "auth.password_changed": "Password changed",
+  "contact.form": "Contact form",
+  "marketing.campaign": "Marketing campaign",
+};
+
+function formatMessageKeyLabel(key?: string): string {
+  if (!key) return "";
+  if (MESSAGE_KEY_LABELS[key]) return MESSAGE_KEY_LABELS[key];
+  return key
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatCategoryLabel(category: EmailDeliveryCategory): string {
+  return category === "campaign" ? "Campaign" : "Transactional";
+}
+
 function formatWhen(value?: string): string {
   if (!value) return "—";
   try {
@@ -41,7 +75,7 @@ function deliveryBadges(row: EmailDelivery): { label: string; className: string 
   if (!badges.length && row.sentAt)
     badges.push({ label: "Sent", className: "bg-[#b9aca2]/40 text-[#5d6043]" });
   if (!badges.length)
-    badges.push({ label: row.lastEvent || "Pending", className: "bg-[#b9aca2]/30 text-[#5d6043]" });
+    badges.push({ label: "Pending", className: "bg-[#b9aca2]/30 text-[#5d6043]" });
   return badges.slice(0, 3);
 }
 
@@ -248,7 +282,7 @@ export default function EmailManagementPage() {
                     : "bg-[#b9aca2]/25 text-[#5d6043]"
                 }`}
               >
-                All triggers
+                All types
               </button>
               {summary.messageKeys.map((key) => (
                 <button
@@ -264,7 +298,7 @@ export default function EmailManagementPage() {
                       : "bg-[#b9aca2]/25 text-[#5d6043] hover:bg-[#b9aca2]/40"
                   }`}
                 >
-                  {key}
+                  {formatMessageKeyLabel(key)}
                 </button>
               ))}
             </div>
@@ -311,15 +345,15 @@ export default function EmailManagementPage() {
                             </div>
                             {row.messageKey ? (
                               <div className="text-xs text-[#5d6043]">
-                                {row.messageKey}
+                                {formatMessageKeyLabel(row.messageKey)}
                               </div>
                             ) : null}
                           </td>
                           <td className="px-4 py-3 max-w-[240px] truncate text-[#222222]">
                             {row.subject}
                           </td>
-                          <td className="px-4 py-3 capitalize text-[#5d6043]">
-                            {row.category}
+                          <td className="px-4 py-3 text-[#5d6043]">
+                            {formatCategoryLabel(row.category)}
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex flex-wrap gap-1">
