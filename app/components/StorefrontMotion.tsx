@@ -36,7 +36,10 @@ export default function StorefrontMotion() {
           }
         });
       },
-      { threshold: 0.16 }
+      // threshold 0: reveal as soon as any pixel enters the viewport.
+      // A 0.16 threshold breaks mobile shop — single-column category
+      // sections are taller than the viewport, so they never reach 16% visible.
+      { threshold: 0, rootMargin: "64px 0px 64px 0px" }
     );
 
     const observeElement = (element: HTMLElement) => {
