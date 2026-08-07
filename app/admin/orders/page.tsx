@@ -12,7 +12,6 @@ import {
   FilterIcon,
   Package01Icon,
   Search01Icon,
-  ShoppingBag01Icon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
 import AdminIcon from "../components/AdminIcon";
@@ -69,7 +68,7 @@ const getStatusIcon = (status?: string) => {
     case "preparing":
       return <AdminIcon icon={Package01Icon} size={16} />;
     case "awaiting-pickup":
-      return <AdminIcon icon={ShoppingBag01Icon} size={16} />;
+      return <AdminIcon icon={Clock01Icon} size={16} />;
     case "on-delivery":
       return <AdminIcon icon={DeliveryTruck01Icon} size={16} />;
     case "delivered":
@@ -621,8 +620,7 @@ export default function OrdersPage() {
                         )}`}
                       >
                         {getStatusIcon(order.status)}
-                        {String(order.status ?? "").charAt(0).toUpperCase() +
-                          String(order.status ?? "").slice(1)}
+                        {formatStatusLabel(order.status)}
                       </span>
                     </div>
 

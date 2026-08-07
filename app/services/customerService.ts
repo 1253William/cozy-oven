@@ -209,6 +209,21 @@ export const customerService = {
     );
     return response.data;
   },
+
+  updateCustomerProfile: async (payload: {
+    userId?: string;
+    lookupEmail?: string;
+    lookupPhone?: string;
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+  }): Promise<GetCustomerDetailsResponse & { message?: string }> => {
+    const response = await apiClient.patch(
+      `/api/v1/dashboard/admin/customers/profile`,
+      payload
+    );
+    return response.data;
+  },
 };
 
 export default customerService;

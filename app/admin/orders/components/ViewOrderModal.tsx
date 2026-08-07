@@ -329,9 +329,18 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
                         ? 'bg-yellow-100 text-yellow-700'
                         : orderDetails.orderStatus === 'preparing'
                         ? 'bg-blue-100 text-blue-700'
+                        : orderDetails.orderStatus === 'awaiting-pickup'
+                        ? 'bg-teal-100 text-teal-700'
+                        : orderDetails.orderStatus === 'on-delivery'
+                        ? 'bg-purple-100 text-purple-700'
+                        : orderDetails.orderStatus === 'cancelled'
+                        ? 'bg-red-100 text-red-700'
                         : 'bg-[#b9aca2] text-[#5d6043]'
                     }`}>
-                      {(orderDetails.orderStatus?.charAt(0) || "").toUpperCase() + (orderDetails.orderStatus?.slice(1) || "")}
+                      {(orderDetails.orderStatus || "")
+                        .split("-")
+                        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                        .join(" ")}
                     </span>
                   </div>
                 </div>

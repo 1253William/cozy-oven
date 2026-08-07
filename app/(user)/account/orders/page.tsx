@@ -5,18 +5,34 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { orderService, type Order } from "@/app/services/orderService";
 
-const steps = [
-  { key: "pending", label: "Order Placed" },
-  { key: "preparing", label: "Preparing" },
-  { key: "on-delivery", label: "Out for Delivery" },
-  { key: "delivered", label: "Delivered" },
-];
+const getStepsForStatus = (status: string) => {
+  const fulfillmentStep =
+    status === "awaiting-pickup"
+      ? { key: "awaiting-pickup", label: "Awaiting Pickup" }
+      : { key: "on-delivery", label: "Out for Delivery" };
+
+  return [
+    { key: "pending", label: "Order Placed" },
+    { key: "preparing", label: "Preparing" },
+    fulfillmentStep,
+    { key: "delivered", label: "Delivered" },
+  ];
+};
 
 const getStatusIndex = (status: string) => {
   if (status === "cancelled") return -1;
-  const index = steps.findIndex((step) => step.key === status);
-  return index >= 0 ? index : 0;
+  if (status === "pending") return 0;
+  if (status === "preparing") return 1;
+  if (status === "awaiting-pickup" || status === "on-delivery") return 2;
+  if (status === "delivered") return 3;
+  return 0;
 };
+
+const formatStatusLabel = (status?: string) =>
+  String(status ?? "")
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -85,7 +101,8 @@ export default function OrdersPage() {
       ) : (
         <div className="space-y-6">
           {orders.map((order) => {
-            const activeIndex = getStatusIndex(order.status);
+            const steps = getStepsForStatus(order.status || "");
+            const activeIndex = getStatusIndex(order.status || "");
             const isCancelled = order.status === "cancelled";
 
             return (
@@ -144,7 +161,7 @@ export default function OrdersPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-[#5d6043]">Status</p>
-                    <p className="mt-1 font-semibold capitalize">{order.status?.replace("-", " ")}</p>
+                    <p className="mt-1 font-semibold">{formatStatusLabel(order.status)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-[#5d6043]">Delivery</p>

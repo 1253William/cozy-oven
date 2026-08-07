@@ -21,6 +21,7 @@ import customerService, {
   type Customer,
   type CustomerOverview,
 } from "../../services/customerService";
+import CustomerDetailsModal from "./components/CustomerDetailsModal";
 
 export default function CustomersPage() {
   const { user, isAuthenticated } = useAuth();
@@ -31,6 +32,7 @@ export default function CustomersPage() {
     "all"
   );
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+  const [detailsCustomer, setDetailsCustomer] = useState<Customer | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [overview, setOverview] = useState<CustomerOverview | null>(null);
   const [listLoading, setListLoading] = useState(true);
@@ -110,44 +112,8 @@ export default function CustomersPage() {
     setStatusFilter(value);
   };
 
-  const handleViewDetails = async (customer: Customer) => {
-    try {
-      const params =
-        customer.kind === "registered" && customer.registeredUserId
-          ? { userId: customer.registeredUserId }
-          : customer.email
-            ? { email: customer.email }
-            : customer.phoneNumber
-              ? { phone: customer.phoneNumber }
-              : null;
-
-      if (!params) {
-        alert("This customer has no email or phone to look up.");
-        setSelectedCustomer(null);
-        return;
-      }
-
-      const response = await customerService.getCustomerProfile(params);
-      if (response.success) {
-        const { customer: profile, orders } = response.data;
-        const activityLabel = profile.isActive ? "Recent" : "Lapsed";
-        const details = [
-          "Customer Details",
-          "",
-          `Name: ${profile.fullName}`,
-          `Email: ${profile.email || "—"}`,
-          `Phone: ${profile.phoneNumber || "—"}`,
-          `Type: ${response.data.kind === "registered" ? "Registered" : "Guest"}`,
-          `Total Orders: ${orders.length}`,
-          `Activity: ${activityLabel}`,
-          `First order: ${new Date(profile.createdAt).toLocaleDateString()}`,
-        ].join("\n");
-        alert(details);
-      }
-    } catch (error) {
-      console.error("Error fetching customer details:", error);
-      alert("Failed to fetch customer details");
-    }
+  const handleViewDetails = (customer: Customer) => {
+    setDetailsCustomer(customer);
     setSelectedCustomer(null);
   };
 
@@ -393,7 +359,7 @@ export default function CustomersPage() {
                   {selectedCustomer === customer.rowKey && (
                     <div className="border-t border-[#b9aca2]/40 pt-3 space-y-2">
                       <button
-                        onClick={() => void handleViewDetails(customer)}
+                        onClick={() => handleViewDetails(customer)}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5] rounded-lg"
                       >
                         <AdminIcon icon={ViewIcon} size={16} />
@@ -549,7 +515,7 @@ export default function CustomersPage() {
                             {selectedCustomer === customer.rowKey && (
                               <div className="absolute right-0 mt-2 w-48 bg-[#faf9f5] rounded-lg shadow-lg border border-[#b9aca2]/60 z-10">
                                 <button
-                                  onClick={() => void handleViewDetails(customer)}
+                                  onClick={() => handleViewDetails(customer)}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#5d6043] hover:bg-[#faf9f5] rounded-t-lg"
                                 >
                                   <AdminIcon icon={ViewIcon} size={16} />
@@ -610,6 +576,17 @@ export default function CustomersPage() {
               Next
             </button>
           </div>
+        )}
+
+        {detailsCustomer && (
+          <CustomerDetailsModal
+            customer={detailsCustomer}
+            onClose={() => setDetailsCustomer(null)}
+            onSaved={() => {
+              void fetchCustomers();
+              void fetchOverview();
+            }}
+          />
         )}
       </div>
     </AdminLayout>
