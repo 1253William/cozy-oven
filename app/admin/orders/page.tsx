@@ -12,6 +12,7 @@ import {
   FilterIcon,
   Package01Icon,
   Search01Icon,
+  ShoppingBag01Icon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
 import AdminIcon from "../components/AdminIcon";
@@ -30,10 +31,17 @@ const statusOptions = [
   { value: "all", label: "All Orders" },
   { value: "pending", label: "Pending" },
   { value: "preparing", label: "Preparing" },
+  { value: "awaiting-pickup", label: "Awaiting Pickup" },
   { value: "on-delivery", label: "On Delivery" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
+
+const formatStatusLabel = (status?: string) =>
+  String(status ?? "")
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 
 const getStatusColor = (status?: string) => {
   switch (status) {
@@ -41,6 +49,8 @@ const getStatusColor = (status?: string) => {
       return "bg-yellow-100 text-yellow-700";
     case "preparing":
       return "bg-blue-100 text-blue-700";
+    case "awaiting-pickup":
+      return "bg-teal-100 text-teal-700";
     case "on-delivery":
       return "bg-purple-100 text-purple-700";
     case "delivered":
@@ -58,6 +68,8 @@ const getStatusIcon = (status?: string) => {
       return <AdminIcon icon={Clock01Icon} size={16} />;
     case "preparing":
       return <AdminIcon icon={Package01Icon} size={16} />;
+    case "awaiting-pickup":
+      return <AdminIcon icon={ShoppingBag01Icon} size={16} />;
     case "on-delivery":
       return <AdminIcon icon={DeliveryTruck01Icon} size={16} />;
     case "delivered":
@@ -180,7 +192,14 @@ export default function OrdersPage() {
 };
 
   const handleStatusUpdate = async (orderId: string, status: string) => {
-    const allowedStatuses = ["pending", "preparing", "on-delivery", "delivered", "cancelled"] as const;
+    const allowedStatuses = [
+      "pending",
+      "preparing",
+      "awaiting-pickup",
+      "on-delivery",
+      "delivered",
+      "cancelled",
+    ] as const;
     if (!allowedStatuses.includes(status as (typeof allowedStatuses)[number])) {
       alert("Invalid status selected. Please choose a valid status.");
       return;
@@ -478,6 +497,7 @@ export default function OrdersPage() {
                             <option value="">Select status</option>
                             <option value="pending">Pending</option>
                             <option value="preparing">Preparing</option>
+                            <option value="awaiting-pickup">Awaiting Pickup</option>
                             <option value="on-delivery">On Delivery</option>
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
@@ -489,8 +509,7 @@ export default function OrdersPage() {
                             )}`}
                           >
                             {getStatusIcon(order.status)}
-                            {String(order.status ?? "").charAt(0).toUpperCase() +
-                              String(order.status ?? "").slice(1)}
+                            {formatStatusLabel(order.status)}
                           </span>
                         )}
                       </td>
@@ -643,6 +662,7 @@ export default function OrdersPage() {
                           <option value="">Select status</option>
                           <option value="pending">Pending</option>
                           <option value="preparing">Preparing</option>
+                          <option value="awaiting-pickup">Awaiting Pickup</option>
                           <option value="on-delivery">On Delivery</option>
                           <option value="delivered">Delivered</option>
                           <option value="cancelled">Cancelled</option>

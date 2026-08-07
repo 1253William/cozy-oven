@@ -8,6 +8,7 @@ export type MessageKey =
   | "order.momo_rejected"
   | "order.status.pending"
   | "order.status.preparing"
+  | "order.status.awaiting-pickup"
   | "order.status.on-delivery"
   | "order.status.delivered"
   | "order.status.cancelled"
@@ -99,6 +100,7 @@ export const messageKeyLabel = (key: MessageKey): string => {
     "order.momo_rejected": "MoMo payment rejected",
     "order.status.pending": "Status: Pending",
     "order.status.preparing": "Status: Preparing",
+    "order.status.awaiting-pickup": "Status: Awaiting pickup",
     "order.status.on-delivery": "Status: On delivery",
     "order.status.delivered": "Status: Delivered",
     "order.status.cancelled": "Status: Cancelled",

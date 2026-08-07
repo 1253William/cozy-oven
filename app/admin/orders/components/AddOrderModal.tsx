@@ -368,7 +368,7 @@ export default function AddOrderModal({ isOpen, onClose, onSuccess }: AddOrderMo
                                   customer.registeredUserId ||
                                   customer.email ||
                                   customer.phoneNumber ||
-                                  customer._id ||
+                                  customer.rowKey ||
                                   index
                                 }
                                 type="button"

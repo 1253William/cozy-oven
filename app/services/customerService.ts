@@ -1,13 +1,18 @@
 import apiClient from "./apiClient";
 
-// Customer interfaces
+export type CustomerKind = "registered" | "guest";
+
 export interface Customer {
-  _id: string | null;
-  registeredUserId?: string | null;
+  /** Stable row key for React; never sent as a User id unless kind is registered. */
+  rowKey: string;
+  registeredUserId: string | null;
+  customerKey: string;
+  kind: CustomerKind;
   fullName: string | null;
   email: string | null;
   phoneNumber: string | null;
-  isActive: boolean;
+  /** Recent buyer within 90 days (paid-order activity). */
+  isRecent: boolean;
   totalOrders: number;
   totalSpent: number;
   createdAt: string;
@@ -21,18 +26,22 @@ export interface CustomerOverview {
 }
 
 export interface CustomerDetails {
+  kind: CustomerKind;
   customer: {
-    _id: string;
+    _id: string | null;
     fullName: string;
-    email: string;
-    phoneNumber: string;
+    email: string | null;
+    phoneNumber: string | null;
     isActive: boolean;
+    isAccountDeleted?: boolean;
     createdAt: string;
   };
   orders: Array<{
+    orderId?: string;
     totalAmount: number;
     paymentStatus: string;
     createdAt: string;
+    paidAt?: string;
   }>;
 }
 
@@ -54,6 +63,7 @@ export interface GetCustomerOverviewResponse {
 export interface GetCustomerDetailsResponse {
   success: boolean;
   data: CustomerDetails;
+  message?: string;
 }
 
 export interface ApiResponse {
@@ -61,18 +71,19 @@ export interface ApiResponse {
   message: string;
 }
 
-// Raw API response shapes from backend
 interface RawCustomer {
   id: string | null;
+  customerKey?: string;
+  kind?: CustomerKind;
   customer: string | null;
   contact: {
     email: string | null;
     phone: string | null;
   };
   orders: number | null;
-  totalSpent: string | null; // e.g. "GHS 65.00"
+  totalSpent: string | null;
   status: "active" | "inactive" | null;
-  joined: string | null; // e.g. "11/03/2026"
+  joined: string | null;
 }
 
 interface RawGetCustomersResponse {
@@ -91,14 +102,13 @@ interface RawGetCustomersResponse {
 }
 
 export const customerService = {
-  // GET /api/v1/dashboard/admin/customers/overview - Get customer overview statistics
   getCustomerOverview: async (): Promise<GetCustomerOverviewResponse> => {
-    // Note: The API spec mentions "/customers/over" but it should be "/customers/overview"
-    const response = await apiClient.get("/api/v1/dashboard/admin/customers/overview");
+    const response = await apiClient.get(
+      "/api/v1/dashboard/admin/customers/overview"
+    );
     return response.data;
   },
 
-  // GET /api/v1/dashboard/admin/customer - Fetch all customers with pagination
   getAllCustomers: async (params?: {
     page?: number;
     limit?: number;
@@ -106,7 +116,7 @@ export const customerService = {
     status?: "active" | "inactive";
   }): Promise<GetCustomersResponse> => {
     const queryParams = new URLSearchParams();
-    
+
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.search) queryParams.append("search", params.search);
@@ -117,24 +127,16 @@ export const customerService = {
     );
 
     const raw: RawGetCustomersResponse = response.data;
-
     const rawCustomers = raw?.data?.customers ?? [];
 
     const customers: Customer[] = rawCustomers.map((c, index) => {
-      // Parse "GHS 65.00" into a number
       let totalSpent = 0;
       if (typeof c.totalSpent === "string") {
-        const numeric = c.totalSpent
-          .replace("GHS", "")
-          .replace(",", "")
-          .trim();
+        const numeric = c.totalSpent.replace("GHS", "").replace(",", "").trim();
         const parsed = parseFloat(numeric);
-        if (!Number.isNaN(parsed)) {
-          totalSpent = parsed;
-        }
+        if (!Number.isNaN(parsed)) totalSpent = parsed;
       }
 
-      // Convert joined "DD/MM/YYYY" to ISO string for consistent Date parsing
       let createdAt = c.joined || new Date().toISOString();
       const parts = c.joined?.split("/") ?? [];
       if (parts.length === 3) {
@@ -147,13 +149,25 @@ export const customerService = {
         }
       }
 
+      const registeredUserId = c.id || null;
+      const kind: CustomerKind =
+        c.kind || (registeredUserId ? "registered" : "guest");
+      const customerKey =
+        c.customerKey ||
+        registeredUserId ||
+        c.contact?.email ||
+        c.contact?.phone ||
+        `row-${index}`;
+
       return {
-        _id: c.id || `anon-${index}`, // Fallback for React keys if ID is null
-        registeredUserId: c.id,
+        rowKey: customerKey,
+        registeredUserId,
+        customerKey,
+        kind,
         fullName: c.customer || "Unknown Customer",
         email: c.contact?.email ?? null,
         phoneNumber: c.contact?.phone ?? null,
-        isActive: c.status === "active",
+        isRecent: c.status === "active",
         totalOrders: c.orders ?? 0,
         totalSpent,
         createdAt,
@@ -173,15 +187,26 @@ export const customerService = {
     };
   },
 
-  // GET /api/v1/dashboard/admin/customers/{id} - Get customer details
-  getCustomerDetails: async (id: string): Promise<GetCustomerDetailsResponse> => {
-    const response = await apiClient.get(`/api/v1/dashboard/admin/customers/${id}`);
+  getCustomerProfile: async (params: {
+    userId?: string;
+    email?: string;
+    phone?: string;
+  }): Promise<GetCustomerDetailsResponse> => {
+    const queryParams = new URLSearchParams();
+    if (params.userId) queryParams.set("userId", params.userId);
+    if (params.email) queryParams.set("email", params.email);
+    if (params.phone) queryParams.set("phone", params.phone);
+
+    const response = await apiClient.get(
+      `/api/v1/dashboard/admin/customers/profile?${queryParams.toString()}`
+    );
     return response.data;
   },
 
-  // DELETE /api/v1/dashboard/admin/customers/{id}/deactivate - Toggle customer active status
   deactivateCustomer: async (id: string): Promise<ApiResponse> => {
-    const response = await apiClient.delete(`/api/v1/dashboard/admin/customers/${id}/deactivate`);
+    const response = await apiClient.delete(
+      `/api/v1/dashboard/admin/customers/${id}/deactivate`
+    );
     return response.data;
   },
 };

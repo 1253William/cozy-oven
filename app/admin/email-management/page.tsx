@@ -25,6 +25,7 @@ const MESSAGE_KEY_LABELS: Record<string, string> = {
   "order.deleted": "Order deleted",
   "order.status.pending": "Order pending",
   "order.status.preparing": "Order preparing",
+  "order.status.awaiting-pickup": "Awaiting pickup",
   "order.status.on-delivery": "Out for delivery",
   "order.status.delivered": "Order delivered",
   "order.status.cancelled": "Order cancelled",
