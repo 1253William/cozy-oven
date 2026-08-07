@@ -73,11 +73,6 @@ export default function PurchaseToast() {
   useEffect(() => {
     // Don't show notifications on admin pages, while loading, or with no real data
     if (isAdminPage || isLoading || purchases.length === 0) {
-      // #region agent log
-      if (!isAdminPage && !isLoading && purchases.length === 0) {
-        fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'B',location:'PurchaseToast.tsx:empty',message:'no toast — no real purchases',data:{source:'none',purchaseCount:0},timestamp:Date.now()})}).catch(()=>{});
-      }
-      // #endregion
       return;
     }
 
@@ -91,10 +86,6 @@ export default function PurchaseToast() {
         productImage: randomPurchase.thumbnail,
         timeAgo: formatTimeAgo(randomPurchase.purchasedAt),
       };
-
-      // #region agent log
-      fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'B',location:'PurchaseToast.tsx:real',message:'showing real purchase toast',data:{source:'api',purchaseCount:purchases.length},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
 
       setCurrentNotification(notification);
     };

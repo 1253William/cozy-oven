@@ -204,9 +204,6 @@ export interface GetAllOrdersResponse {
 export const orderService = {
   // Customer: Create a new order (checkout)
   checkout: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {
-    // #region agent log
-    fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'D',location:'orderService.ts:checkout',message:'using storefront checkout endpoint',data:{itemCount:data.items?.length??0},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     const response = await apiClient.post("/api/v1/store/customer/orders/checkout", data);
     return response.data;
   },
@@ -284,9 +281,6 @@ export const orderService = {
   // Admin: Create a new order via storefront checkout (same endpoint as customers).
   // Prefer createOfflineSale / createInvoice for in-person or invoice flows.
   adminCheckout: async (data: CheckoutRequest): Promise<ApiResponse<Order>> => {
-    // #region agent log
-    fetch('http://127.0.0.1:7682/ingest/510e7aaa-5fe9-4bfe-b44b-f784e1fadb5e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'464b52'},body:JSON.stringify({sessionId:'464b52',runId:'post-fix',hypothesisId:'D',location:'orderService.ts:adminCheckout',message:'adminCheckout delegates to storefront checkout',data:{itemCount:data.items?.length??0},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     return orderService.checkout(data);
   },
 

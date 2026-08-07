@@ -61,7 +61,7 @@ export default function ShopPage() {
                     </div>
                     <p className="rounded-full bg-[#faf9f5] px-4 py-2 text-sm font-black text-[#5d6043] shadow-[inset_0_0_0_1px_rgba(34,34,34,0.09)]">{groups[category].length} items</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
                     {groups[category].map((product) => (
                       <EditorialProductCard key={product.id} product={product} />
                     ))}
