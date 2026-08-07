@@ -40,8 +40,14 @@ export interface CustomerDetails {
     orderId?: string;
     totalAmount: number;
     paymentStatus: string;
+    orderStatus?: string;
+    paymentMethod?: string;
+    deliveryAddress?: string;
+    city?: string;
     createdAt: string;
     paidAt?: string;
+    itemCount?: number;
+    itemsPreview?: Array<{ name: string; quantity: number }>;
   }>;
 }
 
