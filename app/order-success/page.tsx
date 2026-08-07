@@ -77,6 +77,15 @@ function OrderSuccessContent() {
               </ul>
             </div>
 
+            <div className="mb-8 rounded-[22px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5] p-5 text-left">
+              <p className="text-sm font-semibold text-[#222222]">Loved your order?</p>
+              <p className="mt-2 text-sm leading-6 text-[#5d6043]">
+                Once you&apos;ve tasted everything, visit the shop and tap{" "}
+                <span className="font-semibold text-[#222222]">Reviews</span> on any product to
+                share how it was.
+              </p>
+            </div>
+
             <div className="mb-8 rounded-[22px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5] p-4">
               <p className="text-sm text-[#5d6043]">
                 A confirmation email has been sent to your email address with tracking information.

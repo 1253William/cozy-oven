@@ -385,7 +385,11 @@ export default function CheckoutPage() {
     <div className="rounded-[22px] border border-[rgba(34,34,34,0.09)] bg-[#faf9f5] p-5">
       <h3 className="mb-2 text-sm font-semibold text-[#222222]">Delivery policy</h3>
       <div className="space-y-2 text-sm leading-6 text-[#5d6043]">
-        <p className="font-medium text-[#222222]">Your Cozy Oven order is on the way!</p>
+        <p>
+          Kindly note that your order will be delivered on Tuesday or Thursday unless otherwise
+          specified. Deliveries start at 12pm and the courier will call the number indicated during
+          checkout when it&apos;s your turn.
+        </p>
         <p>
           Please keep your phone nearby. If the rider cannot reach you within 10 minutes, they
           will continue with other deliveries. Any redelivery may incur an additional delivery fee.

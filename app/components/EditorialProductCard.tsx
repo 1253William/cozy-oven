@@ -179,18 +179,26 @@ export default function EditorialProductCard({ product, compact = false }: Edito
           </p>
         )}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-semibold text-[#5d6043]">
-            {priced.compareAtPrice != null ? (
-              <>
-                <span className="mr-2 text-sm font-normal text-[#5d6043]/55 line-through">
-                  GHS {priced.compareAtPrice.toFixed(2)}
-                </span>
-                GHS {price.toFixed(2)}
-              </>
-            ) : (
-              <>GHS {price.toFixed(2)}</>
-            )}
-          </p>
+          <div>
+            <p className="font-semibold text-[#5d6043]">
+              {priced.compareAtPrice != null ? (
+                <>
+                  <span className="mr-2 text-sm font-normal text-[#5d6043]/55 line-through">
+                    GHS {priced.compareAtPrice.toFixed(2)}
+                  </span>
+                  GHS {price.toFixed(2)}
+                </>
+              ) : (
+                <>GHS {price.toFixed(2)}</>
+              )}
+            </p>
+            <Link
+              href={`/product/${product.id}#reviews`}
+              className="mt-1 inline-flex text-xs font-medium text-[#bd6325] transition hover:text-[#222222]"
+            >
+              Reviews →
+            </Link>
+          </div>
           {needsBuild ? (
             <Link href={`/product/${product.id}`} className="editorial-button-outline px-4 py-2 text-sm">
               Build box

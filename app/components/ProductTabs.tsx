@@ -51,10 +51,29 @@ export default function ProductTabs({
         if (active) setLoading(false);
       }
     };
-    load();
+    void load();
     return () => {
       active = false;
     };
+  }, [productId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const openReviewsFromHash = () => {
+      if (window.location.hash !== "#reviews") return;
+      setActiveTab("reviews");
+      window.requestAnimationFrame(() => {
+        document.getElementById("reviews")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    };
+
+    openReviewsFromHash();
+    window.addEventListener("hashchange", openReviewsFromHash);
+    return () => window.removeEventListener("hashchange", openReviewsFromHash);
   }, [productId]);
 
   const renderStars = (value: number, interactive = false) => (
@@ -110,7 +129,7 @@ export default function ProductTabs({
   };
 
   return (
-    <div className="mt-8">
+    <div id="reviews" className="mt-8 scroll-mt-28">
       <div className="flex gap-4 border-b border-[#b9aca2]/60">
         <button
           onClick={() => setActiveTab("details")}
