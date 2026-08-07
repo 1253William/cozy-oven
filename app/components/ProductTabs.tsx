@@ -100,7 +100,7 @@ export default function ProductTabs({
       setDisplayName("");
       setComment("");
       setRating(5);
-      setMessage("Thanks! Your review was submitted and is awaiting approval.");
+      setMessage("Thanks! Your review was submitted.");
     } catch (err) {
       console.error("Failed to submit review:", err);
       setError("Could not submit your review. Please try again.");

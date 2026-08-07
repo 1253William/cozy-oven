@@ -67,6 +67,13 @@ function OrderSuccessContent() {
                   <span className="font-black text-[#bd6325]">3.</span>
                   <span>Your order will be ready for delivery/pickup at your scheduled time</span>
                 </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-black text-[#bd6325]">4.</span>
+                  <span>
+                    After you try them, we&apos;d love a review on the product pages — it helps
+                    other customers (and makes our day)
+                  </span>
+                </li>
               </ul>
             </div>
 
@@ -77,8 +84,8 @@ function OrderSuccessContent() {
             </div>
 
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <button onClick={() => router.push("/")} className="editorial-button px-8 py-3">
-                Continue Shopping
+              <button onClick={() => router.push("/shop")} className="editorial-button px-8 py-3">
+                Browse products to review
               </button>
               <button onClick={handleTrackOrder} className="editorial-button-outline px-8 py-3">
                 Track Order

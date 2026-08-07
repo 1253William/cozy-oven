@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { useCart, type PackageSelection } from "../context/CartContext";
 import type { PackageGroup, Product as StoreProduct } from "../services/productService";
 import { resolveProductPrice } from "../lib/productPricing";

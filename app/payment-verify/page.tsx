@@ -85,6 +85,10 @@ function PaymentVerificationContent() {
                     <p className="text-lg font-bold text-orange-500">{orderNumber}</p>
                   </div>
                 )}
+                <p className="mt-4 text-sm leading-6 text-[#5d6043]">
+                  After you try your treats, leave a review on the product pages — it helps other
+                  customers.
+                </p>
                 <p className="text-sm text-[#5d6043] mt-4">
                   Redirecting to order confirmation...
                 </p>
