@@ -129,10 +129,20 @@ export default function ViewOrderModal({ orderId, onClose }: ViewOrderModalProps
 
       // Normalise backend response into OrderDetails shape
       const rawPricing = raw.pricing || {};
-      const rawPaymentBreakdown =
+      const rawBreakdownSource =
         rawPricing.paymentBreakdown ||
         raw.payment?.paymentBreakdown ||
         raw.paymentBreakdown;
+      // Offline/cash sales never set a payment breakdown, but the schema stores
+      // an empty one ({ currency, feeRate }) from field defaults. Only treat it
+      // as real when the charge amounts are present, otherwise the fee/charge
+      // rows below would call .toFixed on undefined and crash the modal.
+      const rawPaymentBreakdown =
+        rawBreakdownSource &&
+        typeof rawBreakdownSource.transactionFee === "number" &&
+        typeof rawBreakdownSource.chargedAmount === "number"
+          ? rawBreakdownSource
+          : undefined;
 
       const pricingSubtotal =
         typeof rawPricing.subtotal === "number"
